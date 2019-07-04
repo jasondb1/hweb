@@ -1,16 +1,30 @@
 const baseAPI = '/api';
+import axios from 'axios';
+import httpClient from './httpClient';
+
+const request = axios.create();
+request.defaults.headers.common.token = httpClient.getToken();
 
 const homewebService = {
 
     getStatus() {
-        return new Promise((resolve, reject) => {
-            fetch(`${baseAPI}/status`)
-                .then(response => response.json())
-                .then(json => resolve(json))
-                .catch(err => {
-                    reject(err);
-                });
-        });
+
+        httpClient.getStatus = () => {
+            return this({ url: '/api/status'})
+                .then((serverResponse) => {
+                    return serverResponse.json();
+                })
+                .catch(err => console.log(err));
+        };
+
+        // return new Promise((resolve, reject) => {
+        //     fetch(`${baseAPI}/status`)
+        //         .then(response => response.json())
+        //         .then(json => resolve(json))
+        //         .catch(err => {
+        //             reject(err);
+        //         });
+        // });
     },
 
     getComponentState(component) {
@@ -25,21 +39,30 @@ const homewebService = {
     },
 
     componentOn(component) {
-        return new Promise((resolve, reject) => {
-            fetch(`${baseAPI}/component_on/${component}`, {
-                method: 'POST',
-                body: JSON.stringify({}),
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-                //.then(response => response.json())
-                .then(result => resolve(result))
-                .catch(err => {
-                    reject(err);
-                });
-        });
+
+        httpClient.getStatus = () => {
+            return this({ method:'post', url: `/api/component_on/${component}`, data: {} })
+                .then((serverResponse) => {
+                    return serverResponse.json();
+                })
+                .catch(err => console.log(err));
+        };
+
+        //return new Promise((resolve, reject) => {
+        //    fetch(`${baseAPI}/component_on/${component}`, {
+        //        method: 'POST',
+        //        body: JSON.stringify({}),
+        //        headers: {
+        //            Accept: 'application/json',
+        //            'Content-Type': 'application/json'
+        //        }
+        //    })
+        //        //.then(response => response.json())
+        //        .then(result => resolve(result))
+        //        .catch(err => {
+        //            reject(err);
+        //        });
+        //});
     },
 
     componentOff(component) {

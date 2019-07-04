@@ -47,8 +47,8 @@ router.get('/component/:id', (req, res) => {
 
 router.post('/component_on/:id', (req, res) => {
     let comp = req.params.id;
-    //console.log('component_on:' + comp);
-    //console.log(req.params);
+    console.log('component_on:' + comp);
+    console.log(req.params);
 
     if (component[comp].low_on) {
         component[comp].pin.writeSync(0);

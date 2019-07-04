@@ -42,29 +42,30 @@ const homewebService = {
 
     componentOn(component) {
 
-        httpClient.componentOn = () => {
-            return this({ method:'post', url: `/api/component_on/${component}`, data: {} })
-                .then((serverResponse) => {
-                    return serverResponse.json();
-                })
-                .catch(err => console.log(err));
-        }
+        // httpClient.componentOn = () => {
+        //     return this({ method:'post', url: `/api/component_on/${component}`, data: {} })
+        //         .then((serverResponse) => {
+        //             return serverResponse.json();
+        //         })
+        //         .catch(err => console.log(err));
+        // }
 
-        //return new Promise((resolve, reject) => {
-        //    fetch(`${baseAPI}/component_on/${component}`, {
-        //        method: 'POST',
-        //        body: JSON.stringify({}),
-        //        headers: {
-        //            Accept: 'application/json',
-        //            'Content-Type': 'application/json'
-        //        }
-        //    })
-        //        //.then(response => response.json())
-        //        .then(result => resolve(result))
-        //        .catch(err => {
-        //            reject(err);
-        //        });
-        //});
+        return new Promise((resolve, reject) => {
+           fetch(`${baseAPI}/component_on/${component}`, {
+               method: 'POST',
+               body: JSON.stringify({}),
+               headers: {
+                   Accept: 'application/json',
+                   'Content-Type': 'application/json',
+                   token: httpClient.getToken(),
+               }
+           })
+               //.then(response => response.json())
+               .then(result => resolve(result))
+               .catch(err => {
+                   reject(err);
+               });
+        });
     },
 
     componentOff(component) {
@@ -74,7 +75,8 @@ const homewebService = {
                 body: JSON.stringify({}),
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    token: httpClient.getToken(),
                 }
             })
                 //.then(response => response.json())

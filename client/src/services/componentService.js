@@ -1,9 +1,11 @@
-const baseAPI = '/api';
 import axios from 'axios';
 import httpClient from './httpClient';
 
+const baseAPI = '/api';
+
 const request = axios.create();
 request.defaults.headers.common.token = httpClient.getToken();
+
 
 const homewebService = {
 
@@ -40,13 +42,13 @@ const homewebService = {
 
     componentOn(component) {
 
-        httpClient.getStatus = () => {
+        httpClient.componentOn = () => {
             return this({ method:'post', url: `/api/component_on/${component}`, data: {} })
                 .then((serverResponse) => {
                     return serverResponse.json();
                 })
                 .catch(err => console.log(err));
-        };
+        }
 
         //return new Promise((resolve, reject) => {
         //    fetch(`${baseAPI}/component_on/${component}`, {

@@ -1,20 +1,19 @@
-const
-	express = require('express'),
-	usersRouter = new express.Router(),
-	usersCtrl = require('../controllers/users.js'),
-	verifyToken = require('../serverAuth.js').verifyToken
+const	express = require('express');
+const	usersRouter = new express.Router();
+const	usersCtrl = require('../controllers/users.js');
+const	verifyToken = require('../serverAuth.js').verifyToken;
 
 usersRouter.route('/')
 	.get(usersCtrl.index)
-	.post(usersCtrl.create)
+	.post(usersCtrl.create);
 
-usersRouter.post('/authenticate', usersCtrl.authenticate)
+usersRouter.post('/authenticate', usersCtrl.authenticate);
 
 
-usersRouter.use(verifyToken)
+usersRouter.use(verifyToken);
 usersRouter.route('/:id')
 	.get(usersCtrl.show)
 	.patch(usersCtrl.update)
-	.delete(usersCtrl.destroy)
+	.delete(usersCtrl.destroy);
 
-module.exports = usersRouter
+module.exports = usersRouter;

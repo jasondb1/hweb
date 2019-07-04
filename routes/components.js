@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const componentsCtrl = require('../controllers/components');
+const verifyToken = require('../serverAuth.js').verifyToken;
 
 componentsCtrl.initialize();
 componentsCtrl.start();

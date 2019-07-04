@@ -6,8 +6,6 @@ const fs = require('fs');
 const i2c = require('i2c-bus');
 const i2c_bus = i2c.openSync(1);
 
-const verifyToken = require('../serverAuth.js').verifyToken;
-
 //i2c comm settings for arduino
 let arduino_i2cAddress = 0x08;
 let arduino_data_length = 0x20;

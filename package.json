@@ -20,7 +20,9 @@
     "mongoose": "5.3.8",
     "morgan": "^1.9.1",
     "node-dht-sensor": "^0.3.0",
-    "onoff": "^4.1.2",
     "sqlite3": "^4.0.9"
+  },
+  "devDependencies": {
+    "onoff": "^4.1.2"
   }
 }

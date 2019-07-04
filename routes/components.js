@@ -4,7 +4,7 @@ const componentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 
 componentsCtrl.initialize();
-componentsCtrl.start();
+//componentsCtrl.start();
 
 //authenticate the following routes
 router.use(verifyToken);
@@ -47,8 +47,9 @@ router.get('/component/:id', (req, res) => {
 
 router.post('/component_on/:id', (req, res) => {
     let comp = req.params.id;
-    //console.log('component_on:' + comp);
-    //console.log(req.params);
+    console.log('component_on:' + comp);
+    console.log(req.params);
+console.log(component[comp]);
 
     if (component[comp].low_on) {
         component[comp].pin.writeSync(0);

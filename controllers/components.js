@@ -203,11 +203,11 @@ module.exports = {
 
     },
 
-    start: () => {
-        setInterval(function () {
-            readAllSensors();
-        }, (SAMPLEINTERVAL * 1000));
-    },
+    //start: () => {
+    //    setInterval(function () {
+    //        readAllSensors();
+    //    }, (SAMPLEINTERVAL * 1000));
+    //},
 
 };
 

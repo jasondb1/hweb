@@ -4,7 +4,7 @@ const componentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 
 componentsCtrl.initialize();
-componentsCtrl.start();
+//componentsCtrl.start();
 
 //authenticate the following routes
 router.use(verifyToken);
@@ -50,14 +50,16 @@ router.post('/component_on/:id', (req, res) => {
     console.log('component_on:' + comp);
     console.log(req.params);
 
-    if (component[comp].low_on) {
-        component[comp].pin.writeSync(0);
-    } else {
-        console.log("here 1");
-        component[comp].pin.writeSync(1);
-    }
-    component[comp].status = true;
-    component[comp].value = true;
+    componentsCtrl.componentOn(comp);
+
+    // if (component[comp].low_on) {
+    //     component[comp].pin.writeSync(0);
+    // } else {
+    //     console.log("here 1");
+    //     component[comp].pin.writeSync(1);
+    // }
+    // component[comp].status = true;
+    // component[comp].value = true;
     res.json({status: true});
 
     //console.log("component:on");
@@ -69,18 +71,18 @@ router.post('/component_on/:id', (req, res) => {
 // returns the component state
 
 router.post('/component_off/:id', (req, res) => {
-
     let comp = req.params.id;
+    componentsCtrl.componentOff(comp);
 
-    if (component[comp].low_on) {
-        component[comp].pin.writeSync(1);
-    } else {
-        component[comp].pin.writeSync(0);
-    }
-
-    component[comp].status = false;
-    component[comp].value = false;
-    currentStatus[comp] = false;
+    // if (component[comp].low_on) {
+    //     component[comp].pin.writeSync(1);
+    // } else {
+    //     component[comp].pin.writeSync(0);
+    // }
+    //
+    // component[comp].status = false;
+    // component[comp].value = false;
+    // currentStatus[comp] = false;
     res.json({status: true});
 
 });

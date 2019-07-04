@@ -1,5 +1,5 @@
 import React from 'react'
-import httpClient from '../httpClient'
+import httpClient from '../services/httpClient'
 
 class LogIn extends React.Component {
 	state = {

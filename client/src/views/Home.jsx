@@ -6,6 +6,6 @@ const Home = (props) => {
 			<h1>React Client App w/ JWT Auth</h1>
 		</div>
 	)
-}
+};
 
 export default Home

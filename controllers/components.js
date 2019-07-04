@@ -208,6 +208,27 @@ module.exports = {
     //        readAllSensors();
     //    }, (SAMPLEINTERVAL * 1000));
     //},
+    componentOff: (comp) => {
+        if (component[comp].low_on) {
+            component[comp].pin.writeSync(1);
+        } else {
+            component[comp].pin.writeSync(0);
+        }
+
+        component[comp].status = false;
+        component[comp].value = false;
+        currentStatus[comp] = false;
+    },
+
+    componentOn: (comp) => {
+        if (component[comp].low_on) {
+            component[comp].pin.writeSync(0);
+        } else {
+            component[comp].pin.writeSync(1);
+        }
+        component[comp].status = true;
+        component[comp].value = true;
+    },
 
 };
 

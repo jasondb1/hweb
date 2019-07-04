@@ -51,14 +51,16 @@ router.post('/component_on/:id', (req, res) => {
     console.log(req.params);
 console.log(component[comp]);
 
-    if (component[comp].low_on) {
-        component[comp].pin.writeSync(0);
-    } else {
-        console.log("here 1");
-        component[comp].pin.writeSync(1);
-    }
-    component[comp].status = true;
-    component[comp].value = true;
+    componentsCtrl.componentOn(comp);
+
+    // if (component[comp].low_on) {
+    //     component[comp].pin.writeSync(0);
+    // } else {
+    //     console.log("here 1");
+    //     component[comp].pin.writeSync(1);
+    // }
+    // component[comp].status = true;
+    // component[comp].value = true;
     res.json({status: true});
 
     //console.log("component:on");
@@ -70,18 +72,18 @@ console.log(component[comp]);
 // returns the component state
 
 router.post('/component_off/:id', (req, res) => {
-
     let comp = req.params.id;
+    componentsCtrl.componentOff(comp);
 
-    if (component[comp].low_on) {
-        component[comp].pin.writeSync(1);
-    } else {
-        component[comp].pin.writeSync(0);
-    }
-
-    component[comp].status = false;
-    component[comp].value = false;
-    currentStatus[comp] = false;
+    // if (component[comp].low_on) {
+    //     component[comp].pin.writeSync(1);
+    // } else {
+    //     component[comp].pin.writeSync(0);
+    // }
+    //
+    // component[comp].status = false;
+    // component[comp].value = false;
+    // currentStatus[comp] = false;
     res.json({status: true});
 
 });

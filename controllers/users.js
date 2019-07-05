@@ -5,7 +5,7 @@ module.exports = {
     // list all users
     index: (req, res) => {
         User.find({}, (err, users) => {
-            res.json(users)
+            res.json(users);
         })
     },
 
@@ -14,7 +14,7 @@ module.exports = {
         console.log("Current User:");
         console.log(req.user);
         User.findById(req.params.id, (err, user) => {
-            res.json(user)
+            res.json(user);
         })
     },
 
@@ -41,7 +41,7 @@ module.exports = {
     // delete an existing user
     destroy: (req, res) => {
         User.findByIdAndRemove(req.params.id, (err, user) => {
-            res.json({success: true, message: "User deleted.", user})
+            res.json({success: true, message: "User deleted.", user});
         })
     },
 
@@ -52,11 +52,11 @@ module.exports = {
             // if there's no user or the password is invalid
             if (!user || !user.validPassword(req.body.password)) {
                 // deny access
-                return res.json({success: false, message: "Invalid credentials."})
+                return res.json({success: false, message: "Invalid credentials."});
             }
 
             const token = signToken(user);
-            res.json({success: true, message: "Token attached.", token})
+            res.json({success: true, message: "Token attached.", token});
         })
     }
 };

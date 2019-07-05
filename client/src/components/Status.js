@@ -6,14 +6,6 @@ const UPDATEINTERVAL = 10000;
 const ListItems = (props) => {
     console.log(props.values);
     //console.log(props.values.length());
-    //if (props.values.length > 0){
-    //	props.values.map( (value) => {
-    //		return (<ListItem key={value} value={value} />);
-    //	});
-    //} else {
-    //	console.log("return null");
-    //	return null;
-    //}
 
     return (
         <ul>

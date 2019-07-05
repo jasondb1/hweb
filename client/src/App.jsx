@@ -52,7 +52,7 @@ class App extends React.Component {
 
                     <Route path="/dashboard" render={() => {
                         return currentUser
-                            ? <Dashboard />
+                            ? <Dashboard/>
                             : <Redirect to="/login"/>
                     }}/>
 

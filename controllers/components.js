@@ -1,5 +1,6 @@
-const sqlite3 = require('sqlite3').verbose();
+import { Led } from './Led.js';
 
+const sqlite3 = require('sqlite3').verbose();
 const Gpio = require('onoff').Gpio;
 const dht_sensor = require('node-dht-sensor').promises;
 const fs = require('fs');
@@ -18,19 +19,23 @@ const RELAY2PIN = 23;
 
 const TEMPPIN = 17;
 const SAMPLEINTERVAL = 10; //interval in seconds to sample temperature and humidity
+const DB_FILEPATH = './db/homeWeb.db';
+const LOG_FILEPATH = 'log.csv';
 
 //components
 let component = {};
-//let currentStatus = {};
 
 let LED = new Gpio(LEDPIN, 'out');
 let RELAY1 = new Gpio(RELAY1PIN, 'out');
 let RELAY2 = new Gpio(RELAY2PIN, 'out');
+let LED1 = new Led(4);
 
 module.exports = {
     initialize: () => {
 
         component = {
+            led1: LED1,
+
             led: {
                 pin: LED,
                 name: 'LED',
@@ -93,7 +98,7 @@ module.exports = {
 
         //temperature sensor (currently in simulation mode
         dht_sensor.setMaxRetries(10);
-//sensor.initialize(22, TEMPPIN);
+        //sensor.initialize(22, TEMPPIN);
         dht_sensor.initialize({
             test: {
                 fake: {
@@ -123,9 +128,6 @@ module.exports = {
                     component.humidity_local.value = res.humidity.toFixed(2);
 
                 },
-                //err => {
-                //    console.error("Failed to read sensor data:", err);
-                //}
             )
             .catch(err => {
                 console.error('failed to read sensor data:', err);
@@ -144,7 +146,7 @@ module.exports = {
         component.temp_remote0.value = vals[1];
         component.humidity_remote0.value = vals[2];
 
-        console.log(string.split(/[\s,\0]+/, 3));
+        //console.log(string.split(/[\s,\0]+/, 3));
 
     },
 
@@ -158,7 +160,7 @@ module.exports = {
         //console.log(component);
         let datetime = new Date();
         fs.appendFile(
-            "log.csv",
+            LOG_FILEPATH,
             datetime.getTime() +
             "," +
             datetime.toLocaleDateString() +
@@ -172,10 +174,10 @@ module.exports = {
             }
         );
 
-//open database
+        //open database
         let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
 
-        let db = new sqlite3.Database('./db/homeWeb.db', (err) => {
+        let db = new sqlite3.Database(DB_FILEPATH, (err) => {
             if (err) {
                 console.error("[components.js] " + err.message);
             } else {
@@ -200,11 +202,10 @@ module.exports = {
                 //console.log('Close the db connection');
             }
         });
-
     },
 
     componentOff: (comp) => {
-        if (component[comp].low_on) {
+        if (component[comp].lowOn) {
             component[comp].pin.writeSync(1);
         } else {
             component[comp].pin.writeSync(0);
@@ -215,7 +216,7 @@ module.exports = {
     },
 
     componentOn: (comp) => {
-        if (component[comp].low_on) {
+        if (component[comp].lowOn) {
             component[comp].pin.writeSync(0);
         } else {
             component[comp].pin.writeSync(1);
@@ -237,6 +238,13 @@ module.exports = {
 		return currentStatus;
 
 	},
+
+    start: () => {
+        setInterval(function () {
+            module.exports.readAllSensors();
+        }, (SAMPLEINTERVAL * 1000));
+    },
+
 };
 
 

@@ -7,7 +7,7 @@ function signToken(user) {
     // toObject() returns a basic js object with only the info from the db
     const userData = user.toObject();
     delete userData.password;
-    return jwt.sign(userData, JWT_SECRET)
+    return jwt.sign(userData, JWT_SECRET);
 }
 
 // function for verifying tokens
@@ -27,9 +27,9 @@ function verifyToken(req, res, next) {
             // otherwise, add user to req object
             req.user = user;
             // go on to process the route:
-            next()
+            next();
         })
-    })
+    });
 }
 
 module.exports = {

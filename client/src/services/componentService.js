@@ -11,22 +11,22 @@ const homewebService = {
 
     getStatus() {
 
-        httpClient.getStatus = () => {
-            return this({ url: '/api/status'})
-                .then((serverResponse) => {
-                    return serverResponse.json();
-                })
-                .catch(err => console.log(err));
-        };
+        //httpClient.getStatus = () => {
+        //    return this({ url: '/api/status'})
+        //        .then((serverResponse) => {
+        //            return serverResponse.json();
+        //        })
+        //        .catch(err => console.log(err));
+        //};
 
-        // return new Promise((resolve, reject) => {
-        //     fetch(`${baseAPI}/status`)
-        //         .then(response => response.json())
-        //         .then(json => resolve(json))
-        //         .catch(err => {
-        //             reject(err);
-        //         });
-        // });
+        return new Promise((resolve, reject) => {
+             fetch(`${baseAPI}/status`, {headers: {token: httpClient.getToken(), } })
+                 .then(response => response.json())
+                 .then(json => resolve(json))
+                 .catch(err => {
+                     reject(err);
+                 });
+         });
     },
 
     getComponentState(component) {

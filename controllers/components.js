@@ -152,8 +152,8 @@ module.exports = {
 // readSensors
 
     readAllSensors: () => {
-        readTemp();
-        readArduino();
+        module.exports.readTemp();
+        module.exports.readArduino();
 
         //console.log(component);
         let datetime = new Date();
@@ -203,11 +203,6 @@ module.exports = {
 
     },
 
-    //start: () => {
-    //    setInterval(function () {
-    //        readAllSensors();
-    //    }, (SAMPLEINTERVAL * 1000));
-    //},
     componentOff: (comp) => {
         if (component[comp].low_on) {
             component[comp].pin.writeSync(1);
@@ -217,7 +212,6 @@ module.exports = {
 
         component[comp].status = false;
         component[comp].value = false;
-        currentStatus[comp] = false;
     },
 
     componentOn: (comp) => {
@@ -230,6 +224,20 @@ module.exports = {
         component[comp].value = true;
     },
 
+
+	currentStatus: () => {
+		let currentStatus = {};
+		currentStatus.ts = new Date().getTime();
+		 
+		let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
+
+		for (key of keys) {
+		     currentStatus[key] = component[key].value;
+		}
+		return currentStatus;
+
+	},
 };
+
 
 

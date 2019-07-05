@@ -2,9 +2,14 @@ const express = require('express');
 const router = express.Router();
 const componentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
+const SAMPLEINTERVAL = 10;
 
 componentsCtrl.initialize();
 //componentsCtrl.start();
+setInterval(function () {
+	            componentsCtrl.readAllSensors();
+	        }, (SAMPLEINTERVAL * 1000));
+
 
 //authenticate the following routes
 router.use(verifyToken);
@@ -14,17 +19,18 @@ router.use(verifyToken);
 // returns the status
 
 //status
+//TODO: Maybe request keys here
 router.get('/status', (req, res) => {
-    let currentStatus = {};
-    currentStatus.ts = new Date().getTime();
+    //let currentStatus = {};
+    //currentStatus.ts = new Date().getTime();
 
-    let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
+    //let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
 
-    for (key of keys) {
-        currentStatus[key] = component[key].value;
-    }
+    //for (key of keys) {
+    //    currentStatus[key] = component[key].value;
+    //}
 
-    res.status(200).json(currentStatus);
+    res.status(200).json(componentsCtrl.currentStatus());
 
 });
 
@@ -47,9 +53,9 @@ router.get('/component/:id', (req, res) => {
 
 router.post('/component_on/:id', (req, res) => {
     let comp = req.params.id;
-    console.log('component_on:' + comp);
-    console.log(req.params);
-console.log(component[comp]);
+    //console.log('component_on:' + comp);
+    //console.log(req.params);
+//console.log(component[comp]);
 
     componentsCtrl.componentOn(comp);
 

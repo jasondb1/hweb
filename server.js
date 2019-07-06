@@ -9,8 +9,12 @@ const mongoose = require('mongoose');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/react-express-jwt';
 const PORT = process.env.PORT || 3001;
 //const io = require('socket.io');
-const io = require('socket.io')(app);
-const mySocket = require('./socket.js')(io);
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+//const mySocket = require('./socket.js')(io);
+console.log(server);
+console.log(io);
+
 
 const components = require('./routes/components');
 const usersRoutes = require('./routes/users.js');
@@ -21,6 +25,26 @@ mongoose.set('useCreateIndex', true);
 mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
     console.log(err || `Connected to MongoDB.`)
 });
+
+
+io.on('connection', client => {
+	        console.log('client connected');
+
+	        client.on('subscribeToUpdates', (interval) => {
+			            console.log('client is subscribing to updates with interval ', interval);
+
+			            setInterval(() => {
+					                    client.emit('updates', new Date());
+					                }, interval);
+
+			        });
+	        //user disconnects
+	        client.on('disconnect', () => {
+	
+	                    console.log('client disconnected');
+	                            });
+	
+                                });
 
 //middleware
 app.use(express.static(`${__dirname}/client/build`));
@@ -50,6 +74,7 @@ app.use(function (req, res, next) {
 //TODO: Include better error handler?
 
 //Start server
-app.listen(PORT, (err) => {
-    console.log(err || `Server running on port ${PORT}.`)
+//app.listen(PORT, (err) => {
+server.listen(PORT, (err) => {
+	console.log(err || `Server running on port ${PORT}.`)
 });

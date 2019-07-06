@@ -1,3 +1,4 @@
+"use strict";
 const Led = require('./Led.js');
 const GarageRelay = require('./GarageRelay.js');
 
@@ -24,7 +25,7 @@ const DB_FILEPATH = './db/homeWeb.db';
 const LOG_FILEPATH = 'log.csv';
 
 //components
-//let component = {};
+let component = {};
 
 let LED = new Gpio(LEDPIN, 'out');
 let RELAY1 = new Gpio(RELAY1PIN, 'out');
@@ -36,12 +37,77 @@ let garageRelay = new GarageRelay(RELAY1PIN);
 class ComponentsCtrl {
 
     constructor(){
-        this.component = {};
+        //this.component = {};
+         this.component = {
+             ledIndicator: indicator,
+
+             garageRelay: garageRelay,
+
+             led: {
+                 pin: LED,
+                 name: 'LED',
+                 status: LED.readSync(),
+                 value: null
+
+             },
+             relay1: {
+                 pin: RELAY1,
+                 name: 'Relay 1',
+                 status: RELAY1.readSync(),
+                 value: null,
+                 low_on: true,
+             },
+             relay2: {
+                 pin: RELAY2,
+                 name: 'Relay 2',
+                 status: RELAY2.readSync(),
+                 value: null,
+                 low_on: true,
+             },
+             temp_local: {
+                 pin: null,
+                 name: 'DHT22 - temperature',
+                 status: null,
+                 value: null,
+
+             },
+             humidity_local: {
+                 pin: null,
+                 name: 'DHT22 - humidity',
+                 status: null,
+                 value: null,
+
+             },
+             presistor_remote0: {
+                 pin: i2c,
+                 slave_addr: 0x08,
+                 name: 'photo resistor',
+                 status: null,
+                 value: null
+             },
+             temp_remote0: {
+                 pin: i2c,
+                 slave_addr: 0x08,
+                 name: 'remote_temp1',
+                 status: null,
+                 value: null,
+
+             },
+             humidity_remote0: {
+                 pin: i2c,
+                 slave_addr: 0x08,
+                 name: 'DHT22 - humidity',
+                 status: null,
+                 value: null,
+
+             },
+         };
         this.update = null;
         this.updateInterval = null;
+	
     }
 
-     initialize() {
+     init() {
          this.component = {
              ledIndicator: indicator,
 
@@ -154,10 +220,9 @@ class ComponentsCtrl {
      }
 
      readAllSensors() {
-         this.readTemp();
-         this.readArduino();
+         this.readTemp;
+         this.readArduino;
 
-         //console.log(component);
          let datetime = new Date();
          fs.appendFile(
              LOG_FILEPATH,
@@ -185,7 +250,7 @@ class ComponentsCtrl {
              }
          });
 
-         for (key of log_sensors) {
+         for (let key of log_sensors) {
              db.run("INSERT INTO sensor_data(timestamp, description, sensor, value) VALUES( ?, ?, ?, ?)", [datetime.getTime(), this.component[key].name, key, this.component[key].value],
                  (err) => {
                      if (err) {
@@ -212,7 +277,7 @@ class ComponentsCtrl {
          //TODO: move keys to instance variable and method to change?
          let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
 
-         for (key of keys) {
+         for (let key of keys) {
              currentStatus[key] = this.component[key].value;
          }
          return currentStatus;
@@ -221,13 +286,17 @@ class ComponentsCtrl {
      start(interval = SAMPLEINTERVAL) {
         this.updateInterval = interval;
          this.update = setInterval(
-             this.readAllSensors()
+             this.readAllSensors.bind(this)
          , (this.updateInterval * 1000));
      }
 
      stop() {
         clearInterval(this.update);
      }
+
+	//getComponent(comp) {
+	//	return this.component[comp];
+	//}
 
 }
 

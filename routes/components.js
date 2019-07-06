@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const componentsCtrl = require('../controllers/components');
+const ComponentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 
-componentsCtrl.initialize();
+let componentsCtrl = new ComponentsCtrl();
+componentsCtrl.init();
 componentsCtrl.start();
+//console.log(componentsCtrl);
 
 //authenticate the following routes
 router.use(verifyToken);
@@ -27,6 +29,8 @@ router.get('/component/:id', (req, res) => {
 
 router.post('/component_on/:id', (req, res) => {
     let comp = req.params.id;
+console.log(comp);
+	console.log(componentsCtrl.component);
     componentsCtrl.component[comp].off();
     //componentsCtrl.componentOn(comp);
     res.json({status: true});
@@ -35,7 +39,9 @@ router.post('/component_on/:id', (req, res) => {
 
 router.post('/component_off/:id', (req, res) => {
     let comp = req.params.id;
-    componentsCtrl.component[comp].off();
+    	console.log(comp);
+	console.log(componentsCtrl.component);
+	componentsCtrl.component[comp].off();
     //componentsCtrl.componentOff(comp);
     res.json({status: true});
 

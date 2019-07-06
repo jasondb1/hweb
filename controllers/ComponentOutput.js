@@ -55,7 +55,7 @@ class ComponentOutput {
         this.updateInterval = interval;
         this.update = setInterval(
             function () {
-                this.updateValue();
+                this.updateValue.bind(this)
             },
             (this.updateInterval * 1000)
         );

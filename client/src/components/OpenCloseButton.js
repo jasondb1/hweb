@@ -2,14 +2,14 @@ import React, {Component} from 'react';
 import api from "../services/componentService";
 
 
-class OnOff extends Component {
+class OpenClose extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             label: props.label,
-            isOn: props.isOn,
+            isOpen: props.isOpen,
             component: props.component,
         };
 
@@ -17,20 +17,20 @@ class OnOff extends Component {
     }
 
     componentDidMount() {
-        api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
+        api.getComponentState(this.state.component).then(json => this.setState({isOpen: json.isOpen}));
     }
 
     handleClick() {
-        if (this.state.isOn) {
-            api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
+        if (this.state.isOpen) {
+            api.componentOpen(this.state.component).then(json => this.setState({isOpen: false}));
         } else {
-            api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
+            api.componentClose(this.state.component).then(json => this.setState({isOpen: true}));
         }
     };
 
     btnClasses() {
         let classes = "m-2 btn";
-        classes += this.state.isOn === true ? ' btn-success' : ' btn-danger';
+        classes += this.state.isOpen === true ? ' btn-success' : ' btn-danger';
         return classes;
     }
 
@@ -44,11 +44,11 @@ class OnOff extends Component {
                     onClick={this.handleClick}
                     className={this.btnClasses()}
                 >
-                    {this.state.isOn ? 'ON' : 'OFF'}
+                    {this.state.isOn ? 'OPEN' : 'CLOSE'}
                 </button>
             </div>
         );
     }
 }
 
-export default OnOff;
+export default OpenClose;

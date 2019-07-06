@@ -1,11 +1,8 @@
 "use strict";
 const ComponentOutput = require('./ComponentOutput');
-//import ComponentOutput from './ComponentOutput';
-
 const Gpio = require('onoff').Gpio;
 
 class Led extends ComponentOutput {
-    //log = null;
 
     constructor(pin_number, name = 'led', location = "unknown") {
         super();
@@ -17,6 +14,6 @@ class Led extends ComponentOutput {
         this.value = this.pin.readSync();
     }
 
-};
+}
 
 module.exports = Led;

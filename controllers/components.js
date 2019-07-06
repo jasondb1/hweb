@@ -1,4 +1,5 @@
 const Led = require('./Led.js');
+const GarageRelay = require('./GarageRelay.js');
 
 const sqlite3 = require('sqlite3').verbose();
 const Gpio = require('onoff').Gpio;
@@ -28,13 +29,16 @@ let component = {};
 let LED = new Gpio(LEDPIN, 'out');
 let RELAY1 = new Gpio(RELAY1PIN, 'out');
 let RELAY2 = new Gpio(RELAY2PIN, 'out');
-let LED1 = new Led(4);
+let indicator = new Led(LEDPIN);
+let garageRelay = new GarageRelay(RELAY1PIN);
 
 module.exports = {
     initialize: () => {
 
         component = {
-            led1: LED1,
+            ledIndicator: indicator,
+
+            garageRelay: garageRelay,
 
             led: {
                 pin: LED,
@@ -204,26 +208,26 @@ module.exports = {
         });
     },
 
-    componentOff: (comp) => {
-        if (component[comp].lowOn) {
-            component[comp].pin.writeSync(1);
-        } else {
-            component[comp].pin.writeSync(0);
-        }
-
-        component[comp].status = false;
-        component[comp].value = false;
-    },
-
-    componentOn: (comp) => {
-        if (component[comp].lowOn) {
-            component[comp].pin.writeSync(0);
-        } else {
-            component[comp].pin.writeSync(1);
-        }
-        component[comp].status = true;
-        component[comp].value = true;
-    },
+    // componentOff: (comp) => {
+    //     if (component[comp].lowOn) {
+    //         component[comp].pin.writeSync(1);
+    //     } else {
+    //         component[comp].pin.writeSync(0);
+    //     }
+    //
+    //     component[comp].status = false;
+    //     component[comp].value = false;
+    // },
+    //
+    // componentOn: (comp) => {
+    //     if (component[comp].lowOn) {
+    //         component[comp].pin.writeSync(0);
+    //     } else {
+    //         component[comp].pin.writeSync(1);
+    //     }
+    //     component[comp].status = true;
+    //     component[comp].value = true;
+    // },
 
 
 	currentStatus: () => {

@@ -68,6 +68,44 @@ const homewebService = {
         });
     },
 
+    componentOpen(component) {
+        return new Promise((resolve, reject) => {
+            fetch(`${baseAPI}/open_garage`, {
+                method: 'POST',
+                body: JSON.stringify({}),
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    token: httpClient.getToken(),
+                }
+            })
+            //.then(response => response.json())
+                .then(result => resolve(result))
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    },
+
+    componentClose(component) {
+        return new Promise((resolve, reject) => {
+            fetch(`${baseAPI}/close_garage`, {
+                method: 'POST',
+                body: JSON.stringify({}),
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    token: httpClient.getToken(),
+                }
+            })
+            //.then(response => response.json())
+                .then(result => resolve(result))
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    },
+
     ledOn() {
         return new Promise((resolve, reject) => {
             fetch(`${baseAPI}/led_on`)

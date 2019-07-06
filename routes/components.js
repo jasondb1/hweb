@@ -27,16 +27,28 @@ router.get('/component/:id', (req, res) => {
 
 router.post('/component_on/:id', (req, res) => {
     let comp = req.params.id;
-    componentsCtrl.componentOn(comp);
+    componentsCtrl.component[comp].off();
+    //componentsCtrl.componentOn(comp);
     res.json({status: true});
 });
 
 
 router.post('/component_off/:id', (req, res) => {
     let comp = req.params.id;
-    componentsCtrl.componentOff(comp);
+    componentsCtrl.component[comp].off();
+    //componentsCtrl.componentOff(comp);
     res.json({status: true});
 
+});
+
+router.post('/open_garage', (req, res) => {
+    componentsCtrl.component.garageRelay.open();
+    res.json({status: true});
+});
+
+router.post('/close_garage', (req, res) => {
+    componentsCtrl.component.garageRelay.open();
+    res.json({status: true});
 });
 
 module.exports = router;

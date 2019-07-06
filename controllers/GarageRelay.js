@@ -14,6 +14,9 @@ class GarageRelay extends ComponentOutput {
 
         this.pin = new Gpio(this.pinNumber, 'out');
         this.value = this.pin.readSync();
+
+        this.open.bind(this);
+        this.close.bind(this);
     }
 
     open(){

@@ -8,6 +8,9 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/react-express-jwt';
 const PORT = process.env.PORT || 3001;
+//const io = require('socket.io');
+const io = require('socket.io')(app);
+const mySocket = require('./socket.js')(io);
 
 const components = require('./routes/components');
 const usersRoutes = require('./routes/users.js');

@@ -1,4 +1,4 @@
-import { Led } from './Led.js';
+const Led = require('./Led.js');
 
 const sqlite3 = require('sqlite3').verbose();
 const Gpio = require('onoff').Gpio;

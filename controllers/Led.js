@@ -68,6 +68,6 @@ class Led {
         clearInterval(this.update);
     }
 
-}
+};
 
-module.exports = Led;
+module.exports =  Led;

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import api from "../services/componentService";
+import { subscribeToUpdates} from "../services/socket";
 
 const UPDATEINTERVAL = 10000;
 
@@ -22,8 +23,14 @@ class Status extends Component {
     constructor() {
         super();
         this.state = {
+            timestamp: 'no timestamp yet',
             status: [],
         };
+
+        subscribeToUpdates((err, timestamp) => this.setState({timestamp})
+
+        );
+
         this.updateStatus = this.updateStatus.bind(this);
     }
 
@@ -45,6 +52,7 @@ class Status extends Component {
         return (
             <div>
                 <h2>Status</h2>
+                <p>Timestamp: {this.state.timestamp}</p>
                 <ListItems values={this.state.status}/>
             </div>
         );

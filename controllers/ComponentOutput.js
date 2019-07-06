@@ -11,7 +11,7 @@ class ComponentOutput {
         this.lowOn = false;
         this.pin = null;
         this.updateInterval = null;
-        //update = null;
+        this.update = null;
     }
 
     on() {

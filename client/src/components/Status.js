@@ -28,6 +28,7 @@ class Status extends Component {
         };
 
         subscribeToUpdates((err, timestamp) => this.setState({timestamp})
+        //subscribeToUpdates((err, payload) => this.setState({status: payload})
 
         );
 
@@ -35,7 +36,7 @@ class Status extends Component {
     }
 
     componentDidMount() {
-        this.interval = setInterval(this.updateStatus, UPDATEINTERVAL);
+        //this.interval = setInterval(this.updateStatus, UPDATEINTERVAL);
     };
 
 

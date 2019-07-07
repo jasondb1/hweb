@@ -27,7 +27,7 @@ module.exports = function (io) {
         //component off
         client.on('turnComponentOff', comp => {
             console.log(comp);
-            componentsCtrl.component[comp].on();
+            componentsCtrl.component[comp].off();
             client.emit('componentStatusUpdate', {component: comp, isOn: false});
         });
 
@@ -39,10 +39,21 @@ module.exports = function (io) {
         });
 
         //garage open
+        //component on
+        client.on('componentOpen', comp => {
+            //console.log(comp);
+            componentsCtrl.component.garageRelay.open();
+            client.emit('componentStatusUpdate', {component: comp, isOpen: true});
+        });
+
         //componentsCtrl.component.garageRelay.open();
 
         //garage close
-        //componentsCtrl.component.garageRelay.open();
+        client.on('componentClose', comp => {
+            //console.log(comp);
+            componentsCtrl.component.garageRelay.open();
+            client.emit('componentStatusUpdate', {component: comp, isOpen: false});
+        });
 
 
         //user disconnects

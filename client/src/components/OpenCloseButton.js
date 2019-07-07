@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import api from "../services/componentService";
+//import api from "../services/componentService";
+import { componentOpen, componentClose, socket } from "../services/socket";
 
 
 class OpenClose extends Component {
@@ -17,14 +18,25 @@ class OpenClose extends Component {
     }
 
     componentDidMount() {
-        api.getComponentState(this.state.component).then(json => this.setState({isOpen: json.isOpen}));
+
+        socket.on('componentStatusUpdate', (data) => {
+            if (data.component === this.state.component) {
+                //this.setState({isOn: data.isOn});
+                this.setState({isOpen: data.isOpen});
+            }
+            console.log('updateStatus:');
+            console.log(data);
+        });
+        //api.getComponentState(this.state.component).then(json => this.setState({isOpen: json.isOpen}));
     }
 
     handleClick() {
         if (this.state.isOpen) {
-            api.componentOpen(this.state.component).then(json => this.setState({isOpen: false}));
+            componentOpen(this.state.component);
+            //api.componentOpen(this.state.component).then(json => this.setState({isOpen: false}));
         } else {
-            api.componentClose(this.state.component).then(json => this.setState({isOpen: true}));
+            componentClose(this.state.component);
+            //api.componentClose(this.state.component).then(json => this.setState({isOpen: true}));
         }
     };
 

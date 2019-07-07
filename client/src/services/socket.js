@@ -23,10 +23,22 @@ function componentOff(component) {
     socket.emit('turnComponentOff', component);
 }
 
+function componentOpen(component) {
+    console.log('component open:' + component );
+    socket.emit('componentOpen', component);
+}
+
+function componentClose(component) {
+    console.log('component close:' + component );
+    socket.emit('componentClose', component);
+}
+
 
 
 export {    subscribeToUpdates,
             componentOn,
             componentOff,
+            componentOpen,
+            componentClose,
             socket,
 };

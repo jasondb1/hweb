@@ -8,6 +8,7 @@ const ListItems = (props) => {
 
     return (
         <ul>
+            <li key="ts">Time: {props.values.ts}</li>
             <li key="temp_local">Temperature Local: {props.values.temp_local}</li>
             <li key="humidity_local">Humidity Local: {props.values.humidity_local}</li>
             <li key="temp_remote0">Temperature Remote: {props.values.temp_remote0}</li>

@@ -277,7 +277,12 @@ class ComponentsCtrl {
          //TODO: move keys to instance variable and method to change?
          let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
 
+         console.log('currentStatus');
+         console.log(this.component);
+
          for (let key of keys) {
+             console.log(key);
+             console.log(this.component);
              currentStatus[key] = this.component[key].value;
          }
          return currentStatus;

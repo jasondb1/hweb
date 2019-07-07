@@ -10,9 +10,11 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/react-expres
 const PORT = process.env.PORT || 3001;
 //const io = require('socket.io');
 const server = require('http').Server(app);
-//const io = require('socket.io')(server);
-const io = require('./socket.js')(server);
-console.log(io);
+const io = require('socket.io')(server);
+const socketio = require('./socket.js')(io);
+
+
+console.log(socketio);
 
 
 const components = require('./routes/components');

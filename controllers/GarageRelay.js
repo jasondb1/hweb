@@ -22,13 +22,13 @@ class GarageRelay extends ComponentOutput {
     open(){
         this.on();
         //Keep relay engaged for set time
-        setTimeout(this.off, HOLDOPEN);
+        setTimeout(this.off.bind(this), HOLDOPEN);
     }
 
     close(){
         this.on();
         //Keep relay engaged for set time
-        setTimeout(this.off, HOLDOPEN);
+        setTimeout(this.off.bind(this), HOLDOPEN);
     }
 
 }

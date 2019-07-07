@@ -18,12 +18,13 @@ class OnOff extends Component {
     }
 
     componentDidMount() {
-        getComponentState(this.state.component);
-
-        socket.on('ComponentStatusUpdate', (data) => {
+        //getComponentState(this.state.component);
+console.log('socket:');
+console.log(socket);
+        socket.on('componentStatusUpdate', (data) => {
             this.setState({isOn: data.isOn});
             console.log('updateStatus:');
-            console.log(payload);
+            console.log(data);
         });
 
 

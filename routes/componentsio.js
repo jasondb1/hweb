@@ -11,6 +11,8 @@ module.exports = function (io) {
     io.on('connection', client => {
         console.log('client connected in componentsio');
 
+        //emit status???
+
 
         //updates
         client.on('subscribeToUpdates', (interval) => {

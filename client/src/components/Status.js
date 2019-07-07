@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import api from "../services/componentService";
 import { subscribeToUpdates} from "../services/socket";
 
-const UPDATEINTERVAL = 10000;
-
 const ListItems = (props) => {
     console.log(props.values);
     //console.log(props.values.length());
@@ -27,7 +25,7 @@ class Status extends Component {
             status: [],
         };
 
-        subscribeToUpdates((err, timestamp) => this.setState({timestamp})
+        subscribeToUpdates((err, payload) => this.setState({status: payload})
         //subscribeToUpdates((err, payload) => this.setState({status: payload})
 
         );

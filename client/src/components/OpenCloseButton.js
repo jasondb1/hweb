@@ -21,11 +21,11 @@ class OpenClose extends Component {
 
         socket.on('componentStatusUpdate', (data) => {
             if (data.component === this.state.component) {
-                //this.setState({isOn: data.isOn});
                 this.setState({isOpen: data.isOpen});
+                console.log('updateStatus:');
+                console.log(data);
             }
-            console.log('updateStatus:');
-            console.log(data);
+
         });
         //api.getComponentState(this.state.component).then(json => this.setState({isOpen: json.isOpen}));
     }

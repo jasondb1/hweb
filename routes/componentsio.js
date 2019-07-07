@@ -1,27 +1,29 @@
 const ComponentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 
+//start updating components at regular intervals
 let componentsCtrl = new ComponentsCtrl();
 componentsCtrl.init();
 componentsCtrl.start();
-//console.log(componentsCtrl);
 
 module.exports = function (io) {
 //Establish a client connection
     io.on('connection', client => {
         console.log('client connected in componentsio');
 
-        //emit status???
-
-
         //updates
         client.on('subscribeToUpdates', (interval) => {
             console.log('client is subscribing to updates with interval ', interval);
 
             setInterval(() => {
-                client.emit('updates', new Date());
+                //client.emit('updates', new Date());
+                componentsCtrl.currentStatus();
             }, interval);
 
+        });
+
+        client.on('componentGetStatus', comp => {
+            client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         });
 
         //component off
@@ -54,6 +56,8 @@ module.exports = function (io) {
             componentsCtrl.component.garageRelay.open();
             client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         });
+
+
 
 
         //user disconnects

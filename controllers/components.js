@@ -38,70 +38,6 @@ class ComponentsCtrl {
 
     constructor(){
         this.component = {};
-        //  this.component = {
-        //      ledIndicator: indicator,
-        //
-        //      garageRelay: garageRelay,
-        //
-        //      led: {
-        //          pin: LED,
-        //          name: 'LED',
-        //          status: LED.readSync(),
-        //          value: null
-        //
-        //      },
-        //      relay1: {
-        //          pin: RELAY1,
-        //          name: 'Relay 1',
-        //          status: RELAY1.readSync(),
-        //          value: null,
-        //          low_on: true,
-        //      },
-        //      relay2: {
-        //          pin: RELAY2,
-        //          name: 'Relay 2',
-        //          status: RELAY2.readSync(),
-        //          value: null,
-        //          low_on: true,
-        //      },
-        //      temp_local: {
-        //          pin: null,
-        //          name: 'DHT22 - temperature',
-        //          status: null,
-        //          value: null,
-        //
-        //      },
-        //      humidity_local: {
-        //          pin: null,
-        //          name: 'DHT22 - humidity',
-        //          status: null,
-        //          value: null,
-        //
-        //      },
-        //      presistor_remote0: {
-        //          pin: i2c,
-        //          slave_addr: 0x08,
-        //          name: 'photo resistor',
-        //          status: null,
-        //          value: null
-        //      },
-        //      temp_remote0: {
-        //          pin: i2c,
-        //          slave_addr: 0x08,
-        //          name: 'remote_temp1',
-        //          status: null,
-        //          value: null,
-        //
-        //      },
-        //      humidity_remote0: {
-        //          pin: i2c,
-        //          slave_addr: 0x08,
-        //          name: 'DHT22 - humidity',
-        //          status: null,
-        //          value: null,
-        //
-        //      },
-        //  };
         this.update = null;
         this.updateInterval = null;
 	
@@ -189,7 +125,7 @@ class ComponentsCtrl {
 
 
      readTemp() {
-         dht_sensor.read(22, TEMPPIN)
+	     dht_sensor.read(22, TEMPPIN)
              .then(res => {
                      let datetime = new Date();
                      console.log(res);
@@ -211,17 +147,18 @@ class ComponentsCtrl {
          i2c_bus.i2cReadSync(arduino_i2cAddress, arduino_data_length, buffer_arduino);
          let string = buffer_arduino.toString();
          let vals = string.split(/[\s,\0]+/, 3);
+	     console.log(vals);
+
 
          this.component.presistor_remote0.value = vals[0];
          this.component.temp_remote0.value = vals[1];
          this.component.humidity_remote0.value = vals[2];
-
          //console.log(string.split(/[\s,\0]+/, 3));
      }
 
      readAllSensors() {
-         this.readTemp;
-         this.readArduino;
+         this.readTemp();
+         this.readArduino();
 
          let datetime = new Date();
          fs.appendFile(
@@ -277,19 +214,16 @@ class ComponentsCtrl {
          //TODO: move keys to instance variable and method to change?
          let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
 
-         console.log('currentStatus');
-         console.log(this.component);
 
          for (let key of keys) {
-             console.log(key);
-             console.log(this.component);
              currentStatus[key] = this.component[key].value;
          }
          return currentStatus;
      }
 
      start(interval = SAMPLEINTERVAL) {
-        this.updateInterval = interval;
+        console.log('set update interval');
+	     this.updateInterval = interval;
          this.update = setInterval(
              this.readAllSensors.bind(this)
          , (this.updateInterval * 1000));
@@ -298,10 +232,6 @@ class ComponentsCtrl {
      stop() {
         clearInterval(this.update);
      }
-
-	//getComponent(comp) {
-	//	return this.component[comp];
-	//}
 
 }
 

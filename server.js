@@ -12,9 +12,9 @@ const PORT = process.env.PORT || 3001;
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const socketio = require('./socket.js')(io);
+//app.io = io;
 
-
-console.log(socketio);
+//console.log(io);
 
 
 const components = require('./routes/components');
@@ -25,6 +25,15 @@ const usersRoutes = require('./routes/users.js');
 mongoose.set('useCreateIndex', true);
 mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
     console.log(err || `Connected to MongoDB.`)
+});
+
+
+//attach socket io instance to req
+//use it in routes with req.io.emit
+app.use(function(req,res,next){
+    req.io = io;
+    console.log(req.io);
+    next();
 });
 
 //

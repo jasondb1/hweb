@@ -10,9 +10,8 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/react-expres
 const PORT = process.env.PORT || 3001;
 //const io = require('socket.io');
 const server = require('http').Server(app);
-const io = require('socket.io')(server);
-//const mySocket = require('./socket.js')(io);
-console.log(server);
+//const io = require('socket.io')(server);
+const io = require('./socket.js')(server);
 console.log(io);
 
 
@@ -26,25 +25,25 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
     console.log(err || `Connected to MongoDB.`)
 });
 
-
-io.on('connection', client => {
-	        console.log('client connected');
-
-	        client.on('subscribeToUpdates', (interval) => {
-			            console.log('client is subscribing to updates with interval ', interval);
-
-			            setInterval(() => {
-					                    client.emit('updates', new Date());
-					                }, interval);
-
-			        });
-	        //user disconnects
-	        client.on('disconnect', () => {
-	
-	                    console.log('client disconnected');
-	                            });
-	
-                                });
+//
+// io.on('connection', client => {
+//     console.log('client connected');
+//
+//     client.on('subscribeToUpdates', (interval) => {
+//         console.log('client is subscribing to updates with interval ', interval);
+//
+//         setInterval(() => {
+//             client.emit('updates', new Date());
+//         }, interval);
+//
+//     });
+//     //user disconnects
+//     client.on('disconnect', () => {
+//
+//         console.log('client disconnected');
+//     });
+//
+// });
 
 //middleware
 app.use(express.static(`${__dirname}/client/build`));
@@ -76,5 +75,5 @@ app.use(function (req, res, next) {
 //Start server
 //app.listen(PORT, (err) => {
 server.listen(PORT, (err) => {
-	console.log(err || `Server running on port ${PORT}.`)
+    console.log(err || `Server running on port ${PORT}.`)
 });

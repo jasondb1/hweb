@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import api from "../services/componentService";
+//import api from "../services/componentService";
+import { componentOn, componentOff, socket } from "../services/socket";
 
 
 class OnOff extends Component {
@@ -17,14 +18,25 @@ class OnOff extends Component {
     }
 
     componentDidMount() {
-        api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
+        getComponentState(this.state.component);
+
+        socket.on('ComponentStatusUpdate', (data) => {
+            this.setState({isOn: data.isOn});
+            console.log('updateStatus:');
+            console.log(payload);
+        });
+
+
+            //api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
     }
 
     handleClick() {
         if (this.state.isOn) {
-            api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
+            //api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
+            componentOff(this.state.component);
         } else {
-            api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
+            //api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
+            componentOn(this.state.component);
         }
     };
 

@@ -11,10 +11,10 @@ componentsCtrl.start();
 //authenticate the following routes
 router.use(verifyToken);
 
-
 //status
 //TODO: Maybe request keys here in post instead
 router.get('/status', (req, res) => {
+
     res.status(200).json(componentsCtrl.currentStatus());
 });
 

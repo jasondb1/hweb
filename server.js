@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 3001;
 //const io = require('socket.io');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const socketio = require('./socket.js')(io);
+//const socketio = require('./socket.js')(io);
+const componentsio = require('./routes/componentsio.js')(io);
 //app.io = io;
 
 //console.log(io);
@@ -28,35 +29,18 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
 });
 
 
+
+//middleware
+
+
 //attach socket io instance to req
 //use it in routes with req.io.emit
 app.use(function(req,res,next){
     req.io = io;
-    console.log(req.io);
+    //console.log(req.io);
     next();
 });
 
-//
-// io.on('connection', client => {
-//     console.log('client connected');
-//
-//     client.on('subscribeToUpdates', (interval) => {
-//         console.log('client is subscribing to updates with interval ', interval);
-//
-//         setInterval(() => {
-//             client.emit('updates', new Date());
-//         }, interval);
-//
-//     });
-//     //user disconnects
-//     client.on('disconnect', () => {
-//
-//         console.log('client disconnected');
-//     });
-//
-// });
-
-//middleware
 app.use(express.static(`${__dirname}/client/build`));
 app.use(logger('dev'));
 app.use(bodyParser.json());

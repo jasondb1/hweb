@@ -44,7 +44,7 @@ class OpenClose extends Component {
                     onClick={this.handleClick}
                     className={this.btnClasses()}
                 >
-                    {this.state.isOn ? 'OPEN' : 'CLOSE'}
+                    {this.state.isOpen ? 'OPEN' : 'CLOSE'}
                 </button>
             </div>
         );

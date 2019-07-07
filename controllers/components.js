@@ -25,7 +25,7 @@ const DB_FILEPATH = './db/homeWeb.db';
 const LOG_FILEPATH = 'log.csv';
 
 //components
-let component = {};
+//let component = {};
 
 let LED = new Gpio(LEDPIN, 'out');
 let RELAY1 = new Gpio(RELAY1PIN, 'out');
@@ -37,71 +37,71 @@ let garageRelay = new GarageRelay(RELAY1PIN);
 class ComponentsCtrl {
 
     constructor(){
-        //this.component = {};
-         this.component = {
-             ledIndicator: indicator,
-
-             garageRelay: garageRelay,
-
-             led: {
-                 pin: LED,
-                 name: 'LED',
-                 status: LED.readSync(),
-                 value: null
-
-             },
-             relay1: {
-                 pin: RELAY1,
-                 name: 'Relay 1',
-                 status: RELAY1.readSync(),
-                 value: null,
-                 low_on: true,
-             },
-             relay2: {
-                 pin: RELAY2,
-                 name: 'Relay 2',
-                 status: RELAY2.readSync(),
-                 value: null,
-                 low_on: true,
-             },
-             temp_local: {
-                 pin: null,
-                 name: 'DHT22 - temperature',
-                 status: null,
-                 value: null,
-
-             },
-             humidity_local: {
-                 pin: null,
-                 name: 'DHT22 - humidity',
-                 status: null,
-                 value: null,
-
-             },
-             presistor_remote0: {
-                 pin: i2c,
-                 slave_addr: 0x08,
-                 name: 'photo resistor',
-                 status: null,
-                 value: null
-             },
-             temp_remote0: {
-                 pin: i2c,
-                 slave_addr: 0x08,
-                 name: 'remote_temp1',
-                 status: null,
-                 value: null,
-
-             },
-             humidity_remote0: {
-                 pin: i2c,
-                 slave_addr: 0x08,
-                 name: 'DHT22 - humidity',
-                 status: null,
-                 value: null,
-
-             },
-         };
+        this.component = {};
+        //  this.component = {
+        //      ledIndicator: indicator,
+        //
+        //      garageRelay: garageRelay,
+        //
+        //      led: {
+        //          pin: LED,
+        //          name: 'LED',
+        //          status: LED.readSync(),
+        //          value: null
+        //
+        //      },
+        //      relay1: {
+        //          pin: RELAY1,
+        //          name: 'Relay 1',
+        //          status: RELAY1.readSync(),
+        //          value: null,
+        //          low_on: true,
+        //      },
+        //      relay2: {
+        //          pin: RELAY2,
+        //          name: 'Relay 2',
+        //          status: RELAY2.readSync(),
+        //          value: null,
+        //          low_on: true,
+        //      },
+        //      temp_local: {
+        //          pin: null,
+        //          name: 'DHT22 - temperature',
+        //          status: null,
+        //          value: null,
+        //
+        //      },
+        //      humidity_local: {
+        //          pin: null,
+        //          name: 'DHT22 - humidity',
+        //          status: null,
+        //          value: null,
+        //
+        //      },
+        //      presistor_remote0: {
+        //          pin: i2c,
+        //          slave_addr: 0x08,
+        //          name: 'photo resistor',
+        //          status: null,
+        //          value: null
+        //      },
+        //      temp_remote0: {
+        //          pin: i2c,
+        //          slave_addr: 0x08,
+        //          name: 'remote_temp1',
+        //          status: null,
+        //          value: null,
+        //
+        //      },
+        //      humidity_remote0: {
+        //          pin: i2c,
+        //          slave_addr: 0x08,
+        //          name: 'DHT22 - humidity',
+        //          status: null,
+        //          value: null,
+        //
+        //      },
+        //  };
         this.update = null;
         this.updateInterval = null;
 	
@@ -240,7 +240,7 @@ class ComponentsCtrl {
          );
 
          //open database
-         let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
+         let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
 
          let db = new sqlite3.Database(DB_FILEPATH, (err) => {
              if (err) {

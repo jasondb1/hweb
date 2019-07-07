@@ -17,7 +17,7 @@ module.exports = function (io) {
 
             setInterval(() => {
                 //client.emit('updates', new Date());
-                componentsCtrl.currentStatus();
+                client.emit('updates', componentsCtrl.currentStatus());
             }, interval);
 
         });

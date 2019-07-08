@@ -33,19 +33,21 @@ console.log( localStorage.getItem('token') );
                     console.log("User's token has expired");
                 }
             });
+});
 
-function authenticate(){
-    socket.emit('authenticate', {token: httpClient.getToken()})
-        .on('authenticated', () => {
-            console.log('socket authenticated')
-        })
-        .on('unauthorized', function(error, callback) {
-            if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-                // redirect user to login page perhaps or execute callback:
-                callback();
-                console.log("User's token has expired");
-            }
-        });
+function authenticate() {
+//	let token = localStorage.getItem('token');
+//    socket.emit('authenticate', {token: httpClient.getToken()})
+//        .on('authenticated', () => {
+//            console.log('socket authenticated')
+//        })
+//        .on('unauthorized', function(error, callback) {
+//            if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+//                // redirect user to login page perhaps or execute callback:
+//                callback();
+//                console.log("User's token has expired");
+//            }
+//        });
 }
 
 function subscribeToUpdates(callback) {

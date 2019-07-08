@@ -36,8 +36,6 @@ module.exports = function (io) {
         console.log('client connected');
         console.log('hello! ' + client.decoded_token.name);
 
-
-
         client.on('subscribeToUpdates', (interval) => {
             console.log('client is subscribing to updates with interval ', interval);
 

@@ -14,7 +14,6 @@ const io = require('socket.io')(server);
 //const socketio = require('./socket.js')(io);
 const componentsio = require('./routes/componentsio.js')(io);
 //app.io = io;
-
 //console.log(io);
 
 

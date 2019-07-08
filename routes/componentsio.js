@@ -12,7 +12,7 @@ module.exports = function (io) {
 
     io.on('connection', socketioJwt.authorize({
         secret: {JWT_SECRET},
-        timeout: 15000
+        //timeout: 15000
     })).on('authenticated', client => {
         //Establish a client connection
         //io.on('connection', client => {

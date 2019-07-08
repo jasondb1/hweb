@@ -8,6 +8,7 @@ import Status from "../components/Status";
 class Dashboard extends Component {
 
     componentWillUnmount(){
+        console.log('Dashboard - :Authenticate socket');
         authenticate();
     }
 

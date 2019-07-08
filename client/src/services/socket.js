@@ -3,25 +3,28 @@ import openSocket from 'socket.io-client';
 const socket = openSocket('http://192.168.1.108:3001');
 const UPDATEINTERVAL = 10000;
 
-// socket.on('connect', () => {
-//         console.log('socket connect');
-//         socket.emit('authenticate', {token: httpClient.getToken()})
-//             .on('authenticated', () => {
-//                 console.log('socket authenticated')
-//             })
-//             .on('unauthorized', function(error, callback) {
-//                 if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-//                     // redirect user to login page perhaps or execute callback:
-//                     callback();
-//                     console.log("User's token has expired");
-//                 }
-//             });
-//
-// });
 socket.on('connect', () => {
         console.log('socket connect');
-	let token = localStorage.getItem('token');
-console.log( localStorage.getItem('token') );
+        //let token = localStorage.getItem('token');
+        //console.log( localStorage.getItem('token') );
+        // socket.emit('authenticate', {token: token})
+        //     .on('authenticated', () => {
+        //         console.log('socket authenticated')
+        //     })
+        //     .on('unauthorized', function(error, callback) {
+        //         if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+        //             // redirect user to login page perhaps or execute callback:
+        //             callback();
+        //             console.log("User's token has expired");
+        //         }
+        //     });
+});
+
+function authenticate() {
+
+        console.log('authenticate');
+        let token = localStorage.getItem('token');
+        console.log( localStorage.getItem('token') );
         socket.emit('authenticate', {token: token})
             .on('authenticated', () => {
                 console.log('socket authenticated')
@@ -33,21 +36,7 @@ console.log( localStorage.getItem('token') );
                     console.log("User's token has expired");
                 }
             });
-});
 
-function authenticate() {
-//	let token = localStorage.getItem('token');
-//    socket.emit('authenticate', {token: httpClient.getToken()})
-//        .on('authenticated', () => {
-//            console.log('socket authenticated')
-//        })
-//        .on('unauthorized', function(error, callback) {
-//            if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-//                // redirect user to login page perhaps or execute callback:
-//                callback();
-//                console.log("User's token has expired");
-//            }
-//        });
 }
 
 function subscribeToUpdates(callback) {

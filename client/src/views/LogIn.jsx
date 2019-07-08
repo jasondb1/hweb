@@ -16,9 +16,9 @@ class LogIn extends React.Component {
     };
 
     onFormSubmit(evt) {
-        evt.preventDefault()
+        evt.preventDefault();
         httpClient.logIn(this.state.fields).then(user => {
-            this.setState({fields: {email: '', password: ''}})
+            this.setState({fields: {email: '', password: ''}});
             if (user) {
                 this.props.onLoginSuccess(user);
                 this.props.history.push('/dashboard')

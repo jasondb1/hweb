@@ -36,202 +36,196 @@ let garageRelay = new GarageRelay(RELAY1PIN);
 
 class ComponentsCtrl {
 
-    constructor(){
+    constructor() {
         this.component = {};
         this.update = null;
         this.updateInterval = null;
-	
     }
 
-     init() {
-         this.component = {
-             ledIndicator: indicator,
+    init() {
+        this.component = {
+            ledIndicator: indicator,
 
-             garageRelay: garageRelay,
+            garageRelay: garageRelay,
 
-             led: {
-                 pin: LED,
-                 name: 'LED',
-                 status: LED.readSync(),
-                 value: null
+            led: {
+                pin: LED,
+                name: 'LED',
+                status: LED.readSync(),
+                value: null
 
-             },
-             relay1: {
-                 pin: RELAY1,
-                 name: 'Relay 1',
-                 status: RELAY1.readSync(),
-                 value: null,
-                 low_on: true,
-             },
-             relay2: {
-                 pin: RELAY2,
-                 name: 'Relay 2',
-                 status: RELAY2.readSync(),
-                 value: null,
-                 low_on: true,
-             },
-             temp_local: {
-                 pin: null,
-                 name: 'DHT22 - temperature',
-                 status: null,
-                 value: null,
+            },
+            relay1: {
+                pin: RELAY1,
+                name: 'Relay 1',
+                status: RELAY1.readSync(),
+                value: null,
+                low_on: true,
+            },
+            relay2: {
+                pin: RELAY2,
+                name: 'Relay 2',
+                status: RELAY2.readSync(),
+                value: null,
+                low_on: true,
+            },
+            temp_local: {
+                pin: null,
+                name: 'DHT22 - temperature',
+                status: null,
+                value: null,
+            },
+            humidity_local: {
+                pin: null,
+                name: 'DHT22 - humidity',
+                status: null,
+                value: null,
+            },
+            presistor_remote0: {
+                pin: i2c,
+                slave_addr: 0x08,
+                name: 'photo resistor',
+                status: null,
+                value: null
+            },
+            temp_remote0: {
+                pin: i2c,
+                slave_addr: 0x08,
+                name: 'remote_temp1',
+                status: null,
+                value: null,
+            },
+            humidity_remote0: {
+                pin: i2c,
+                slave_addr: 0x08,
+                name: 'DHT22 - humidity',
+                status: null,
+                value: null,
+            },
+        };
 
-             },
-             humidity_local: {
-                 pin: null,
-                 name: 'DHT22 - humidity',
-                 status: null,
-                 value: null,
+        //temperature sensor (currently in simulation mode
+        dht_sensor.setMaxRetries(10);
+        //sensor.initialize(22, TEMPPIN);
+        dht_sensor.initialize({
+            test: {
+                fake: {
+                    temperature: 21.5,
+                    humidity: 60.25
+                }
+            }
+        });
 
-             },
-             presistor_remote0: {
-                 pin: i2c,
-                 slave_addr: 0x08,
-                 name: 'photo resistor',
-                 status: null,
-                 value: null
-             },
-             temp_remote0: {
-                 pin: i2c,
-                 slave_addr: 0x08,
-                 name: 'remote_temp1',
-                 status: null,
-                 value: null,
-
-             },
-             humidity_remote0: {
-                 pin: i2c,
-                 slave_addr: 0x08,
-                 name: 'DHT22 - humidity',
-                 status: null,
-                 value: null,
-
-             },
-         };
-
-         //temperature sensor (currently in simulation mode
-         dht_sensor.setMaxRetries(10);
-         //sensor.initialize(22, TEMPPIN);
-         dht_sensor.initialize({
-             test: {
-                 fake: {
-                     temperature: 21.5,
-                     humidity: 60.25
-                 }
-             }
-         });
-
-     }
+    }
 
 
-     readTemp() {
-	     dht_sensor.read(22, TEMPPIN)
-             .then(res => {
-                     let datetime = new Date();
-                     console.log(res);
-                     console.log(`temp: ${res.temperature.toFixed(1)} deg C`
-                         + `    humidity: ${res.humidity.toFixed(1)}%`
-                         + `    ts:` + datetime.toLocaleString());
+    readTemp() {
+        dht_sensor.read(22, TEMPPIN)
+            .then(res => {
+                    let datetime = new Date();
+                    console.log(res);
+                    console.log(`temp: ${res.temperature.toFixed(1)} deg C`
+                        + `    humidity: ${res.humidity.toFixed(1)}%`
+                        + `    ts:` + datetime.toLocaleString());
 
-                     this.component.temp_local.value = res.temperature.toFixed(2);
-                     this.component.humidity_local.value = res.humidity.toFixed(2);
+                    this.component.temp_local.value = res.temperature.toFixed(2);
+                    this.component.humidity_local.value = res.humidity.toFixed(2);
 
-                 },
-             )
-             .catch(err => {
-                 console.error('failed to read sensor data:', err);
-             });
-     }
+                },
+            )
+            .catch(err => {
+                console.error('failed to read sensor data:', err);
+            });
+    }
 
-     readArduino() {
-         i2c_bus.i2cReadSync(arduino_i2cAddress, arduino_data_length, buffer_arduino);
-         let string = buffer_arduino.toString();
-         let vals = string.split(/[\s,\0]+/, 3);
-	     console.log(vals);
+    readArduino() {
+        i2c_bus.i2cReadSync(arduino_i2cAddress, arduino_data_length, buffer_arduino);
+        let string = buffer_arduino.toString();
+        let vals = string.split(/[\s,\0]+/, 3);
+        console.log(vals);
 
+        this.component.presistor_remote0.value = vals[0];
+        this.component.temp_remote0.value = vals[1];
+        this.component.humidity_remote0.value = vals[2];
+        //console.log(string.split(/[\s,\0]+/, 3));
+    }
 
-         this.component.presistor_remote0.value = vals[0];
-         this.component.temp_remote0.value = vals[1];
-         this.component.humidity_remote0.value = vals[2];
-         //console.log(string.split(/[\s,\0]+/, 3));
-     }
+    readAllSensors() {
+        this.readTemp();
+        this.readArduino();
 
-     readAllSensors() {
-         this.readTemp();
-         this.readArduino();
+        let datetime = new Date();
+        fs.appendFile(
+            LOG_FILEPATH,
+            datetime.getTime() +
+            "," +
+            datetime.toLocaleDateString() +
+            "," +
+            datetime.toLocaleTimeString() +
+            "," +
+            this.component.temp_local.value +
+            "," +
+            this.component.humidity_local.value +
+            "\n", function (err) {
+            }
+        );
 
-         let datetime = new Date();
-         fs.appendFile(
-             LOG_FILEPATH,
-             datetime.getTime() +
-             "," +
-             datetime.toLocaleDateString() +
-             "," +
-             datetime.toLocaleTimeString() +
-             "," +
-             this.component.temp_local.value +
-             "," +
-             this.component.humidity_local.value +
-             "\n", function (err) {
-             }
-         );
+        //open database
+        let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
 
-         //open database
-         let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
+        let db = new sqlite3.Database(DB_FILEPATH, (err) => {
+            if (err) {
+                console.error("[components.js] " + err.message);
+            } else {
+                //console.log('Connected to the homeWeb database.');
+            }
+        });
 
-         let db = new sqlite3.Database(DB_FILEPATH, (err) => {
-             if (err) {
-                 console.error("[components.js] " + err.message);
-             } else {
-                 //console.log('Connected to the homeWeb database.');
-             }
-         });
+        for (let key of log_sensors) {
+            db.run("INSERT INTO sensor_data(timestamp, description, sensor, value) VALUES( ?, ?, ?, ?)", [datetime.getTime(), this.component[key].name, key, this.component[key].value],
+                (err) => {
+                    if (err) {
+                        console.error(err);
+                    }
+                }
+            );
+        }
 
-         for (let key of log_sensors) {
-             db.run("INSERT INTO sensor_data(timestamp, description, sensor, value) VALUES( ?, ?, ?, ?)", [datetime.getTime(), this.component[key].name, key, this.component[key].value],
-                 (err) => {
-                     if (err) {
-                         console.error(err);
-                     }
-                 }
-             );
-         }
-
-         db.close((err) => {
-             if (err) {
-                 return console.error(err.message);
-             } else {
-                 //console.log('Close the db connection');
-             }
-         });
-     }
-
-
-     currentStatus() {
-         let currentStatus = {};
-         currentStatus.ts = new Date().getTime();
-
-         //TODO: move keys to instance variable and method to change?
-         let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
+        db.close((err) => {
+            if (err) {
+                return console.error(err.message);
+            } else {
+                //console.log('Close the db connection');
+            }
+        });
+    }
 
 
-         for (let key of keys) {
-             currentStatus[key] = this.component[key].value;
-         }
-         return currentStatus;
-     }
+    currentStatus() {
+        let currentStatus = {};
+        currentStatus.ts = new Date().getTime();
 
-     start(interval = SAMPLEINTERVAL) {
+        //TODO: move keys to instance variable and method to change?
+        let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
+
+
+        for (let key of keys) {
+            currentStatus[key] = this.component[key].value;
+        }
+        return currentStatus;
+    }
+
+    start(interval = SAMPLEINTERVAL) {
         console.log('set update interval');
-	     this.updateInterval = interval;
-         this.update = setInterval(
-             this.readAllSensors.bind(this)
-         , (this.updateInterval * 1000));
-     }
+        this.updateInterval = interval;
+        this.update = setInterval(
+            this.readAllSensors.bind(this)
+            , (this.updateInterval * 1000));
+    }
 
-     stop() {
+    stop() {
         clearInterval(this.update);
-     }
+    }
 
 }
 

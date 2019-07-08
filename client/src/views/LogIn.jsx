@@ -20,7 +20,7 @@ class LogIn extends React.Component {
         httpClient.logIn(this.state.fields).then(user => {
             this.setState({fields: {email: '', password: ''}})
             if (user) {
-                this.props.onLoginSuccess(user)
+                this.props.onLoginSuccess(user);
                 this.props.history.push('/dashboard')
             }
         });

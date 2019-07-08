@@ -1,5 +1,10 @@
 import openSocket from 'socket.io-client';
+const httpClient = require('httpClient');
 const socket = openSocket('http://192.168.1.108:3001');
+
+socket.on('connection', () =>
+console.log('socket connected');
+)
 
 const UPDATEINTERVAL = 10000;
 

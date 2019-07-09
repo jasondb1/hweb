@@ -22,12 +22,8 @@ class Status extends Component {
     constructor() {
         super();
         this.state = {
-            timestamp: 'no timestamp yet',
             status: [],
         };
-
-
-        );
 
         this.updateStatus = this.updateStatus.bind(this);
     }

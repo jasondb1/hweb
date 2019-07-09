@@ -8,7 +8,7 @@ import Status from "../components/Status";
 class Dashboard extends Component {
 
     componentWillMount(){
-        console.log('Dashboard - :Authenticate socket');
+        console.log('Dashboard - Authenticate socket');
         authenticate();
     }
 

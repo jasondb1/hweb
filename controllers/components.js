@@ -123,10 +123,10 @@ class ComponentsCtrl {
         dht_sensor.read(22, TEMPPIN)
             .then(res => {
                     let datetime = new Date();
-                    console.log(res);
-                    console.log(`temp: ${res.temperature.toFixed(1)} deg C`
-                        + `    humidity: ${res.humidity.toFixed(1)}%`
-                        + `    ts:` + datetime.toLocaleString());
+                    //console.log(res);
+                    //console.log(`temp: ${res.temperature.toFixed(1)} deg C`
+                    //    + `    humidity: ${res.humidity.toFixed(1)}%`
+                    //    + `    ts:` + datetime.toLocaleString());
 
                     this.component.temp_local.value = res.temperature.toFixed(2);
                     this.component.humidity_local.value = res.humidity.toFixed(2);
@@ -142,7 +142,7 @@ class ComponentsCtrl {
         i2c_bus.i2cReadSync(arduino_i2cAddress, arduino_data_length, buffer_arduino);
         let string = buffer_arduino.toString();
         let vals = string.split(/[\s,\0]+/, 3);
-        console.log(vals);
+        //console.log(vals);
 
         this.component.presistor_remote0.value = vals[0];
         this.component.temp_remote0.value = vals[1];
@@ -216,7 +216,6 @@ class ComponentsCtrl {
     }
 
     start(interval = SAMPLEINTERVAL) {
-        console.log('set update interval');
         this.updateInterval = interval;
         this.update = setInterval(
             this.readAllSensors.bind(this)

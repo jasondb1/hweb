@@ -1,10 +1,10 @@
 import openSocket from 'socket.io-client';
 //const httpClient = require('./httpClient');
-const socket = openSocket('http://192.168.1.108:3001');
+const socket = null;
 const UPDATEINTERVAL = 10000;
 
-socket.on('connect', () => {
-        console.log('socket connect');
+// socket.on('connect', () => {
+//         console.log('socket connect');
         //let token = localStorage.getItem('token');
         //console.log( localStorage.getItem('token') );
         // socket.emit('authenticate', {token: token})
@@ -18,10 +18,12 @@ socket.on('connect', () => {
         //             console.log("User's token has expired");
         //         }
         //     });
-});
+// });
 
 function authenticate() {
+        const socket = openSocket('http://192.168.1.108:3001');
 
+    socket.on('connect', () => {
         console.log('authenticate');
         let token = localStorage.getItem('token');
         console.log( localStorage.getItem('token') );
@@ -36,6 +38,8 @@ function authenticate() {
                     console.log("User's token has expired");
                 }
             });
+
+    });
 
 }
 

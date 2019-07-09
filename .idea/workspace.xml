@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d46f19e8-a7c9-433d-b495-3502f63e1632" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/client/src/NavBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/NavBar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/OnOffButton.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/OnOffButton.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Status.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Status.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/views/LogIn.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/views/LogIn.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/services/socket.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/socket.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/componentsio.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/componentsio.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/socket.js" beforeDir="false" afterPath="$PROJECT_DIR$/socket.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/node_modules/" />
     <ignored path="$PROJECT_DIR$/client/node_modules/" />
@@ -23,20 +23,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/Status.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="354">
-              <caret line="35" column="25" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/client/src/components/OnOffButton.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="24" column="38" selection-start-line="24" selection-start-column="38" selection-end-line="24" selection-end-column="38" />
+            <state relative-caret-position="272">
+              <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -45,10 +33,28 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/src/components/OnOffButton.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="269">
+              <caret line="33" column="39" lean-forward="true" selection-start-line="33" selection-start-column="39" selection-end-line="33" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/src/services/socket.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-51">
+              <caret line="3" selection-start-line="3" selection-end-line="3" selection-end-column="50" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/componentsio.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+            <state relative-caret-position="153">
+              <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
             </state>
           </provider>
         </entry>
@@ -95,13 +101,13 @@
         <option value="$PROJECT_DIR$/client/src/App.jsx" />
         <option value="$PROJECT_DIR$/client/src/components/OpenCloseButton.js" />
         <option value="$PROJECT_DIR$/client/src/services/httpClient.js" />
-        <option value="$PROJECT_DIR$/socket.js" />
-        <option value="$PROJECT_DIR$/client/src/services/socket.js" />
-        <option value="$PROJECT_DIR$/routes/componentsio.js" />
         <option value="$PROJECT_DIR$/client/src/NavBar.jsx" />
         <option value="$PROJECT_DIR$/client/src/views/LogIn.jsx" />
         <option value="$PROJECT_DIR$/client/src/components/Status.js" />
+        <option value="$PROJECT_DIR$/socket.js" />
+        <option value="$PROJECT_DIR$/client/src/services/socket.js" />
         <option value="$PROJECT_DIR$/client/src/components/OnOffButton.js" />
+        <option value="$PROJECT_DIR$/routes/componentsio.js" />
       </list>
     </option>
   </component>
@@ -220,12 +226,12 @@
       <updated>1562266981758</updated>
       <workItem from="1562266982908" duration="10793000" />
       <workItem from="1562596177915" duration="11616000" />
-      <workItem from="1562628781199" duration="25128000" />
+      <workItem from="1562628781199" duration="27255000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="84379000" />
+    <option name="totallyTimeSpent" value="86506000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="961" y="0" width="959" height="1049" extended-state="0" />
@@ -517,44 +523,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/socket.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="680">
+          <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/components/Status.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="354">
-          <caret line="35" column="25" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
+        <state relative-caret-position="272">
+          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/services/socket.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="49" selection-start-line="49" selection-end-line="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/socket.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="2" lean-forward="true" selection-start-line="15" selection-start-column="2" selection-end-line="15" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/routes/componentsio.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client/src/components/OnOffButton.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" column="38" selection-start-line="24" selection-start-column="38" selection-end-line="24" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="269">
+          <caret line="33" column="39" lean-forward="true" selection-start-line="33" selection-start-column="39" selection-end-line="33" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/services/socket.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-51">
+          <caret line="3" selection-start-line="3" selection-end-line="3" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/componentsio.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
         </state>
       </provider>
     </entry>

@@ -35,9 +35,7 @@ function getAuthSocket() {
         //console.log( localStorage.getItem('token') );
         socket.emit('authenticate', {token: token})
             .on('authenticated', () => {
-                //console.log('socket authenticated')
-
-
+                console.log('socket authenticated')
             })
             .on('unauthorized', function(error, callback) {
                 if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {

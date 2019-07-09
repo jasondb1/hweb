@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
+import {socket} from "../services/socket";
 //import api from "../services/componentService";
-import { componentOn, componentOff, socket } from "../services/socket";
+//import { componentOn, componentOff, socket } from "../services/socket";
 
 
 class OnOff extends Component {
@@ -20,7 +21,10 @@ class OnOff extends Component {
     componentDidMount() {
         //getComponentState(this.state.component);
         console.log('ON OFF updateStatus:');
-        socket.on('componentStatusUpdate', (data) => {
+        console.log(this.props.socket);
+        this.sock = this.props.socket;
+
+        this.sock.on('componentStatusUpdate', (data) => {
             console.log('updateStatus:');
             if (data.component === this.state.component) {
                 this.setState({isOn: data.isOn});
@@ -37,10 +41,12 @@ class OnOff extends Component {
     handleClick() {
         if (this.state.isOn) {
             //api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
-            componentOff(this.state.component);
+            //componentOff(this.state.component);
+            this.sock.emit('componentOff', this.state.component);
         } else {
             //api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
-            componentOn(this.state.component);
+            //componentOn(this.state.component);
+            this.sock.emit('componentOn', this.state.component);
         }
     };
 

@@ -40,6 +40,7 @@ function authenticate() {
             });
 
     });
+    return socket;
 
 }
 

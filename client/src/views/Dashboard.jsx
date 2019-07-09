@@ -1,11 +1,17 @@
 import React, {Component} from 'react';
-//import {authenticate, subscribeToUpdates} from '../services/socket';
+import { authenticate } from '../services/socket';
 
 import Controls from "../components/Controls";
 import Status from "../components/Status";
 
 
 class Dashboard extends Component {
+
+    constructor() {
+        super();
+        authenticate();
+
+    }
 
     componentDidMount(){
         //authenticate();

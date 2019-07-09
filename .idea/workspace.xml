@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d46f19e8-a7c9-433d-b495-3502f63e1632" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/client/src/components/OnOffButton.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/OnOffButton.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Status.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Status.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/services/httpClient.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/services/httpClient.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/views/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/views/Dashboard.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/views/LogIn.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/views/LogIn.jsx" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/node_modules/" />
@@ -44,41 +42,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/OnOffButton.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client/src/views/Dashboard.jsx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
-              <folding>
-                <element signature="e#112#158#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client/src/App.jsx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="23" column="30" lean-forward="true" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="221">
+              <caret line="13" column="39" lean-forward="true" selection-start-line="13" selection-start-column="39" selection-end-line="13" selection-end-column="39" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/client/src/views/Dashboard.jsx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" column="23" lean-forward="true" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/services/httpClient.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="2" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="2" />
+            <state relative-caret-position="340">
+              <caret line="20" column="18" selection-start-line="20" selection-start-column="18" selection-end-line="20" selection-end-column="18" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -89,8 +75,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/views/LogIn.jsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+            <state relative-caret-position="442">
+              <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
+              <folding>
+                <element signature="e#0#25#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -134,11 +123,11 @@
         <option value="$PROJECT_DIR$/client/src/services/socket.js" />
         <option value="$PROJECT_DIR$/routes/componentsio.js" />
         <option value="$PROJECT_DIR$/client/src/App.jsx" />
-        <option value="$PROJECT_DIR$/client/src/views/Dashboard.jsx" />
         <option value="$PROJECT_DIR$/client/src/components/Status.js" />
         <option value="$PROJECT_DIR$/client/src/components/OnOffButton.js" />
-        <option value="$PROJECT_DIR$/client/src/views/LogIn.jsx" />
         <option value="$PROJECT_DIR$/client/src/services/httpClient.js" />
+        <option value="$PROJECT_DIR$/client/src/views/LogIn.jsx" />
+        <option value="$PROJECT_DIR$/client/src/views/Dashboard.jsx" />
       </list>
     </option>
   </component>
@@ -252,12 +241,12 @@
       <updated>1562266981758</updated>
       <workItem from="1562266982908" duration="10793000" />
       <workItem from="1562596177915" duration="11616000" />
-      <workItem from="1562628781199" duration="10605000" />
+      <workItem from="1562628781199" duration="12312000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69856000" />
+    <option name="totallyTimeSpent" value="71563000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="961" y="0" width="959" height="1049" extended-state="0" />
@@ -502,20 +491,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/services/socket.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/OnOffButton.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/components/Status.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -526,27 +501,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/views/LogIn.jsx">
+    <entry file="file://$PROJECT_DIR$/client/src/services/socket.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        <state relative-caret-position="680">
+          <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/views/Dashboard.jsx">
+    <entry file="file://$PROJECT_DIR$/client/src/components/OnOffButton.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
-          <folding>
-            <element signature="e#112#158#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="221">
+          <caret line="13" column="39" lean-forward="true" selection-start-line="13" selection-start-column="39" selection-end-line="13" selection-end-column="39" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client/src/App.jsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="30" lean-forward="true" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
+        <state relative-caret-position="34">
+          <caret line="2" column="46" lean-forward="true" selection-start-line="2" selection-start-column="46" selection-end-line="2" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/views/LogIn.jsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
@@ -555,10 +534,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client/src/services/httpClient.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="2" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="2" />
+        <state relative-caret-position="340">
+          <caret line="20" column="18" selection-start-line="20" selection-start-column="18" selection-end-line="20" selection-end-column="18" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/views/Dashboard.jsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="23" lean-forward="true" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>

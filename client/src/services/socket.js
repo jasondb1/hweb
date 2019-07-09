@@ -46,11 +46,13 @@ function authenticate() {
 function subscribeToUpdates(callback) {
 	console.log('subscribing to updates');
 
-    socket.on('updates',
-        payload => callback(null, payload)
-    );
+    if (socket !== null ) {
+        socket.on('updates',
+            payload => callback(null, payload)
+        );
 
-    socket.emit('subscribeToUpdates', UPDATEINTERVAL);
+        socket.emit('subscribeToUpdates', UPDATEINTERVAL);
+    }
 }
 
 function componentOn(component) {
@@ -74,8 +76,11 @@ function componentClose(component) {
 }
 
 function componentGetStatus(component) {
-    console.log('component close:' + component );
-    socket.emit('componentGetStatus', component);
+
+    if (socket !== null ) {
+        console.log('component close:' + component);
+        socket.emit('componentGetStatus', component);
+    }
 }
 
 

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import api from "../services/componentService";
 import { subscribeToUpdates} from "../services/socket";
+//import { socket } from "../services/socket";
 
 const ListItems = (props) => {
     console.log(props.values);

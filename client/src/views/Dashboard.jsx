@@ -8,14 +8,15 @@ class Dashboard extends Component {
 
 
     componentDidMount(){
-        this.socket = authenticate();
+        //authenticate();
         //subscribeToUpdates((err, payload) => this.setState({status: payload}));
+
     }
 
 
 
     render() { return (<div className='Dashboard'>
-            <Controls socket = { this.socket } />
+            <Controls/>
             <Status/>
         </div>
     )};

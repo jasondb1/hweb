@@ -13,11 +13,11 @@ class Controls extends Component {
         return (
             <div>
                 <h2>Controls</h2><br/>
-                <OnOff socket = { this.props.socket } label='LED' component='led'/>
-                <OnOff socket = { this.props.socket } label='LED1' component='ledIndicator'/>
-                <OpenClose socket = { this.props.socket } label='Garage' component='garageRelay'/>
-                <OnOff socket = { this.props.socket } label='Relay 1' component='relay1'/>
-                <OnOff socket = { this.props.socket } label='Relay 2' component='relay2'/>
+                <OnOff label='LED' component='led'/>
+                <OnOff label='LED1' component='ledIndicator'/>
+                <OpenClose label='Garage' component='garageRelay'/>
+                <OnOff label='Relay 1' component='relay1'/>
+                <OnOff label='Relay 2' component='relay2'/>
             </div>
         );
     };

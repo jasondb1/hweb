@@ -1,6 +1,6 @@
 import openSocket from 'socket.io-client';
 //const httpClient = require('./httpClient');
-const socket = null;
+let socket = null;
 const UPDATEINTERVAL = 10000;
 
 // socket.on('connect', () => {
@@ -21,12 +21,33 @@ const UPDATEINTERVAL = 10000;
 // });
 
 function authenticate() {
-        const socket = openSocket('http://192.168.1.108:3001');
+        socket = openSocket('http://192.168.1.108:3001');
 
     socket.on('connect', () => {
         console.log('authenticate');
         let token = localStorage.getItem('token');
         console.log( localStorage.getItem('token') );
+        socket.emit('authenticate', {token: token})
+            .on('authenticated', () => {
+                console.log('socket authenticated')
+            })
+            .on('unauthorized', function(error, callback) {
+                if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+                    // redirect user to login page perhaps or execute callback:
+                    callback();
+                    console.log("User's token has expired");
+                }
+            });
+
+    });
+    return socket;
+
+}
+
+function getAuthSocket() {
+    socket = openSocket('http://192.168.1.108:3001');
+
+    socket.on('connect', () => {
         socket.emit('authenticate', {token: token})
             .on('authenticated', () => {
                 console.log('socket authenticated')
@@ -93,5 +114,6 @@ export {    subscribeToUpdates,
             componentClose,
             componentGetStatus,
             authenticate,
+            getAuthSocket,
             socket,
 };

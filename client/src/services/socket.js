@@ -46,8 +46,10 @@ function authenticate() {
 
 function getAuthSocket() {
     socket = openSocket('http://192.168.1.108:3001');
-
     socket.on('connect', () => {
+        console.log('authenticate');
+        let token = localStorage.getItem('token');
+        console.log( localStorage.getItem('token') );
         socket.emit('authenticate', {token: token})
             .on('authenticated', () => {
                 console.log('socket authenticated')
@@ -62,7 +64,6 @@ function getAuthSocket() {
 
     });
     return socket;
-
 }
 
 function subscribeToUpdates(callback) {

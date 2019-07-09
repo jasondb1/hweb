@@ -19,9 +19,11 @@ class OnOff extends Component {
     }
 
     componentDidMount() {
+        console.log('onoff did mount');
         //getComponentState(this.state.component);
         //console.log('ON OFF updateStatus:');
         this.socket = getAuthSocket();
+        this.socket.emit('componentGetStatus', this.state.component);
 
         this.socket.on('componentStatusUpdate', (data) => {
             console.log('got update for component');
@@ -30,7 +32,7 @@ class OnOff extends Component {
             }
         });
 
-            api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
+            //api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
     }
 
     handleClick() {

@@ -6,8 +6,8 @@ const UPDATEINTERVAL = 10000;
 const ListItems = (props) => {
     //console.log(props.values);
     //console.log(props.values.length());
-    let date = new Date(props.ts * 1000);
-    console.log(props);
+    let date = new Date(1000 * props.ts);
+    console.log(props.ts);
     console.log(date);
     let formatted_time = date.toUTCString();
 
@@ -34,7 +34,6 @@ class Status extends Component {
     }
 
     componentDidMount() {
-
         this.socket = getAuthSocket();
         this.subscribeToUpdates((err, payload) => {
             this.setState({status: payload})

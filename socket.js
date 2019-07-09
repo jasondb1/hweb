@@ -28,7 +28,7 @@ module.exports = function (io) {
 //     });
 //
 // };
-
+    
     io.on('connection', socketioJwt.authorize({
         secret: {JWT_SECRET},
         timeout: 15000

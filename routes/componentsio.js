@@ -17,7 +17,7 @@ module.exports = function (io) {
     })).on('authenticated', client => {
         //Establish a client connection
         //io.on('connection', client => {
-        console.log('client connected');
+        console.log('client connected componentsio');
 
         //updates
         client.on('subscribeToUpdates', (interval) => {
@@ -33,12 +33,14 @@ module.exports = function (io) {
 
         //component off
         client.on('turnComponentOff', comp => {
+console.log('turn comp off');
             componentsCtrl.component[comp].off();
             client.emit('componentStatusUpdate', {component: comp, isOn: false});
         });
 
         //component on
         client.on('turnComponentOn', comp => {
+console.log('turn comp off');
             componentsCtrl.component[comp].on();
             client.emit('componentStatusUpdate', {component: comp, isOn: true});
         });

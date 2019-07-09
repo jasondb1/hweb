@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 //import api from "../services/componentService";
 //import {componentOn, componentOff, getAuthSocket, socket} from "../services/socket";
-import {getAuthSocket, socket} from "../services/socket";
-const SOCKET_SERVER = 'http://192.168.1.108:3001';
-
+import {getAuthSocket} from "../services/socket";
+//
+// const SOCKET_SERVER = 'http://192.168.1.108:3001';
+// const io = require('socket.io-client/socket.io');
 
 class OnOff extends Component {
 
@@ -20,31 +21,30 @@ class OnOff extends Component {
     }
 
     componentDidMount() {
-        console.log('onoff did mount');
         //getComponentState(this.state.component);
         //console.log('ON OFF updateStatus:');
-        //this.socket = getAuthSocket();
+        this.socket = getAuthSocket();
 
-        this.socket = openSocket(SOCKET_SERVER);
-        this.socket.on('connect', () => {
-            //console.log('authenticate');
-            let token = localStorage.getItem('token');
-            //console.log( localStorage.getItem('token') );
-            socket.emit('authenticate', {token: token})
-                .on('authenticated', () => {
-                    console.log('socket authenticated')
-                })
-                .on('unauthorized', function(error, callback) {
-                    if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-                        // redirect user to login page perhaps or execute callback:
-                        callback();
-                        console.log("User's token has expired");
-                    }
-                });
-
-
-
-        });
+        // this.socket = openSocket(SOCKET_SERVER);
+        // this.socket.on('connect', () => {
+        //     //console.log('authenticate');
+        //     let token = localStorage.getItem('token');
+        //     //console.log( localStorage.getItem('token') );
+        //     socket.emit('authenticate', {token: token})
+        //         .on('authenticated', () => {
+        //             console.log('socket authenticated')
+        //         })
+        //         .on('unauthorized', function(error, callback) {
+        //             if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+        //                 // redirect user to login page perhaps or execute callback:
+        //                 callback();
+        //                 console.log("User's token has expired");
+        //             }
+        //         });
+        //
+        //
+        //
+        // });
 
         this.socket.on('componentStatusUpdate', (data) => {
             console.log('got update for component');

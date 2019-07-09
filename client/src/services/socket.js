@@ -1,7 +1,26 @@
-import openSocket from 'socket.io-client';
+//import openSocket from 'socket.io-client';
 //const httpClient = require('./httpClient');
-let socket = null;
+//const SOCKET_SERVER = 'http://192.168.1.108:3001';
+
 const SOCKET_SERVER = 'http://192.168.1.108:3001';
+const io = require('socket.io-client/socket.io');
+
+
+function getAuthSocket() {
+
+    //let socket = io(SOCKET_SERVER);
+    let token = localStorage.getItem('token');
+
+
+    return io.connect(SOCKET_SERVER, {
+        query: {token: token}
+    });
+}
+
+
+
+///old
+
 
 // function authenticate() {
 //         socket = openSocket('http://192.168.1.108:3001');
@@ -27,29 +46,29 @@ const SOCKET_SERVER = 'http://192.168.1.108:3001';
 //
 // }
 
-function getAuthSocket() {
-    socket = openSocket(SOCKET_SERVER);
-    socket.on('connect', () => {
-        //console.log('authenticate');
-        let token = localStorage.getItem('token');
-        //console.log( localStorage.getItem('token') );
-        socket.emit('authenticate', {token: token})
-            .on('authenticated', () => {
-                console.log('socket authenticated')
-            })
-            .on('unauthorized', function(error, callback) {
-                if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-                    // redirect user to login page perhaps or execute callback:
-                    callback();
-                    console.log("User's token has expired");
-                }
-            });
-
-
-
-    });
-    return socket;
-}
+// function getAuthSocket() {
+//     socket = openSocket(SOCKET_SERVER);
+//     socket.on('connect', () => {
+//         //console.log('authenticate');
+//         let token = localStorage.getItem('token');
+//         //console.log( localStorage.getItem('token') );
+//         socket.emit('authenticate', {token: token})
+//             .on('authenticated', () => {
+//                 console.log('socket authenticated')
+//             })
+//             .on('unauthorized', function(error, callback) {
+//                 if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+//                     // redirect user to login page perhaps or execute callback:
+//                     callback();
+//                     console.log("User's token has expired");
+//                 }
+//             });
+//
+//
+//
+//     });
+//     return socket;
+// }
 
 // function subscribeToUpdates(callback) {
 // 	console.log('subscribing to updates');
@@ -82,14 +101,14 @@ function getAuthSocket() {
 //     console.log('component close:' + component );
 //     socket.emit('componentClose', component);
 // }
-
-function componentGetStatus(component) {
-
-    if (socket !== null ) {
-        console.log('component get status:' + component);
-        socket.emit('componentGetStatus', component);
-    }
-}
+//
+// function componentGetStatus(component) {
+//
+//     if (socket !== null ) {
+//         console.log('component get status:' + component);
+//         socket.emit('componentGetStatus', component);
+//     }
+// }
 
 
 
@@ -98,8 +117,8 @@ export {    //subscribeToUpdates,
             //componentOff,
             //componentOpen,
             //componentClose,
-            componentGetStatus,
+            //componentGetStatus,
             //authenticate,
             getAuthSocket,
-            socket,
+            //socket,
 };

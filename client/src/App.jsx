@@ -15,8 +15,8 @@ class App extends React.Component {
 
     onLoginSuccess(user) {
         this.setState({currentUser: httpClient.getCurrentUser()});
-        console.log("login good");
-        console.log(this.state.currentUser);
+        //console.log("login good");
+        //console.log(this.state.currentUser);
     }
 
     logOut() {

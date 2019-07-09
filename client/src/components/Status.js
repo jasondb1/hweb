@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import api from "../services/componentService";
-import { subscribeToUpdates} from "../services/socket";
+//import { subscribeToUpdates} from "../services/socket";
 
 const ListItems = (props) => {
     console.log(props.values);
@@ -29,8 +29,7 @@ class Status extends Component {
     }
 
     componentDidMount() {
-        //subscribeToUpdates((err, payload) => this.setState({status: payload}));
-        //subscribeToUpdates((err, payload) => this.setState({status: payload})
+        subscribeToUpdates((err, payload) => this.setState({status: payload}));
 
         //this.interval = setInterval(this.updateStatus, UPDATEINTERVAL);
     };

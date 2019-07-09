@@ -1,5 +1,8 @@
 import axios from 'axios'
 import jwtDecode from 'jwt-decode'
+import { authenticate } from './socket';
+
+
 
 // instantiate axios
 const httpClient = axios.create();
@@ -32,6 +35,11 @@ httpClient.logIn = function (credentials) {
             } else {
                 return false;
             }
+        })
+        .then(user => {
+            console.log('Dashboard - Authenticate socket');
+            authenticate();
+            return user;
         })
 };
 

@@ -15,16 +15,17 @@ componentsCtrl.start();
 module.exports = function (io) {
 
     io.use(function(socket, next){
-        if (socket.handshake.query && socket.handshake.query.token){
-            jwt.verify(socket.handshake.query.token, {JWT_SECRET}, function(err, decoded) {
+    if (socket.handshake.query && socket.handshake.query.token){
+            jwt.verify(socket.handshake.query.token, JWT_SECRET, function(err, decoded) {
                 if(err) return next(new Error('Authentication error'));
                 socket.decoded = decoded;
                 next();
             });
         } else {
+            console.log('authentication error');
             next(new Error('Authentication error'));
         }
-    })
+    });
 
     //     .on('connection', socketioJwt.authorize({
     //     //secret: {JWT_SECRET},
@@ -33,11 +34,11 @@ module.exports = function (io) {
     // }))
         //.on('authenticated', client => {
 
-        .on('connection', client => {
+       io.on('connection', client => {
         //Establish a client connection
         //io.on('connection', client => {
         console.log('client connected componentsio');
-        console.log(client);
+        //console.log(client);
 
         //updates
         client.on('subscribeToUpdates', (interval) => {
@@ -48,20 +49,17 @@ module.exports = function (io) {
         });
 
         client.on('componentGetStatus', comp => {
-console.log('get component status');
             client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         });
 
         //component off
         client.on('turnComponentOff', comp => {
-console.log('turn comp off');
             componentsCtrl.component[comp].off();
             client.emit('componentStatusUpdate', {component: comp, isOn: false});
         });
 
         //component on
         client.on('turnComponentOn', comp => {
-console.log('turn comp off');
             componentsCtrl.component[comp].on();
             client.emit('componentStatusUpdate', {component: comp, isOn: true});
         });

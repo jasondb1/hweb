@@ -1,9 +1,9 @@
 //import openSocket from 'socket.io-client';
 //const httpClient = require('./httpClient');
-//const SOCKET_SERVER = 'http://192.168.1.108:3001';
-
+//const SOCKET_SERVER = 'http://192.168.1.108:3001'
+import io from 'socket.io-client';
 const SOCKET_SERVER = 'http://192.168.1.108:3001';
-const io = require('socket.io-client/socket.io');
+//const io = require('socket.io-client/socket.io');
 
 
 function getAuthSocket() {

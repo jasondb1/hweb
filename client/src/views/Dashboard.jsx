@@ -6,15 +6,6 @@ import Status from "../components/Status";
 
 class Dashboard extends Component {
 
-
-    componentDidMount(){
-        //authenticate();
-        //subscribeToUpdates((err, payload) => this.setState({status: payload}));
-
-    }
-
-
-
     render() { return (<div className='Dashboard'>
             <Controls/>
             <Status/>

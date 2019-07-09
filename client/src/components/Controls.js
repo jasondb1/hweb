@@ -13,11 +13,8 @@ class Controls extends Component {
         return (
             <div>
                 <h2>Controls</h2><br/>
-                <OnOff label='LED' component='led'/>
                 <OnOff label='LED1' component='ledIndicator'/>
                 <OpenClose label='Garage' component='garageRelay'/>
-                <OnOff label='Relay 1' component='relay1'/>
-                <OnOff label='Relay 2' component='relay2'/>
             </div>
         );
     };

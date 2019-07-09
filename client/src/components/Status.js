@@ -26,8 +26,6 @@ class Status extends Component {
             status: [],
         };
 
-        subscribeToUpdates((err, payload) => this.setState({status: payload})
-        //subscribeToUpdates((err, payload) => this.setState({status: payload})
 
         );
 
@@ -35,6 +33,9 @@ class Status extends Component {
     }
 
     componentDidMount() {
+        subscribeToUpdates((err, payload) => this.setState({status: payload})
+        //subscribeToUpdates((err, payload) => this.setState({status: payload})
+
         //this.interval = setInterval(this.updateStatus, UPDATEINTERVAL);
     };
 
@@ -52,7 +53,6 @@ class Status extends Component {
         return (
             <div>
                 <h2>Status</h2>
-                <p>Timestamp: {this.state.timestamp}</p>
                 <ListItems values={this.state.status}/>
             </div>
         );

@@ -38,8 +38,6 @@ class Status extends Component {
         this.subscribeToUpdates((err, payload) => {
             this.setState({status: payload})
         });
-
-        //this.interval = setInterval(this.updateStatus, UPDATEINTERVAL);
     };
 
 
@@ -48,7 +46,6 @@ class Status extends Component {
     }
 
     updateStatus() {
-        //console.log("updating status");
         api.getStatus().then(json => {
             this.setState({status: json})
 
@@ -56,7 +53,6 @@ class Status extends Component {
     }
 
     subscribeToUpdates(callback) {
-        //console.log('subscribing to updates');
         this.socket.on('updates',
             payload => callback(null, payload)
         );
@@ -72,7 +68,6 @@ class Status extends Component {
             </div>
         );
     }
-
 }
 
 export default Status;

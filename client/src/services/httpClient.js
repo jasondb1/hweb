@@ -1,6 +1,5 @@
 import axios from 'axios'
 import jwtDecode from 'jwt-decode'
-//import { authenticate } from './socket';
 
 // instantiate axios
 const httpClient = axios.create();
@@ -16,8 +15,6 @@ httpClient.setToken = function (token) {
 
 httpClient.getCurrentUser = function () {
     const token = this.getToken();
-    //console.log(token);
-    //console.log(jwtDecode(token));
     if (token) return jwtDecode(token);
     return null;
 };
@@ -34,11 +31,6 @@ httpClient.logIn = function (credentials) {
                 return false;
             }
         })
-        // .then(user => {
-        //     console.log('Dashboard - Authenticate socket');
-        //     authenticate();
-        //     return user;
-        // })
 };
 
 // logIn and signUp functions could be combined into one since the only difference is the url we're sending a request to..

@@ -8,14 +8,9 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/react-express-jwt';
 const PORT = process.env.PORT || 3001;
-//const io = require('socket.io');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-//const socketio = require('./socket.js')(io);
 const componentsio = require('./routes/componentsio.js')(io);
-//app.io = io;
-//console.log(io);
-
 
 const components = require('./routes/components');
 const usersRoutes = require('./routes/users.js');
@@ -28,9 +23,7 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
 });
 
 
-
 //middleware
-
 
 //attach socket io instance to req
 //use it in routes with req.io.emit

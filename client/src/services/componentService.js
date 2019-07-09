@@ -41,7 +41,6 @@ const homewebService = {
                     token: httpClient.getToken(),
                 }
             })
-            //.then(response => response.json())
                 .then(result => resolve(result))
                 .catch(err => {
                     reject(err);
@@ -60,7 +59,6 @@ const homewebService = {
                     token: httpClient.getToken(),
                 }
             })
-            //.then(response => response.json())
                 .then(result => resolve(result))
                 .catch(err => {
                     reject(err);
@@ -79,7 +77,6 @@ const homewebService = {
                     token: httpClient.getToken(),
                 }
             })
-            //.then(response => response.json())
                 .then(result => resolve(result))
                 .catch(err => {
                     reject(err);
@@ -98,7 +95,6 @@ const homewebService = {
                     token: httpClient.getToken(),
                 }
             })
-            //.then(response => response.json())
                 .then(result => resolve(result))
                 .catch(err => {
                     reject(err);

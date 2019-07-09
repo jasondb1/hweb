@@ -9,7 +9,6 @@ usersRouter.route('/')
 
 usersRouter.post('/authenticate', usersCtrl.authenticate);
 
-
 usersRouter.use(verifyToken);
 usersRouter.route('/:id')
     .get(usersCtrl.show)

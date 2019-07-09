@@ -19,12 +19,6 @@ class LogIn extends React.Component {
     onFormSubmit(evt) {
         evt.preventDefault();
         httpClient.logIn(this.state.fields)
-        // .then(user => {
-        //     console.log('Dashboard - Authenticate socket');
-        //     authenticate();
-        //     return user;
-        // })
-
             .then(user => {
             this.setState({fields: {email: '', password: ''}});
             if (user) {

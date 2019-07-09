@@ -1,16 +1,9 @@
-//import openSocket from 'socket.io-client';
-//const httpClient = require('./httpClient');
-//const SOCKET_SERVER = 'http://192.168.1.108:3001'
 import io from 'socket.io-client';
 const SOCKET_SERVER = 'http://192.168.1.108:3001';
-//const io = require('socket.io-client/socket.io');
 
 
 function getAuthSocket() {
-
-    //let socket = io(SOCKET_SERVER);
     let token = localStorage.getItem('token');
-
 
     return io.connect(SOCKET_SERVER, {
         query: {token: token}

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { getAuthSocket } from "../services/socket";
+import {getAuthSocket} from "../services/socket";
 
 
 class OpenClose extends Component {
@@ -25,16 +25,6 @@ class OpenClose extends Component {
                 this.setState({isOpen: data.isOpen});
             }
         });
-
-        // socket.on('componentStatusUpdate', (data) => {
-        //     if (data.component === this.state.component) {
-        //         this.setState({isOpen: data.isOpen});
-        //         console.log('updateStatus:');
-        //         console.log(data);
-        //     }
-        //
-        // });
-        //api.getComponentState(this.state.component).then(json => this.setState({isOpen: json.isOpen}));
     }
 
     handleClick() {
@@ -43,7 +33,6 @@ class OpenClose extends Component {
             //api.componentOpen(this.state.component).then(json => this.setState({isOpen: false}));
         } else {
             this.socket.emit('componentOpen', this.state.component);
-            //componentOpen(this.state.component);
             //api.componentClose(this.state.component).then(json => this.setState({isOpen: true}));
         }
     };

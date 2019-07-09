@@ -1,6 +1,5 @@
 const ComponentsCtrl = require('../controllers/components');
 //const verifyToken = require('../serverAuth.js').verifyToken;
-const socketioJwt = require('socketio-jwt');
 const {JWT_SECRET} = process.env;
 
 const io = require('socket.io')();
@@ -14,10 +13,10 @@ componentsCtrl.start();
 
 module.exports = function (io) {
 
-    io.use(function(socket, next){
-    if (socket.handshake.query && socket.handshake.query.token){
-            jwt.verify(socket.handshake.query.token, JWT_SECRET, function(err, decoded) {
-                if(err) return next(new Error('Authentication error'));
+    io.use(function (socket, next) {
+        if (socket.handshake.query && socket.handshake.query.token) {
+            jwt.verify(socket.handshake.query.token, JWT_SECRET, function (err, decoded) {
+                if (err) return next(new Error('Authentication error'));
                 socket.decoded = decoded;
                 next();
             });
@@ -27,18 +26,8 @@ module.exports = function (io) {
         }
     });
 
-    //     .on('connection', socketioJwt.authorize({
-    //     //secret: {JWT_SECRET},
-    //     secret: 'awkwardsampleskillfulbagpipepetted',
-    //     timeout: 15000
-    // }))
-        //.on('authenticated', client => {
-
-       io.on('connection', client => {
-        //Establish a client connection
-        //io.on('connection', client => {
+    io.on('connection', client => {
         console.log('client connected componentsio');
-        //console.log(client);
 
         //updates
         client.on('subscribeToUpdates', (interval) => {

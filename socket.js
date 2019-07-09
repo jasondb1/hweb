@@ -33,11 +33,11 @@ module.exports = function (io) {
         secret: {JWT_SECRET},
         timeout: 15000
     })).on('authenticated', client => {
-        console.log('client connected');
-        console.log('hello! ' + client.decoded_token.name);
+        //console.log('client connected');
+        //console.log('hello! ' + client.decoded_token.name);
 
         client.on('subscribeToUpdates', (interval) => {
-            console.log('client is subscribing to updates with interval ', interval);
+            //console.log('client is subscribing to updates with interval ', interval);
 
             setInterval(() => {
                 client.emit('updates', new Date());

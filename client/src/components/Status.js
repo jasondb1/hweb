@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
 import api from "../services/componentService";
-import {getAuthSocket, socket} from "../services/socket";
-//import { subscribeToUpdates } from "../services/socket";
-//import { socket } from "../services/socket";
-const UPDATEINTERVAL = 10000;
+import { getAuthSocket } from "../services/socket";
 
+const UPDATEINTERVAL = 10000;
 const ListItems = (props) => {
-    console.log(props.values);
+    //console.log(props.values);
     //console.log(props.values.length());
+    let date = new Date(this.props.ts * 1000);
+    let formatted_time = date.toUTCString();
 
     return (
         <ul>
-            <li key="ts">Time: {props.values.ts}</li>
+            <li key="ts">Time: {formatted_time}</li>
             <li key="temp_local">Temperature Local: {props.values.temp_local}</li>
             <li key="humidity_local">Humidity Local: {props.values.humidity_local}</li>
             <li key="temp_remote0">Temperature Remote: {props.values.temp_remote0}</li>
@@ -34,7 +34,11 @@ class Status extends Component {
     componentDidMount() {
 
         this.socket = getAuthSocket();
-        this.subscribeToUpdates((err, payload) => this.setState({status: payload}));
+        this.subscribeToUpdates((err, payload) => {
+            let date = new Date(json.ts * 1000);
+            paylod.ts = date.toUTCString();
+            this.setState({status: payload})
+        });
 
         //this.interval = setInterval(this.updateStatus, UPDATEINTERVAL);
     };
@@ -47,8 +51,6 @@ class Status extends Component {
     updateStatus() {
         //console.log("updating status");
         api.getStatus().then(json => {
-            let date = new Date(json.ts * 1000);
-            json.ts = date.toUTCString();
             this.setState({status: json})
 
         });

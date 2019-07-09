@@ -1,6 +1,6 @@
 import React from 'react'
 import httpClient from '../services/httpClient'
-import { authenticate } from '../services/socket';
+//import { authenticate } from '../services/socket';
 
 class LogIn extends React.Component {
     state = {

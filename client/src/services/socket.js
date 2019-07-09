@@ -30,12 +30,12 @@ const SOCKET_SERVER = 'http://192.168.1.108:3001';
 function getAuthSocket() {
     socket = openSocket(SOCKET_SERVER);
     socket.on('connect', () => {
-        console.log('authenticate');
+        //console.log('authenticate');
         let token = localStorage.getItem('token');
-        console.log( localStorage.getItem('token') );
+        //console.log( localStorage.getItem('token') );
         socket.emit('authenticate', {token: token})
             .on('authenticated', () => {
-                console.log('socket authenticated')
+                //console.log('socket authenticated')
             })
             .on('unauthorized', function(error, callback) {
                 if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {

@@ -37,11 +37,11 @@ class OnOff extends Component {
         if (this.state.isOn) {
             //api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
             //componentOff(this.state.component);
-            this.socket.emit('turnComponentOff', component);
+            this.socket.emit('turnComponentOff', this.state.component);
         } else {
             //api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
             //componentOn(this.state.component);
-            this.socket.emit('turnComponentOn', component);
+            this.socket.emit('turnComponentOn', this.state.component);
         }
     };
 

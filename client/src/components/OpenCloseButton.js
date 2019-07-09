@@ -39,10 +39,10 @@ class OpenClose extends Component {
 
     handleClick() {
         if (this.state.isOpen) {
-            this.socket.emit('componentClose', component);
+            this.socket.emit('componentClose', this.state.component);
             //api.componentOpen(this.state.component).then(json => this.setState({isOpen: false}));
         } else {
-            this.socket.emit('componentOpen', component);
+            this.socket.emit('componentOpen', this.state.component);
             //componentOpen(this.state.component);
             //api.componentClose(this.state.component).then(json => this.setState({isOpen: true}));
         }

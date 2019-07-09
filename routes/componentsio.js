@@ -28,6 +28,7 @@ module.exports = function (io) {
         });
 
         client.on('componentGetStatus', comp => {
+console.log('get component status');
             client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         });
 

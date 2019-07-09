@@ -36,6 +36,8 @@ function getAuthSocket() {
         socket.emit('authenticate', {token: token})
             .on('authenticated', () => {
                 //console.log('socket authenticated')
+
+
             })
             .on('unauthorized', function(error, callback) {
                 if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
@@ -44,6 +46,8 @@ function getAuthSocket() {
                     console.log("User's token has expired");
                 }
             });
+
+
 
     });
     return socket;

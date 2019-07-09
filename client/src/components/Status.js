@@ -46,7 +46,12 @@ class Status extends Component {
 
     updateStatus() {
         //console.log("updating status");
-        api.getStatus().then(json => this.setState({status: json}));
+        api.getStatus().then(json => {
+            let date = new Date(json.ts * 1000);
+            json.ts = date.toUTCString();
+            this.setState({status: json})
+
+        });
     }
 
     subscribeToUpdates(callback) {

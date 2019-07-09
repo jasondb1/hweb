@@ -1,24 +1,7 @@
 import openSocket from 'socket.io-client';
 //const httpClient = require('./httpClient');
 let socket = null;
-//const UPDATEINTERVAL = 10000;
-
-// socket.on('connect', () => {
-//         console.log('socket connect');
-        //let token = localStorage.getItem('token');
-        //console.log( localStorage.getItem('token') );
-        // socket.emit('authenticate', {token: token})
-        //     .on('authenticated', () => {
-        //         console.log('socket authenticated')
-        //     })
-        //     .on('unauthorized', function(error, callback) {
-        //         if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-        //             // redirect user to login page perhaps or execute callback:
-        //             callback();
-        //             console.log("User's token has expired");
-        //         }
-        //     });
-// });
+const SOCKET_SERVER = 'http://192.168.1.108:3001';
 
 // function authenticate() {
 //         socket = openSocket('http://192.168.1.108:3001');
@@ -45,7 +28,7 @@ let socket = null;
 // }
 
 function getAuthSocket() {
-    socket = openSocket('http://192.168.1.108:3001');
+    socket = openSocket(SOCKET_SERVER);
     socket.on('connect', () => {
         console.log('authenticate');
         let token = localStorage.getItem('token');
@@ -101,7 +84,7 @@ function getAuthSocket() {
 function componentGetStatus(component) {
 
     if (socket !== null ) {
-        console.log('component close:' + component);
+        console.log('component get status:' + component);
         socket.emit('componentGetStatus', component);
     }
 }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-//import api from "../services/componentService";
+import api from "../services/componentService";
 //import {componentOn, componentOff, getAuthSocket, socket} from "../services/socket";
 import { getAuthSocket } from "../services/socket";
 
@@ -13,7 +13,6 @@ class OnOff extends Component {
             label: props.label,
             isOn: props.isOn,
             component: props.component,
-            socket: null,
         };
 
         this.handleClick = this.handleClick.bind(this);
@@ -22,27 +21,29 @@ class OnOff extends Component {
     componentDidMount() {
         //getComponentState(this.state.component);
         //console.log('ON OFF updateStatus:');
-        this.state.socket = getAuthSocket();
+        this.socket = getAuthSocket();
 
-        this.state.socket.on('componentStatusUpdate', (data) => {
+        this.socket.on('componentStatusUpdate', (data) => {
             console.log('got update for component');
             if (data.component === this.state.component) {
                 this.setState({isOn: data.isOn});
             }
         });
 
-            //api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
+            api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
     }
 
     handleClick() {
         if (this.state.isOn) {
+            console.log('handle click: comp off');
             //api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
             //componentOff(this.state.component);
-            this.state.socket.emit('turnComponentOff', this.state.component);
+            this.socket.emit('turnComponentOff', this.state.component);
         } else {
+            console.log('handle click: comp on');
             //api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
             //componentOn(this.state.component);
-            this.state.socket.emit('turnComponentOn', this.state.component);
+            this.socket.emit('turnComponentOn', this.state.component);
         }
     };
 

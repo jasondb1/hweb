@@ -18,8 +18,8 @@ class Arduino extends ComponentInput {
         this.name = name;
         this.location = location;
 
-        this.pin = new Gpio(this.pinNumber, 'in');
-        this.value = this.pin.readSync();
+        this.pin = null;
+        this.value = {};
     }
 
     readSensor() {

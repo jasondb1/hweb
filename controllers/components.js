@@ -45,25 +45,26 @@ class ComponentsCtrl {
 
     init() {
         this.component = {
-            ledIndicator: indicator,
+            ledIndicator: {obj: indicator, value: indicator.value},
+        
 
-            garageRelay: { garageRelay,
+            garageRelay: { obj: garageRelay,
                             value: garageRelay.value },
 
-            temp_local: { dht22,
-                value: dht22.value.getTemperature() },
+            temp_local: { obj: dht22,
+                value: dht22.getTemperature() },
 
-            humidity_local: { dht22,
-                value: dht22.value.getHumidity() },
+            humidity_local: { obj: dht22,
+                value: dht22.getHumidity() },
 
-            presistor_remote0: { arduino,
-                value: arduino.value.getLight() },
+            presistor_remote0: { obj: arduino,
+                value: arduino.getLight() },
 
-            temp_remote0: { arduino,
-                value: arduino.value.getTemperature() },
+            temp_remote0: { obj: arduino,
+                value: arduino.getTemperature() },
 
-            humidity_remote0: { arduino,
-                value: arduino.value.getHumidity() },
+            humidity_remote0: { obj: arduino,
+                value: arduino.getHumidity() },
 
         };
     }
@@ -129,10 +130,11 @@ class ComponentsCtrl {
         currentStatus.ts = new Date().getTime();
 
         //TODO: move keys to instance variable and method to change?
-        let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'led', 'relay1', 'relay2'];
+        let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
 
 
         for (let key of keys) {
+            console.log(key);
             currentStatus[key] = this.component[key].value;
         }
         return currentStatus;

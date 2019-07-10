@@ -37,31 +37,31 @@ module.exports = function (io) {
             }, interval);
         });
 
-        client.on('componentGetStatus', comp => {
-            client.emit('componentStatusUpdate', {component: comp, isOpen: false});
-        });
+        //client.on('componentGetStatus', comp => {
+        //    client.emit('componentStatusUpdate', {component: comp, isOpen: false});
+        //});
 
         //component off
         client.on('turnComponentOff', comp => {
-            componentsCtrl.component[comp].off();
+            componentsCtrl.component[comp].obj.off();
             client.emit('componentStatusUpdate', {component: comp, isOn: false});
         });
 
         //component on
         client.on('turnComponentOn', comp => {
-            componentsCtrl.component[comp].on();
+            componentsCtrl.component[comp].obj.on();
             client.emit('componentStatusUpdate', {component: comp, isOn: true});
         });
 
         //garage open
         client.on('componentOpen', comp => {
-            componentsCtrl.component.garageRelay.open();
+            componentsCtrl.component.garageRelay.obj.open();
             client.emit('componentStatusUpdate', {component: comp, isOpen: true});
         });
 
         //garage close
         client.on('componentClose', comp => {
-            componentsCtrl.component.garageRelay.open();
+            componentsCtrl.component.garageRelay.obj.open();
             client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         });
 

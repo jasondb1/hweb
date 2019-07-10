@@ -14,7 +14,7 @@ class Dht22 extends ComponentInput {
         this.location = location;
 
         this.pin = new Gpio(this.pinNumber, 'in');
-        this.value = this.pin.readSync();
+        this.value = {};
 
 
     }
@@ -52,12 +52,12 @@ class Dht22 extends ComponentInput {
     }
 
     getTemperature() {
-        this.readSensor();
+        this.readSensor.bind(this);
         return this.value.temperature;
     }
 
     getHumidity() {
-        this.readSensor();
+        this.readSensor.bind(this);
         return this.value.humidity;
     }
 

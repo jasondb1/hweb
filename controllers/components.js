@@ -124,7 +124,6 @@ class ComponentsCtrl {
         });
     }
 
-
     currentStatus() {
         let currentStatus = {};
         currentStatus.ts = new Date().getTime();

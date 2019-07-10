@@ -35,17 +35,17 @@ class Arduino extends ComponentInput {
     }
 
     getTemperature() {
-        this.readSensor();
+        this.readSensor.bind(this);
         return this.value.temperature;
     }
 
     getHumidity() {
-        this.readSensor();
+        this.readSensor.bind(this);
         return this.value.humidity;
     }
 
     getLight() {
-        this.readSensor();
+        this.readSensor.bind(this);
         return this.value.presistor;
     }
 

@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 //start updating components at regular intervals
 let componentsCtrl = new ComponentsCtrl();
 componentsCtrl.init();
+componentsCtrl.enableLogging();
 componentsCtrl.start();
 
 module.exports = function (io) {

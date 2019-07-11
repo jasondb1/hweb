@@ -37,6 +37,7 @@ class ComponentsCtrl {
         this.update = null;
         this.updateInterval = null;
         this.database = new Database();
+        this.loggingEnabled = false;
 
     }
 
@@ -73,64 +74,31 @@ class ComponentsCtrl {
 
     readAllSensors() {
 
-        //put all sensor data into ...
         this.currentStatus();
-        //dht22.readSensor();
-        //arduino.readSensor();
-        //this.init();
 
-        // let datetime = new Date();
-        // fs.appendFile(
-        //     LOG_FILEPATH,
-        //     datetime.getTime() +
-        //     "," +
-        //     datetime.toLocaleDateString() +
-        //     "," +
-        //     datetime.toLocaleTimeString() +
-        //     "," +
-        //     this.component.temp_local.value +
-        //     "," +
-        //     this.component.humidity_local.value +
-        //     "\n", function (err) {
-        //     }
-        // );
+        if (this.loggingEnabled) {
+            //open database
+            let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
 
-        //open database
-        let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
+            let data = [];
 
-        // let db = new sqlite3.Database(DB_FILEPATH, (err) => {
-        //     if (err) {
-        //         console.error("[components.js] " + err.message);
-        //     } else {
-        //         //console.log('Connected to the homeWeb database.');
-        //     }
-        // });
-        let data = [];
+            for (let key of log_sensors) {
+                data.push({
+                    description: this.component[key].name,
+                    sensor: key,
+                    value: this.component[key].value,
+                    location: this.component[key].value
+                });
 
-        for (let key of log_sensors) {
-            data.push( {description: this.component[key].name,
-                sensor: key,
-                value: this.component[key].value,
-                location: this.component[key].value
-            });
-            // db.run("INSERT INTO sensor_data(timestamp, description, sensor, value) VALUES( ?, ?, ?, ?)", [datetime.getTime(), this.component[key].name, key, this.component[key].value],
-            //     (err) => {
-            //         if (err) {
-            //             console.error(err);
-            //         }
-            //     }
-            // );
+            }
+
+            this.database.insert(data);
         }
+        
+    }
 
-        this.database.insert(data);
-
-        // db.close((err) => {
-        //     if (err) {
-        //         return console.error(err.message);
-        //     } else {
-        //         //console.log('Close the db connection');
-        //     }
-        // });
+    enableLogging() {
+        this.loggingEnabled = true;
     }
 
     currentStatus() {

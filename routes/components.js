@@ -4,7 +4,7 @@ const ComponentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 
 let componentsCtrl = new ComponentsCtrl();
-componentsCtrl.init();
+componentsCtrl.updateComponents();
 componentsCtrl.start();
 
 //authenticate the following routes

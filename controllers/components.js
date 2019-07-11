@@ -43,7 +43,7 @@ class ComponentsCtrl {
         this.updateInterval = null;
     }
 
-    init() {
+    updateComponents() {
         this.component = {
             ledIndicator: {obj: indicator, 
                             value: indicator.value },
@@ -77,7 +77,9 @@ class ComponentsCtrl {
 
         dht22.readSensor();
         arduino.readSensor();
-
+        
+        this.updateComponents();
+        
         let datetime = new Date();
         fs.appendFile(
             LOG_FILEPATH,
@@ -127,13 +129,13 @@ class ComponentsCtrl {
     currentStatus() {
         let currentStatus = {};
         currentStatus.ts = new Date().getTime();
+        this.updateComponents();
 
         //TODO: move keys to instance variable and method to change?
         let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
 
 
         for (let key of keys) {
-            //console.log(key);
             currentStatus[key] = this.component[key].value;
         }
         console.log(currentStatus);

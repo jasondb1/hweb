@@ -31,23 +31,25 @@ class Dht22 extends ComponentInput {
                 }
             }
         });
+
+        //this.readSensor.bind(this);
     }
 
 
 
-    init() {
-//temperature sensor (currently in simulation mode)
-        dht_sensor.setMaxRetries(10);
-        //sensor.initialize(DHT_TYPE, this.pin_number);
-        dht_sensor.initialize({
-            test: {
-                fake: {
-                    temperature: 21.5,
-                    humidity: 60.25
-                }
-            }
-        });
-    }
+//    init() {
+////temperature sensor (currently in simulation mode)
+//        dht_sensor.setMaxRetries(10);
+//        //sensor.initialize(DHT_TYPE, this.pin_number);
+//        dht_sensor.initialize({
+//            test: {
+//                fake: {
+//                    temperature: 21.5,
+//                    humidity: 60.25
+//                }
+//            }
+//        });
+//    }
 
     readSensor() {
 dht_sensor.read(DHT_TYPE, this.pinNumber)
@@ -76,8 +78,9 @@ dht_sensor.read(DHT_TYPE, this.pinNumber)
 
     getHumidity() {
     console.log('get humidity');
-        this.readSensor();
-        return this.value.humidity;
+    this.readSensor();
+    console.log(this.value.humidity);
+    return this.value.humidity;
     }
 
 }

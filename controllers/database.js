@@ -84,6 +84,30 @@ class Database {
 
     }
 
+    getSensorData(sensor, time_prev = ( 24 * 60 * 60 * 1000)) {
+
+        this.connect();
+        //let datetime = new Date();
+        //let time_now = datetime.getTime();
+        //let time = time_now - time_prev;
+        let rows = null;
+
+        //TODO: limit, allow user to specify columns
+        this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_prev], function (err, rows) {
+
+            if (err) {
+                throw err;
+            }
+
+            //console.log(rows);
+
+        });
+
+        this.close();
+        return rows;
+
+    }
+
     exportData(filter = '1', filename = LOG_FILEPATH) {
 
         this.connect();
@@ -101,11 +125,7 @@ class Database {
 
             fs.appendFile(
                 filename,
-                datetime.getTime() +
-                "," +
-                datetime.toLocaleDateString() +
-                "," +
-                datetime.toLocaleTimeString() +
+                row.timestamp +
                 "," +
                 row.description +
                 "," +

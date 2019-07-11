@@ -77,6 +77,7 @@ class ComponentsCtrl {
 
         dht22.readSensor();
         arduino.readSensor();
+        this.init();
 
         let datetime = new Date();
         fs.appendFile(
@@ -126,6 +127,7 @@ class ComponentsCtrl {
 
     currentStatus() {
         let currentStatus = {};
+        this.init();
         currentStatus.ts = new Date().getTime();
 
         //TODO: move keys to instance variable and method to change?

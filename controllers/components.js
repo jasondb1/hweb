@@ -74,10 +74,10 @@ class ComponentsCtrl {
     readAllSensors() {
 
         //put all sensor data into ...
-
-        dht22.readSensor();
-        arduino.readSensor();
-        this.init();
+        this.currentStatus();
+        //dht22.readSensor();
+        //arduino.readSensor();
+        //this.init();
 
         let datetime = new Date();
         fs.appendFile(
@@ -135,10 +135,8 @@ class ComponentsCtrl {
 
 
         for (let key of keys) {
-            //console.log(key);
             currentStatus[key] = this.component[key].value;
         }
-        console.log(currentStatus);
         return currentStatus;
     }
 

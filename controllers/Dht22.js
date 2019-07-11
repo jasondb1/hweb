@@ -35,19 +35,19 @@ class Dht22 extends ComponentInput {
 
 
 
-    init() {
-//temperature sensor (currently in simulation mode)
-        dht_sensor.setMaxRetries(10);
-        //sensor.initialize(DHT_TYPE, this.pin_number);
-        dht_sensor.initialize({
-            test: {
-                fake: {
-                    temperature: 21.5,
-                    humidity: 60.25
-                }
-            }
-        });
-    }
+//    init() {
+////temperature sensor (currently in simulation mode)
+//        dht_sensor.setMaxRetries(10);
+//        //sensor.initialize(DHT_TYPE, this.pin_number);
+//        dht_sensor.initialize({
+//            test: {
+//                fake: {
+//                    temperature: 21.5,
+//                    humidity: 60.25
+//                }
+//            }
+//        });
+//    }
 
     readSensor() {
 dht_sensor.read(DHT_TYPE, this.pinNumber)
@@ -68,14 +68,11 @@ dht_sensor.read(DHT_TYPE, this.pinNumber)
     }
 
     getTemperature() {
-    console.log('get temp');
         this.readSensor();
-        console.log(this.value.temperature);
         return this.value.temperature;
     }
 
     getHumidity() {
-    console.log('get humidity');
         this.readSensor();
         return this.value.humidity;
     }

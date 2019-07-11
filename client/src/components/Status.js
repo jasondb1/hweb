@@ -6,10 +6,10 @@ const UPDATEINTERVAL = 10000;
 const ListItems = (props) => {
     //console.log(props.values);
     //console.log(props.values.length());
-    let date = new Date(1000 * props.ts);
-    console.log(props.ts);
-    console.log(date);
-    let formatted_time = date.toUTCString();
+    let date = new Date(props.values.ts);
+    //console.log(props.values.ts);
+    //console.log(date);
+    let formatted_time = date.toLocaleTimeString();
 
     return (
         <ul>

@@ -19,7 +19,6 @@ class OnOff extends Component {
         this.socket = getAuthSocket();
 
         this.socket.on('componentStatusUpdate', (data) => {
-            console.log('got update for component');
             if (data.component === this.state.component) {
                 this.setState({isOn: data.isOn});
             }
@@ -31,11 +30,9 @@ class OnOff extends Component {
 
     handleClick() {
         if (this.state.isOn) {
-            console.log('handle click: comp off');
             //api.componentOff(this.state.component).then(json => this.setState({isOn: false}));
             this.socket.emit('turnComponentOff', this.state.component);
         } else {
-            console.log('handle click: comp on');
             //api.componentOn(this.state.component).then(json => this.setState({isOn: true}));
             this.socket.emit('turnComponentOn', this.state.component);
         }

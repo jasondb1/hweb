@@ -23,6 +23,7 @@ class Arduino extends ComponentInput {
     }
 
     readSensor() {
+        console.log('arduino get temp');
         i2c_bus.i2cReadSync(this.slaveAddress, DATA_LENGTH, buffer_arduino);
         let string = buffer_arduino.toString();
         let vals = string.split(/[\s,\0]+/, 3);
@@ -31,10 +32,11 @@ class Arduino extends ComponentInput {
         this.value.presistor = vals[0];
         this.value.temp = vals[1];
         this.value.humidity = vals[2];
-        //console.log(string.split(/[\s,\0]+/, 3));
+        console.log(string.split(/[\s,\0]+/, 3));
     }
 
     getTemperature() {
+        console.log('arduino get temp');
         this.readSensor.bind(this);
         return this.value.temperature;
     }

@@ -5,7 +5,7 @@ const verifyToken = require('../serverAuth.js').verifyToken;
 
 let componentsCtrl = new ComponentsCtrl();
 componentsCtrl.init();
-componentsCtrl.start();
+//componentsCtrl.start();
 
 //authenticate the following routes
 router.use(verifyToken);

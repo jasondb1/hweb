@@ -36,9 +36,8 @@ class ComponentsCtrl {
         this.component = {};
         this.update = null;
         this.updateInterval = null;
-        this.database = new Database();
+        this.database = null;
         this.loggingEnabled = false;
-
     }
 
     init() {
@@ -94,11 +93,12 @@ class ComponentsCtrl {
 
             this.database.insert(data);
         }
-        
+
     }
 
     enableLogging() {
         this.loggingEnabled = true;
+        this.database = new Database();
     }
 
     currentStatus() {

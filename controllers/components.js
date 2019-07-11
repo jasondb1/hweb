@@ -3,6 +3,7 @@ const Led = require('./Led.js');
 const GarageRelay = require('./GarageRelay.js');
 const Dht22 = require('./Dht22');
 const Arduino = require('./Arduino');
+const Relay = require('./Relay');
 
 const sqlite3 = require('sqlite3').verbose();
 const Gpio = require('onoff').Gpio;
@@ -33,7 +34,7 @@ let indicator = new Led(LEDPIN);
 let garageRelay = new GarageRelay(RELAY1PIN);
 let arduino = new Arduino(ARDUINO_I2C_ADDR);
 let dht22 = new Dht22(DHT22PIN);
-
+let relay2 = new Relay(RELAY2PIN);
 
 class ComponentsCtrl {
 
@@ -51,6 +52,9 @@ class ComponentsCtrl {
             garageRelay: { obj: garageRelay,
                             value: garageRelay.value },
 
+            relay2: { obj: relay2,
+                            value: relay2.value },
+            
             temp_local: { obj: dht22,
                 value: dht22.getTemperature() },
 
@@ -96,7 +100,7 @@ class ComponentsCtrl {
         );
 
         //open database
-        let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
+        let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
 
         let db = new sqlite3.Database(DB_FILEPATH, (err) => {
             if (err) {
@@ -131,7 +135,7 @@ class ComponentsCtrl {
         currentStatus.ts = new Date().getTime();
 
         //TODO: move keys to instance variable and method to change?
-        let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay'];
+        let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
 
 
         for (let key of keys) {

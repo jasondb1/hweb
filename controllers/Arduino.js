@@ -19,39 +19,39 @@ class Arduino extends ComponentInput {
         this.location = location;
 
         this.pin = null;
-        this.value = {};
+        this.value = {
+        temperature: null,
+        humidity: null,
+        p_resistor: null,
+        };
     }
 
     readSensor() {
-        console.log('arduino get temp');
         i2c_bus.i2cReadSync(this.slaveAddress, DATA_LENGTH, buffer_arduino);
         let string = buffer_arduino.toString();
         let vals = string.split(/[\s,\0]+/, 3);
-        //console.log(vals);
 
-        this.value.presistor = vals[0];
-        this.value.temp = vals[1];
+        this.value.p_resistor = vals[0];
+        this.value.temperature = vals[1];
         this.value.humidity = vals[2];
-        console.log(string.split(/[\s,\0]+/, 3));
+        //console.log(string.split(/[\s,\0]+/, 3));
     }
 
     getTemperature() {
-        console.log('arduino get temp');
-        this.readSensor.bind(this);
+        this.readSensor();
         return this.value.temperature;
     }
 
     getHumidity() {
-        this.readSensor.bind(this);
+        this.readSensor();
         return this.value.humidity;
     }
 
     getLight() {
-        this.readSensor.bind(this);
-        return this.value.presistor;
+        this.readSensor();
+        return this.value.p_resistor;
     }
 
 }
-
 
 module.exports = Arduino;

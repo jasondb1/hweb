@@ -17,7 +17,7 @@ const LEDPIN = 4;
 const RELAY1PIN = 18;
 const RELAY2PIN = 23;
 let ARDUINO_I2C_ADDR = 0x08;
-    const DHT22PIN = 17;
+const DHT22PIN = 17;
 
 const TEMPPIN = 17;
 const SAMPLEINTERVAL = 10; //interval in seconds to sample temperature and humidity
@@ -45,9 +45,9 @@ class ComponentsCtrl {
 
     init() {
         this.component = {
-            ledIndicator: {obj: indicator, value: indicator.value},
+            ledIndicator: {obj: indicator, 
+                            value: indicator.value },
         
-
             garageRelay: { obj: garageRelay,
                             value: garageRelay.value },
 
@@ -133,9 +133,10 @@ class ComponentsCtrl {
 
 
         for (let key of keys) {
-            console.log(key);
+            //console.log(key);
             currentStatus[key] = this.component[key].value;
         }
+        console.log(currentStatus);
         return currentStatus;
     }
 

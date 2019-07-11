@@ -7,17 +7,33 @@ const DHT_TYPE = 22;
 
 class Dht22 extends ComponentInput {
 
-    constructor(pin_number, name = 'button', location = "unknown") {
+    constructor(pin_number, name = 'DHT 22', location = "unknown") {
         super();
         this.pinNumber = pin_number;
         this.name = name;
         this.location = location;
 
         this.pin = new Gpio(this.pinNumber, 'in');
-        this.value = {};
+        this.value = {
+        humidity: null,
+        temperature: null,
+        };
 
-
+        
+//temperature sensor (currently in simulation mode)
+        dht_sensor.setMaxRetries(10);
+        //sensor.initialize(DHT_TYPE, this.pin_number);
+        dht_sensor.initialize({
+            test: {
+                fake: {
+                    temperature: 21.5,
+                    humidity: 60.25
+                }
+            }
+        });
     }
+
+
 
     init() {
 //temperature sensor (currently in simulation mode)
@@ -34,14 +50,14 @@ class Dht22 extends ComponentInput {
     }
 
     readSensor() {
-        dht_sensor.read(DHT_TYPE, this.pinNumber)
+dht_sensor.read(DHT_TYPE, this.pinNumber)
             .then(res => {
                     let datetime = new Date();
-                    //console.log(res);
-                    //console.log(`temp: ${res.temperature.toFixed(1)} deg C`
-                    //    + `    humidity: ${res.humidity.toFixed(1)}%`
-                    //    + `    ts:` + datetime.toLocaleString());
-
+//                    console.log(res);
+//                    console.log(`temp: ${res.temperature.toFixed(1)} deg C`
+//                        + `    humidity: ${res.humidity.toFixed(1)}%`
+//                        + `    ts:` + datetime.toLocaleString());
+//
                     this.value.temperature = res.temperature.toFixed(2);
                     this.value.humidity = res.humidity.toFixed(2);
                 },
@@ -52,12 +68,15 @@ class Dht22 extends ComponentInput {
     }
 
     getTemperature() {
-        this.readSensor.bind(this);
+    console.log('get temp');
+        this.readSensor();
+        console.log(this.value.temperature);
         return this.value.temperature;
     }
 
     getHumidity() {
-        this.readSensor.bind(this);
+    console.log('get humidity');
+        this.readSensor();
         return this.value.humidity;
     }
 

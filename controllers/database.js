@@ -147,10 +147,5 @@ class Database {
 
 }
 
-exports.module = Database;
-
-
-
-
-
+module.exports = Database;
 

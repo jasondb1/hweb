@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 const Navmenu = (props) => {
     return (
@@ -15,7 +15,7 @@ const Navmenu = (props) => {
                         <li><Link to="/main/test">Other Controls</Link></li>
                         <li><Link to="/signup">Admin</Link></li>
                         <li><Link to="/logout">Log Out</Link></li>
-					</ul>
+                    </ul>
                 )
                 : (
                     <span>

@@ -40,7 +40,7 @@ class Dht22 extends ComponentInput {
 //        dht_sensor.setMaxRetries(10);
 //        //sensor.initialize(DHT_TYPE, this.pin_number);
 //        dht_sensor.initialize({
-//            test: {
+//            Test.js: {
 //                fake: {
 //                    temperature: 21.5,
 //                    humidity: 60.25

@@ -8,6 +8,7 @@ import LogOut from './views/LogOut'
 import SignUp from './views/SignUp'
 import Home from './views/Home'
 import Dashboard from './views/Dashboard';
+import Main from './views/Main';
 
 class App extends React.Component {
     state = {currentUser: httpClient.getCurrentUser()};
@@ -46,6 +47,12 @@ class App extends React.Component {
                     <Route path="/dashboard" render={() => {
                         return currentUser
                             ? <Dashboard/>
+                            : <Redirect to="/login"/>
+                    }}/>
+
+                    <Route path="/main" render={(props) => {
+                        return currentUser
+                            ? <Main {...props}/>
                             : <Redirect to="/login"/>
                     }}/>
 

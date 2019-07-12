@@ -2,7 +2,7 @@ import React from 'react'
 import {Switch, Route, Redirect} from 'react-router-dom'
 import httpClient from './services/httpClient'
 
-import NavBar from './NavBar'
+//import NavBar from './NavBar'
 import LogIn from './views/LogIn'
 import LogOut from './views/LogOut'
 import SignUp from './views/SignUp'
@@ -23,7 +23,7 @@ class App extends React.Component {
     }
 
     render() {
-        const {currentUser} = this.state;
+
         return (
             <div className='App container'>
 
@@ -56,7 +56,12 @@ class App extends React.Component {
                             : <Redirect to="/login"/>
                     }}/>
 
-                    <Route path="/" component={Home}/>
+                    <Route path="/" render={(props) => {
+                        return currentUser
+                            ? <Main {...props}/>
+                            : <Redirect to="/login"/>
+
+                    }}/>
 
                 </Switch>
             </div>

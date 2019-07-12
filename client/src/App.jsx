@@ -27,7 +27,7 @@ class App extends React.Component {
         return (
             <div className='App container'>
 
-                <NavBar currentUser={currentUser}/>
+                { /*<NavBar currentUser={currentUser}/> */}
 
                 <Switch>
 

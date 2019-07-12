@@ -23,7 +23,7 @@ class LogIn extends React.Component {
             this.setState({fields: {email: '', password: ''}});
             if (user) {
                 this.props.onLoginSuccess(user);
-                this.props.history.push('/dashboard')
+                this.props.history.push('/main/dashboard')
             }
         })
     };

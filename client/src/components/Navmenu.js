@@ -7,15 +7,15 @@ const Navmenu = (props) => {
             <Link to="/">Home</Link>
             {props.currentUser
                 ? (
-                    <span>
-						<Link to="/dashboard">Dashboard</Link>
-                        <Link to="/main/dashboard">Dashboard Main</Link>
-                        <Link to="/main/garage">Garage</Link>
-                        <Link to="/main/climate">Climate</Link>
-                        <Link to="/main/test">Other Controls</Link>
-						<Link to="/signup">Admin</Link>
-						<Link to="/logout">Log Out</Link>
-					</span>
+                    <ul>
+                        <li><Link to="/dashboard">Dashboard</Link></li>
+                        <li><Link to="/main/dashboard">Dashboard Main</Link></li>
+                        <li><Link to="/main/garage">Garage</Link></li>
+                        <li><Link to="/main/climate">Climate</Link></li>
+                        <li><Link to="/main/test">Other Controls</Link></li>
+                        <li><Link to="/signup">Admin</Link></li>
+                        <li><Link to="/logout">Log Out</Link></li>
+					</ul>
                 )
                 : (
                     <span>

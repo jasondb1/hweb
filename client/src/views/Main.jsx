@@ -6,8 +6,7 @@ import Navmenu from "../components/Navmenu";
 import Garage from "../components/Garage";
 import Climate from "../components/Climate";
 import Dashboard from "../components/Dashboard";
-import Test from "../components/Test";
-import Status from "../components/Status";
+import Test from "../components/Test";;
 
 
 class Main extends Component {
@@ -28,9 +27,6 @@ class Main extends Component {
             <Route path={`${match.path}/garage`} component={Garage}/>
             <Route path={`${match.path}/climate`} component={Climate}/>
             <Route path={`${match.path}/test`} component={Test}/>
-
-            <Controls/>
-            <Status/>
         </div>
     )};
 

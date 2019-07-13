@@ -11,18 +11,20 @@ import Test from "../components/Test";;
 
 class Main extends Component {
 
-    // constructor(props){
-    //     super(props);
-    // }
+     constructor(props){
+         super(props);
+    
+        console.log(props);
+    }
 
     render() {
         const { match } = this.props;
-        const {currentUser} = this.state;
-        console.log(match);
+        const {currentUser} = this.props;
+        console.log(currentUser);
         return (
         <div className='Main'>
             <Header currentUser={currentUser} />
-            <Navmenu />
+            <Navmenu currentUser={currentUser} />
             <Route path={`${match.path}/`} component={Dashboard} exact/>
             <Route path={`${match.path}/dashboard`} component={Dashboard}/>
             <Route path={`${match.path}/garage`} component={Garage}/>

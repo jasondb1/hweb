@@ -6,7 +6,7 @@ import httpClient from './services/httpClient'
 import LogIn from './views/LogIn'
 import LogOut from './views/LogOut'
 import SignUp from './views/SignUp'
-import Home from './views/Home'
+//import Home from './views/Home'
 import Dashboard from './views/Dashboard';
 import Main from './views/Main';
 
@@ -52,13 +52,13 @@ class App extends React.Component {
 
                     <Route path="/main" render={(props) => {
                         return currentUser
-                            ? <Main {...props}/>
+                            ? <Main {...props} currentUser={currentUser} />
                             : <Redirect to="/login"/>
                     }}/>
 
                     <Route path="/" render={(props) => {
                         return currentUser
-                            ? <Main {...props}/>
+                            ? <Main {...props} currentUser={currentUser}/>
                             : <Redirect to="/login"/>
 
                     }}/>

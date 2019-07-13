@@ -3,19 +3,19 @@ import {Link} from 'react-router-dom';
 
 const Navmenu = (props) => {
     return (
-        <div className='NavMenu'>
-            <Link to="/">Home</Link>
+        <div className='NavMenu nav flex-column nav-pills' id='v-pills-tab'>
+
             {props.currentUser
-                ? (
-                    <ul>
-                        <li><Link to="/dashboard">Dashboard</Link></li>
-                        <li><Link to="/main/dashboard">Dashboard Main</Link></li>
-                        <li><Link to="/main/garage">Garage</Link></li>
-                        <li><Link to="/main/climate">Climate</Link></li>
-                        <li><Link to="/main/test">Other Controls</Link></li>
-                        <li><Link to="/signup">Admin</Link></li>
-                        <li><Link to="/logout">Log Out</Link></li>
-                    </ul>
+                ? (<div>
+                <Link className='nav-link' to="/">Home</Link>
+                <Link className='nav-link' to="/dashboard">Dashboard</Link>
+                <Link className='nav-link' to="/main/dashboard">Dashboard Main</Link>
+                <Link className='nav-link' to="/main/garage">Garage</Link>
+                <Link className='nav-link' to="/main/climate">Climate</Link>
+                <Link className='nav-link' to="/main/test">Other Controls</Link>
+                <Link className='nav-link' to="/signup">Admin</Link>
+                <Link className='nav-link' to="/logout">Log Out</Link>
+                </div>
                 )
                 : (
                     <span>
@@ -25,6 +25,7 @@ const Navmenu = (props) => {
             }
         </div>
     )
+
 };
 
 export default Navmenu;

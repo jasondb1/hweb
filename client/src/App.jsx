@@ -25,7 +25,7 @@ class App extends React.Component {
     render() {
         const {currentUser} = this.state;
         return (
-            <div className='App container'>
+            <div className='App container-fluid'>
 
                 { /*<NavBar currentUser={currentUser}/> */}
 

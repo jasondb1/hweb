@@ -1,8 +1,46 @@
-.NavBar a, .NavBar button {
-	margin: 0 5px;
-	cursor: pointer;
+@import url('https://fonts.googleapis.com/css?family=Quicksandt&display=swap');
+
+
+body {
+	font-family: 'Quicksand', sans-serif;
+	background-color: rgb(242, 245, 255);
 }
 
-.NavBar {
-	margin-bottom: 20px
+h1 {
+	font-size: 2em;
 }
+
+#header{
+	background-color: #EDEDED;
+	color: #6BB6FF;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#header #toggle-menu {
+	border-radius: 8px;
+	border: none;
+	background-color: #3332;
+	padding: 0.75em;
+	margin-right: 1em;
+}
+
+#mainMenu{
+	background-color: lightgreen;
+}
+
+.content-main {
+
+}
+
+.footer {
+	background-color: #EDEDED;
+	min-height: 4em;
+	position: fixed ;
+	left: 0 ;
+	bottom: 0 ;
+	z-index: 1 ;
+	color: #6BB6FF;
+}
+
+

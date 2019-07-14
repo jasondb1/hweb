@@ -31,14 +31,14 @@ class Main extends Component {
 
     componentDidMount() {
         this.socket = getAuthSocket();
-        this.subscribeToUpdates((err, payload) => {
-            this.setState({status: payload})
-        });
+        //this.subscribeToUpdates((err, payload) => {
+        //    this.setState({status: payload})
+        //});
     };
 
     componentWillUnmount() {
         //TODO: unsubscribe from updates
-        clearInterval(this.interval);
+        //clearInterval(this.interval);
     }
 
     // updateStatus() {
@@ -47,13 +47,13 @@ class Main extends Component {
     //     });
     // }
 
-    subscribeToUpdates(callback) {
-        this.socket.on('updates',
-            payload => callback(null, payload)
-        );
-console.log('subscribing to updates');
-        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
-    }
+    //subscribeToUpdates(callback) {
+    //    this.socket.on('updates',
+    //        payload => callback(null, payload)
+    //    );
+//console.log('subscribing to updates');
+//        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
+//    }
 
     toggleNavMenu() {
         this.setState({isNavMenuOpen: !this.state.isNavMenuOpen});

@@ -33,23 +33,9 @@ module.exports = function (io) {
     io.on('connection', client => {
 
         //updates automatically
-        autoUpdate = setInterval(() => {
-            client.emit('updates', componentsCtrl.currentStatus());
-        }, UPDATEINTERVAL);
-
-        //updates
-        client.on('subscribeToUpdates', (interval) => {
-            console.log('client is subscribing to updates with interval ', interval);
-            subscribedUpdate = setInterval(() => {
-                client.emit('updates', componentsCtrl.currentStatus());
-            }, interval);
-        });
-
-        //updates
-        client.on('unsubscribeToUpdates', () => {
-            console.log('client is unsubscribing from updates');
-            clearInterval(subscribedUpdate);
-        });
+          autoUpdate = setInterval(() => {
+              client.emit('updates', componentsCtrl.currentStatus());
+          }, UPDATEINTERVAL);
 
         //client.on('componentGetStatus', comp => {
         //    client.emit('componentStatusUpdate', {component: comp, isOpen: false});

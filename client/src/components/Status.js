@@ -3,12 +3,10 @@ import api from "../services/componentService";
 import { getAuthSocket } from "../services/socket";
 
 const UPDATEINTERVAL = 10000;
+
 const ListItems = (props) => {
-    //console.log(props.values);
-    //console.log(props.values.length());
+
     let date = new Date(props.values.ts);
-    //console.log(props.values.ts);
-    //console.log(date);
     let formatted_time = date.toLocaleTimeString();
 
     return (

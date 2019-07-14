@@ -1,5 +1,12 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+const homeicon = require('../icons/icons8-home-50.png');
+const dashboardicon = require('../icons/icons8-dashboard-50.png');
+const garageicon = require('../icons/icons8-garage-50-7.png');
+const climateicon = require('../icons/icons8-temperature-50.png');
+const othericon = require('../icons/icons8-content-50.png');
+const adminicon = require('../icons/icons8-user-group-50.png');
+const logouticon = require('../icons/icons8-exit-50.png');
 
 const Navmenu = (props) => {
     return (
@@ -7,14 +14,13 @@ const Navmenu = (props) => {
 
             {props.currentUser
                 ? (<div>
-                <Link className='nav-link' to="/">Home</Link>
-                <Link className='nav-link' to="/dashboard">Dashboard</Link>
-                <Link className='nav-link' to="/main/dashboard">Dashboard Main</Link>
-                <Link className='nav-link' to="/main/garage">Garage</Link>
-                <Link className='nav-link' to="/main/climate">Climate</Link>
-                <Link className='nav-link' to="/main/test">Other Controls</Link>
-                <Link className='nav-link' to="/signup">Admin</Link>
-                <Link className='nav-link' to="/logout">Log Out</Link>
+                <Link className='nav-link' to="/"><img alt="" className="icon" src={homeicon} height='32' />Home</Link>
+                <Link className='nav-link' to="/main/dashboard"><img alt="" className="icon" src={dashboardicon} height='32' />Dashboard</Link>
+                <Link className='nav-link' to="/main/garage"><img alt="" className="icon" src={garageicon} height='32' />Garage</Link>
+                <Link className='nav-link' to="/main/climate"><img alt="" className="icon" src={climateicon} height='32' />Climate</Link>
+                <Link className='nav-link' to="/main/test"><img alt="" className="icon" src={othericon} height='32' />Other Controls</Link>
+                <Link className='nav-link' to="/signup"><img alt="" className="icon" src={adminicon} height='32' />Admin</Link>
+                <Link className='nav-link' to="/logout"><img alt="" className="icon" src={logouticon} height='32' />Log Out</Link>
                 </div>
                 )
                 : (

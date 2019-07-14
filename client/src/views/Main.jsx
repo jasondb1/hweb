@@ -7,7 +7,11 @@ import Garage from "../components/Garage";
 import Climate from "../components/Climate";
 import Dashboard from "../components/Dashboard";
 import Test from "../components/Test";
+import Footer from "../components/Footer";
+import {getAuthSocket} from "../services/socket";
+import api from "../services/componentService";
 
+const UPDATEINTERVAL = 10000;
 
 class Main extends Component {
 
@@ -15,12 +19,38 @@ class Main extends Component {
         super(props);
         this.state = {
             isNavMenuOpen: false,
-            isUserMenuOpen: false
+            isUserMenuOpen: false,
+            status: null,
         };
 
         //console.log(props);
+        this.updateStatus = this.updateStatus.bind(this);
         this.toggleNavMenu = this.toggleNavMenu.bind(this);
         this.toggleUserMenu = this.toggleUserMenu.bind(this);
+    }
+
+    componentDidMount() {
+        this.socket = getAuthSocket();
+        this.subscribeToUpdates((err, payload) => {
+            this.setState({status: payload})
+        });
+    };
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
+    updateStatus() {
+        api.getStatus().then(json => {
+            this.setState({status: json})
+        });
+    }
+
+    subscribeToUpdates(callback) {
+        this.socket.on('updates',
+            payload => callback(null, payload)
+        );
+        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
     }
 
     toggleNavMenu() {
@@ -32,6 +62,7 @@ class Main extends Component {
     }
 
     render() {
+        //TODO: doors and lights routes
         const {match} = this.props;
         const {currentUser} = this.props;
         return (
@@ -39,11 +70,7 @@ class Main extends Component {
                 <Header currentUser={currentUser} toggleNavMenu={this.toggleNavMenu}
                         toggleUserMenu={this.toggleUserMenu}/>
 
-
-
-
-
-                <div className="mainMenu row" id="mainMenu">
+                <div className="mainMenu row ml-3" id="mainMenu">
                     {this.state.isNavMenuOpen ? (<nav>
                             <Navmenu currentUser={currentUser}/>
                         </nav>
@@ -52,18 +79,15 @@ class Main extends Component {
 
                 <div className="content-main row">
                     <div className="col-12">
-                        <Route path={`${match.path}/`} component={Dashboard} exact/>
-                        <Route path={`${match.path}/dashboard`} component={Dashboard}/>
-                        <Route path={`${match.path}/garage`} component={Garage}/>
-                        <Route path={`${match.path}/climate`} component={Climate}/>
-                        <Route path={`${match.path}/test`} component={Test}/>
+                        <Route path={`${match.path}/`} {...this.props} component={Dashboard} exact/>
+                        <Route path={`${match.path}/dashboard`} {...this.props} component={Dashboard}/>
+                        <Route path={`${match.path}/garage`} {...this.props} component={Garage}/>
+                        <Route path={`${match.path}/climate`} {...this.props} component={Climate}/>
+                        <Route path={`${match.path}/test`} {...this.props} component={Test}/>
                     </div>
                 </div>
 
-                <div className="footer col-12">
-                    Footer Status icons
-                </div>
-
+                <Footer />
             </div>
         )
     };

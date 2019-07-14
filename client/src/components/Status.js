@@ -54,8 +54,6 @@ class Status extends Component {
         this.socket.on('updates',
             payload => callback(null, payload)
         );
-
-        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
     }
 
     render() {

@@ -37,6 +37,7 @@ class Main extends Component {
     };
 
     componentWillUnmount() {
+        //TODO: unsubscribe from updates
         clearInterval(this.interval);
     }
 

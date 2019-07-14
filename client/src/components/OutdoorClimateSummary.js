@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
-import api from "../services/componentService";
+//import api from "../services/componentService";
 
 const climateIcon = require('../icons/icons8-temperature-outside-50-2.png');
 

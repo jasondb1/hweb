@@ -4,7 +4,7 @@ import api from "../services/componentService";
 
 const climateIcon = require('../icons/icons8-temperature-50.png');
 
-const UPDATEINTERVAL = 10000;
+//const UPDATEINTERVAL = 10000;
 
 const ListItems = (props) => {
 
@@ -42,7 +42,7 @@ class IndoorClimateSummary extends Component {
             status: [],
         };
 
-        this.updateStatus = this.updateStatus.bind(this);
+        //this.updateStatus = this.updateStatus.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -53,21 +53,21 @@ class IndoorClimateSummary extends Component {
         });
     };
 
-    componentWillUnmount() {
-        clearInterval(this.interval);
-    }
+    // componentWillUnmount() {
+    //     clearInterval(this.interval);
+    // }
 
-    updateStatus() {
-        api.getStatus().then(json => {
-            this.setState({status: json})
-        });
-    }
+    // updateStatus() {
+    //     api.getStatus().then(json => {
+    //         this.setState({status: json})
+    //     });
+    // }
 
     subscribeToUpdates(callback) {
         this.socket.on('updates',
             payload => callback(null, payload)
         );
-        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
+        //this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
     }
 
     handleClick() {

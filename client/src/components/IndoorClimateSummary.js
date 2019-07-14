@@ -1,10 +1,7 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
-import api from "../services/componentService";
 
 const climateIcon = require('../icons/icons8-temperature-50.png');
-
-//const UPDATEINTERVAL = 10000;
 
 const ListItems = (props) => {
 
@@ -42,32 +39,18 @@ class IndoorClimateSummary extends Component {
             status: [],
         };
 
-        //this.updateStatus = this.updateStatus.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
 
     componentDidMount() {
         this.socket = getAuthSocket();
-        this.subscribeToUpdates((err, payload) => {
-            this.setState({status: payload})
+        this.socket.on('updates', (payload) => {
+            this.setState({status: payload});
         });
     };
 
-    // componentWillUnmount() {
-    //     clearInterval(this.interval);
-    // }
-
-    // updateStatus() {
-    //     api.getStatus().then(json => {
-    //         this.setState({status: json})
-    //     });
-    // }
-
-    subscribeToUpdates(callback) {
-        this.socket.on('updates',
-            payload => callback(null, payload)
-        );
-        //this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
+    componentWillUnmount() {
+        this.socket.close();
     }
 
     handleClick() {

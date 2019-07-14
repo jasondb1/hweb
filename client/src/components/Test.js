@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Controls from "./Dashboard";
+import Controls from "./Controls";
 import Status from "./Status";
 
 class Test extends Component {
@@ -10,7 +10,6 @@ class Test extends Component {
             <Status/>
         </div>
     )};
-
 }
 
 export default Test

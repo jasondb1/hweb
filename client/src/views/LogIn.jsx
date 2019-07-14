@@ -1,5 +1,6 @@
 import React from 'react'
 import httpClient from '../services/httpClient'
+
 //import { authenticate } from '../services/socket';
 
 class LogIn extends React.Component {
@@ -20,12 +21,12 @@ class LogIn extends React.Component {
         evt.preventDefault();
         httpClient.logIn(this.state.fields)
             .then(user => {
-            this.setState({fields: {email: '', password: ''}});
-            if (user) {
-                this.props.onLoginSuccess(user);
-                this.props.history.push('/main/dashboard')
-            }
-        })
+                this.setState({fields: {email: '', password: ''}});
+                if (user) {
+                    this.props.onLoginSuccess(user);
+                    this.props.history.push('/main/dashboard')
+                }
+            })
     };
 
     render() {

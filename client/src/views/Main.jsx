@@ -8,10 +8,6 @@ import Climate from "../components/Climate";
 import Dashboard from "../components/Dashboard";
 import Test from "../components/Test";
 import Footer from "../components/Footer";
-import {getAuthSocket} from "../services/socket";
-//import api from "../services/componentService";
-
-const UPDATEINTERVAL = 10000;
 
 class Main extends Component {
 
@@ -23,37 +19,9 @@ class Main extends Component {
             status: [],
         };
 
-        //console.log(props);
-        //this.updateStatus = this.updateStatus.bind(this);
         this.toggleNavMenu = this.toggleNavMenu.bind(this);
         this.toggleUserMenu = this.toggleUserMenu.bind(this);
     }
-
-    componentDidMount() {
-        this.socket = getAuthSocket();
-        //this.subscribeToUpdates((err, payload) => {
-        //    this.setState({status: payload})
-        //});
-    };
-
-    componentWillUnmount() {
-        //TODO: unsubscribe from updates
-        //clearInterval(this.interval);
-    }
-
-    // updateStatus() {
-    //     api.getStatus().then(json => {
-    //         this.setState({status: json})
-    //     });
-    // }
-
-    //subscribeToUpdates(callback) {
-    //    this.socket.on('updates',
-    //        payload => callback(null, payload)
-    //    );
-//console.log('subscribing to updates');
-//        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
-//    }
 
     toggleNavMenu() {
         this.setState({isNavMenuOpen: !this.state.isNavMenuOpen});
@@ -88,8 +56,7 @@ class Main extends Component {
                         <Route path={`${match.path}/test`} {...this.props} component={Test}/>
                     </div>
                 </div>
-
-                <Footer />
+                <Footer/>
             </div>
         )
     };

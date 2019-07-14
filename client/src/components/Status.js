@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import api from "../services/componentService";
-import { getAuthSocket } from "../services/socket";
-
-const UPDATEINTERVAL = 10000;
+import {getAuthSocket} from "../services/socket";
 
 const ListItems = (props) => {
 
@@ -33,26 +31,13 @@ class Status extends Component {
 
     componentDidMount() {
         this.socket = getAuthSocket();
-        this.subscribeToUpdates((err, payload) => {
-            this.setState({status: payload})
+        this.socket.on('updates', (payload) => {
+            this.setState({status: payload});
         });
     };
 
     componentWillUnmount() {
         this.socket.close();
-    }
-    updateStatus() {
-        api.getStatus().then(json => {
-            this.setState({status: json})
-
-        });
-    }
-
-    subscribeToUpdates(callback) {
-        this.socket.on('updates',
-            payload => callback(null, payload)
-        );
-        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
     }
 
     render() {

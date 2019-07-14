@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
-//import api from "../services/componentService";
 
 const climateIcon = require('../icons/icons8-temperature-outside-50-2.png');
 
-//const UPDATEINTERVAL = 10000;
 const ListItems = (props) => {
     return (
         <ul className='status-list'>
@@ -29,21 +27,10 @@ class OutdoorClimateSummary extends Component {
 
     componentDidMount() {
         this.socket = getAuthSocket();
-        // this.subscribeToUpdates((err, payload) => {
-        //     this.setState({status: payload})
         this.socket.on('updates', (payload) => {
-            console.log('received update');
-            console.log(payload);
             this.setState({status: payload});
         });
     };
-
-
-    subscribeToUpdates(callback) {
-        this.socket.on('updates',
-            payload => callback(null, payload)
-        );
-    }
 
     handleClick() {
         this.props.history.push('/main/climate');
@@ -59,7 +46,7 @@ class OutdoorClimateSummary extends Component {
                     <div className="">
                         <div className="card-body">
                             <h5 className="card-title mt-md-2">Outdoor Climate</h5>
-                            <ListItems values={this.state.status} />
+                            <ListItems values={this.state.status}/>
                         </div>
                     </div>
                 </div>

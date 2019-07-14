@@ -17,7 +17,6 @@ const Header = (props) => {
                     </div>
                     <div className=''>
                         <button className='btn btn-outline-primary btn-rounded btn-header'><img alt="" src={usericon} height='32' /></button>
-
                 </div>
             </div>
         </div>

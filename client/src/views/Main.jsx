@@ -9,7 +9,7 @@ import Dashboard from "../components/Dashboard";
 import Test from "../components/Test";
 import Footer from "../components/Footer";
 import {getAuthSocket} from "../services/socket";
-import api from "../services/componentService";
+//import api from "../services/componentService";
 
 const UPDATEINTERVAL = 10000;
 
@@ -20,11 +20,11 @@ class Main extends Component {
         this.state = {
             isNavMenuOpen: false,
             isUserMenuOpen: false,
-            status: null,
+            status: [],
         };
 
         //console.log(props);
-        this.updateStatus = this.updateStatus.bind(this);
+        //this.updateStatus = this.updateStatus.bind(this);
         this.toggleNavMenu = this.toggleNavMenu.bind(this);
         this.toggleUserMenu = this.toggleUserMenu.bind(this);
     }
@@ -41,16 +41,17 @@ class Main extends Component {
         clearInterval(this.interval);
     }
 
-    updateStatus() {
-        api.getStatus().then(json => {
-            this.setState({status: json})
-        });
-    }
+    // updateStatus() {
+    //     api.getStatus().then(json => {
+    //         this.setState({status: json})
+    //     });
+    // }
 
     subscribeToUpdates(callback) {
         this.socket.on('updates',
             payload => callback(null, payload)
         );
+console.log('subscribing to updates');
         this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
     }
 

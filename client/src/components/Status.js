@@ -38,11 +38,9 @@ class Status extends Component {
         });
     };
 
-
     componentWillUnmount() {
-        clearInterval(this.interval);
+        this.socket.close();
     }
-
     updateStatus() {
         api.getStatus().then(json => {
             this.setState({status: json})
@@ -54,6 +52,7 @@ class Status extends Component {
         this.socket.on('updates',
             payload => callback(null, payload)
         );
+        this.socket.emit('subscribeToUpdates', UPDATEINTERVAL);
     }
 
     render() {

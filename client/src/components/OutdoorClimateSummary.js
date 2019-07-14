@@ -29,10 +29,15 @@ class OutdoorClimateSummary extends Component {
 
     componentDidMount() {
         this.socket = getAuthSocket();
-        this.subscribeToUpdates((err, payload) => {
-            this.setState({status: payload})
+        // this.subscribeToUpdates((err, payload) => {
+        //     this.setState({status: payload})
+        this.socket.on('updates', (payload) => {
+            console.log('received update');
+            console.log(payload);
+            this.setState({status: payload});
         });
     };
+
 
     subscribeToUpdates(callback) {
         this.socket.on('updates',

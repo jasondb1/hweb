@@ -5,6 +5,9 @@ const {JWT_SECRET} = process.env;
 const io = require('socket.io')();
 const jwt = require('jsonwebtoken');
 
+let subscribedUpdate = null;
+let UPDATEINTERVAL = 10000;
+
 
 //start updating components at regular intervals
 let componentsCtrl = new ComponentsCtrl();
@@ -28,14 +31,24 @@ module.exports = function (io) {
     });
 
     io.on('connection', client => {
-        console.log('client connected componentsio');
+
+        //updates automatically
+        autoUpdate = setInterval(() => {
+            client.emit('updates', componentsCtrl.currentStatus());
+        }, UPDATEINTERVAL);
 
         //updates
         client.on('subscribeToUpdates', (interval) => {
             console.log('client is subscribing to updates with interval ', interval);
-            setInterval(() => {
+            subscribedUpdate = setInterval(() => {
                 client.emit('updates', componentsCtrl.currentStatus());
             }, interval);
+        });
+
+        //updates
+        client.on('unsubscribeToUpdates', () => {
+            console.log('client is unsubscribing from updates');
+            clearInterval(subscribedUpdate);
         });
 
         //client.on('componentGetStatus', comp => {

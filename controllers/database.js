@@ -42,7 +42,6 @@ class Database {
     }
 
     insert(data) {
-console.log('insert data');
         //this.connect();
 
         this.db.run(`CREATE TABLE IF NOT EXISTS ${this.table} (` +

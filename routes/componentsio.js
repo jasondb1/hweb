@@ -72,14 +72,14 @@ module.exports = function (io) {
 
         //temperature up
         client.on('temperatureUp', () => {
-            componentsCtrl.component.temperatureControl.temperatureUp;
+            componentsCtrl.component.temperatureControl.obj.temperatureUp();
             client.emit('statusUpdate', {heatingTemperature:  componentsCtrl.component.heatingTemperature.value,
                                                     coolingTemperature:  componentsCtrl.component.coolingTemperature.value});
         });
 
         //temperature down
         client.on('temperatureDown', () => {
-            componentsCtrl.component.temperatureControl.temperatureDown;
+            componentsCtrl.component.temperatureControl.obj.temperatureDown();
             client.emit('statusUpdate', {heatingTemperature:  componentsCtrl.component.heatingTemperature.value,
                 coolingTemperature:  componentsCtrl.component.coolingTemperature.value});
 
@@ -88,9 +88,9 @@ module.exports = function (io) {
         //heat enabled
         client.on('enableHeat', (value) => {
             if (value) {
-                componentsCtrl.component.temperatureControl.enableHeating;
+                componentsCtrl.component.temperatureControl.enableHeating();
             } else {
-                componentsCtrl.component.temperatureControl.disableHeating;
+                componentsCtrl.component.temperatureControl.disableHeating();
             }
             client.emit('statusUpdate', {heatingEnabled: componentsCtrl.component.heatingEnabled.value,})
         });

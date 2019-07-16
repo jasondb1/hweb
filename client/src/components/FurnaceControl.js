@@ -71,7 +71,7 @@ class IndoorClimateSummary extends Component {
                 </div>
                 <div className='mt-3 col-12'>
 
-                    <OffAutoButton label='Furnace Fan' component='furnaceAuto' eventString='fanOn' />
+                    <OffAutoButton label='Furnace Fan' component='furnaceFanMode' eventString='fanOn' />
                     <EnableDisableButton label='Enable Heat' component='heatingEnabled' eventString='enableHeat'/>
                     <EnableDisableButton label='Enable Cooling' component='coolingEnabled' eventString='enableCooling'/>
 

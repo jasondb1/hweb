@@ -17,7 +17,7 @@ class EnableDisableButton extends Component {
         this.socket = getAuthSocket();
 
         this.socket.on('statusUpdate', (data) => {
-         this.setState({isEnabled: data[this.component].value})
+         this.setState({isEnabled: data[this.state.component].value})
         });
         //this.socket.emit('componentGetStatus', this.state.component);
 

@@ -66,7 +66,7 @@ class TemperatureControl {
     }
 
     setHold(value){
-        this.hold(value);
+        this.hold = value;
     }
 
 
@@ -199,7 +199,7 @@ class TemperatureControl {
     }
 
 
-    start(interval = SAMPLEINTERVAL) {
+    start(interval = UPDATE_INTERVAL) {
         this.updateInterval = interval;
         this.updateStatus = setInterval(
             this.update.bind(this)

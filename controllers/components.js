@@ -77,7 +77,7 @@ class ComponentsCtrl {
                 temperatureDown: temperatureControl.temperatureDown(),
                 runSchedule: temperatureControl.runSchedule(),
                 runAuto: temperatureControl.runAuto(),
-                setHold: temperatureControl.setHold(value),
+                //setHold: temperatureControl.setHold(value),
                 start: temperatureControl.start(),
 
             },
@@ -97,10 +97,10 @@ class ComponentsCtrl {
             coolingEnabled: { obj: temperatureControl,
                 value: temperatureControl.coolingEnabled, },
 
-            furnaceFan: { obj: temperatureControl,
+            furnaceFanStatus: { obj: temperatureControl,
                 value: temperatureControl.isFanOn, },
 
-            furnaceFanStatus: { obj: temperatureControl,
+            furnaceFanMode: { obj: temperatureControl,
                 value: temperatureControl.fanAuto, },
 
             temperatureHold: { obj: temperatureControl,
@@ -110,7 +110,7 @@ class ComponentsCtrl {
 
         };
 
-        this.component.temperatureControl.start();
+        this.component.temperatureControl.start;
     }
 
     readAllSensors() {

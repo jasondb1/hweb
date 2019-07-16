@@ -72,14 +72,14 @@ module.exports = function (io) {
 
         //temperature up
         client.on('temperatureUp', () => {
-            componentsCtrl.component.temperatureControl.temperatureUp();
+            componentsCtrl.component.temperatureControl.temperatureUp;
             client.emit('statusUpdate', {heatingTemperature:  componentsCtrl.component.heatingTemperature.value,
                                                     coolingTemperature:  componentsCtrl.component.coolingTemperature.value});
         });
 
         //temperature down
         client.on('temperatureDown', () => {
-            componentsCtrl.component.temperatureControl.temperatureDown();
+            componentsCtrl.component.temperatureControl.temperatureDown;
             client.emit('statusUpdate', {heatingTemperature:  componentsCtrl.component.heatingTemperature.value,
                 coolingTemperature:  componentsCtrl.component.coolingTemperature.value});
 
@@ -88,9 +88,9 @@ module.exports = function (io) {
         //heat enabled
         client.on('enableHeat', (value) => {
             if (value) {
-                componentsCtrl.component.temperatureControl.enableHeating();
+                componentsCtrl.component.temperatureControl.enableHeating;
             } else {
-                componentsCtrl.component.temperatureControl.disableHeating();
+                componentsCtrl.component.temperatureControl.disableHeating;
             }
             client.emit('statusUpdate', {heatingEnabled: componentsCtrl.component.heatingEnabled.value,})
         });
@@ -103,9 +103,9 @@ module.exports = function (io) {
 
         client.on('enableCooling', (value) => {
             if (value) {
-                componentsCtrl.component.temperatureControl.enableCooling();
+                componentsCtrl.component.temperatureControl.enableCooling;
             } else {
-                componentsCtrl.component.temperatureControl.disableCooling();
+                componentsCtrl.component.temperatureControl.disableCooling;
             }
             client.emit('statusUpdate', {coolingEnabled: componentsCtrl.component.coolingEnabled.value,})
         });
@@ -113,11 +113,11 @@ module.exports = function (io) {
         //fan on
         client.on('fanOn', (value) => {
             if (value) {
-                componentsCtrl.component.temperatureControl.fanOn();
+                componentsCtrl.component.temperatureControl.fanOn;
             } else {
-                componentsCtrl.component.temperatureControl.fanAuto();
+                componentsCtrl.component.temperatureControl.fanAuto;
             }
-            client.emit('statusUpdate', {furnaceFanStatus: componentsCtrl.component.furnaceFanStatus.value,})
+            client.emit('statusUpdate', {furnaceFanMode: componentsCtrl.component.furnaceFanMode.value,})
         });
 
         //temperature hold

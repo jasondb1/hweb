@@ -37,6 +37,11 @@ module.exports = function (io) {
               client.emit('updates', componentsCtrl.currentStatus());
           }, UPDATEINTERVAL);
 
+        //user disconnects
+        client.on('disconnect', () => {
+            console.log('client disconnected');
+        });
+
         //client.on('componentGetStatus', comp => {
         //    client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         //});
@@ -53,22 +58,76 @@ module.exports = function (io) {
             client.emit('componentStatusUpdate', {component: comp, isOn: true});
         });
 
-        //garage open
+        //garage close
         client.on('componentOpen', comp => {
             componentsCtrl.component.garageRelay.obj.open();
             client.emit('componentStatusUpdate', {component: comp, isOpen: true});
         });
 
-        //garage close
+        //garage open
         client.on('componentClose', comp => {
             componentsCtrl.component.garageRelay.obj.open();
             client.emit('componentStatusUpdate', {component: comp, isOpen: false});
         });
 
-        //user disconnects
-        client.on('disconnect', () => {
-            console.log('client disconnected');
+        //temperature up
+        client.on('temperatureUp', () => {
+            componentsCtrl.component.temperatureControl.temperatureUp();
+            client.emit('statusUpdate', {heatingTemperature:  componentsCtrl.component.heatingTemperature.value,
+                                                    coolingTemperature:  componentsCtrl.component.coolingTemperature.value});
         });
+
+        //temperature down
+        client.on('temperatureDown', () => {
+            componentsCtrl.component.temperatureControl.temperatureDown();
+            client.emit('statusUpdate', {heatingTemperature:  componentsCtrl.component.heatingTemperature.value,
+                coolingTemperature:  componentsCtrl.component.coolingTemperature.value});
+
+        });
+
+        //heat enabled
+        client.on('enableHeat', (value) => {
+            if (value) {
+                componentsCtrl.component.temperatureControl.enableHeating();
+            } else {
+                componentsCtrl.component.temperatureControl.disableHeating();
+            }
+            client.emit('statusUpdate', {heatingEnabled: componentsCtrl.component.heatingEnabled.value,})
+        });
+
+        // //heat disabled
+        // client.on('disableHeat', () => {
+        //     componentsCtrl.component.temperatureControl.disableHeating();
+        //     client.emit('statusUpdate', {heatingEnabled: componentsCtrl.component.heatingEnabled.value,})
+        // });
+
+        client.on('enableCooling', (value) => {
+            if (value) {
+                componentsCtrl.component.temperatureControl.enableCooling();
+            } else {
+                componentsCtrl.component.temperatureControl.disableCooling();
+            }
+            client.emit('statusUpdate', {coolingEnabled: componentsCtrl.component.coolingEnabled.value,})
+        });
+
+        //fan on
+        client.on('fanOn', (value) => {
+            if (value) {
+                componentsCtrl.component.temperatureControl.fanOn();
+            } else {
+                componentsCtrl.component.temperatureControl.fanAuto();
+            }
+            client.emit('statusUpdate', {furnaceFanStatus: componentsCtrl.component.furnaceFanStatus.value,})
+        });
+
+        //temperature hold
+        client.on('setHold', (value) => {
+            componentsCtrl.component.temperatureControl.setHold(value);
+            client.emit('statusUpdate', {temperatureHold: componentsCtrl.component.temperatureHold.value,})
+        });
+
+        //TODO: getSchedule, setSchedule, set coolingdifferential
+
 
     });
 };

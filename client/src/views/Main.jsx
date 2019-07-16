@@ -6,14 +6,17 @@ import Navmenu from "../components/Navmenu";
 import Garage from "../components/Garage";
 import Climate from "../components/Climate";
 import Dashboard from "../components/Dashboard";
+import SignUp from "../components/SignUp";
 import Test from "../components/Test";
 import Footer from "../components/Footer";
+import httpClient from '../services/httpClient'
 
 class Main extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            isAdmin: httpClient.getAdmin(),
             isNavMenuOpen: false,
             isUserMenuOpen: false,
             status: [],
@@ -42,7 +45,7 @@ class Main extends Component {
 
                 <div className="mainMenu row ml-3" id="mainMenu">
                     {this.state.isNavMenuOpen ? (<nav>
-                            <Navmenu currentUser={currentUser}/>
+                            <Navmenu currentUser={currentUser} isAdmin={this.state.isAdmin} toggleNavMenu={this.toggleNavMenu} />
                         </nav>
                     ) : null}
                 </div>
@@ -53,6 +56,7 @@ class Main extends Component {
                         <Route path={`${match.path}/dashboard`} {...this.props} component={Dashboard}/>
                         <Route path={`${match.path}/garage`} {...this.props} component={Garage}/>
                         <Route path={`${match.path}/climate`} {...this.props} component={Climate}/>
+                        <Route path={`${match.path}/admin`} {...this.props} isAdmin={this.state.isAdmin} component={SignUp}/>
                         <Route path={`${match.path}/test`} {...this.props} component={Test}/>
                     </div>
                 </div>

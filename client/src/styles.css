@@ -8,32 +8,11 @@ body {
 
 h1 {
 	font-size: 2em;
-}
-
-#header{
-	background-color: #EDEDED;
-	color: #5785d4;
-	white-space: nowrap;
-	overflow: hidden;
-	border-bottom-left-radius: 2rem;
-}
-
-#header #toggle-menu {
-	border-radius: 8px;
-	border: none;
-	background-color: #3332;
-	padding: 0.75em;
-	margin-right: 1em;
-}
-
-
-
-.btn-header {
-	max-height: 2.5em;
+	color: #444;
 }
 
 .content-main {
-
+	padding-bottom: 5em;
 }
 
 .footer {
@@ -55,59 +34,24 @@ h1 {
 
 }
 
-.nav-pills .nav-link {
-	border-radius: 0;
-	border-left: 1px solid #65abf0;
-	border-bottom-left-radius: 1rem;
-
-
-}
-
-.nav-link {
-	border-bottom: 1px solid #65abf0;
-	border-left: 1px solid #65abf0;
-	font-weight: 300;
-	border-radius: 0;
-	border-bottom-left-radius: 1rem;
-}
-
-.nav-link .icon{
-	margin-right: 1em;
-
-}
-
-#garageButton {
-	position:relative;
-	padding-top:20px;
-	display:inline-block;
-}
-
-#garageButton button {
-	border: 1px solid dodgerblue;
-	border-radius: 12px;
-	background-color: #f2f6ff;
-	padding: 3em;
-
-
-}
-
-.notify-badge{
-	position: absolute;
-	right:40px;
-	top:40px;
-	text-align: center;
-	border-radius: 30px 30px 30px 30px;
-	color:white;
-	padding:5px 10px;
-	font-size:20px;
-}
-
 .summary-icon {
 	background-color: #f2f6ff;
 }
 
 .status-list {
 	list-style: none;
+}
+
+.user-list ul{
+	list-style: none;
+}
+
+.input-group-prepend {
+	width: 7em;
+}
+
+.input-group-text {
+	width: 100%;
 }
 
 

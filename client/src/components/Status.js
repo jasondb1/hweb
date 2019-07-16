@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import api from "../services/componentService";
 import {getAuthSocket} from "../services/socket";
 
 const ListItems = (props) => {
@@ -25,8 +24,6 @@ class Status extends Component {
         this.state = {
             status: [],
         };
-
-        this.updateStatus = this.updateStatus.bind(this);
     }
 
     componentDidMount() {

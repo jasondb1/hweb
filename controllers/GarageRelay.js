@@ -1,7 +1,7 @@
 "use strict";
 const ComponentOutput = require('./ComponentOutput');
 const Gpio = require('onoff').Gpio;
-const HOLDOPEN = 1000; //time to hold relay open
+const HOLDOPEN = 1000; //time to hold relay close
 
 class GarageRelay extends ComponentOutput {
 

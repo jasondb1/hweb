@@ -18,15 +18,15 @@ class Relay extends ComponentOutput {
         
         this.value = this.pin.readSync();
 
-        this.open.bind(this);
         this.close.bind(this);
-    }
-
-    open(){
-        this.on();
+        this.open.bind(this);
     }
 
     close(){
+        this.on();
+    }
+
+    open(){
         this.on();
     }
 

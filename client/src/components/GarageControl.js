@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
+import './GarageControl.css';
 const garageIconClosed = require('../icons/icons8-warehouse-80.png');
 const garageIconOpen = require('../icons/icons8-depot-80.png');
 
-class GarageButton extends Component {
+class GarageControl extends Component {
 
     constructor(props) {
         super(props);
@@ -22,10 +23,8 @@ class GarageButton extends Component {
         this.socket = getAuthSocket();
 
         //TODO: This should be a door sensor
-        this.socket.on('componentStatusUpdate', (data) => {
-            if (data.component === this.state.component) {
-                this.setState({isOpen: data.isOpen});
-            }
+        this.socket.on('statusUpdate', (data) => {
+            this.setState({data});
         });
     }
 
@@ -61,4 +60,4 @@ class GarageButton extends Component {
     }
 }
 
-export default GarageButton;
+export default GarageControl;

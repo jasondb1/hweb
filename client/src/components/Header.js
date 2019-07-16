@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import './Header.css';
 const usericon = require('../icons/user.png');
 
 const Header = (props) => {

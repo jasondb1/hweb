@@ -8,9 +8,18 @@ httpClient.getToken = function () {
     return localStorage.getItem('token');
 };
 
+httpClient.getAdmin = function () {
+    return localStorage.getItem('admin');
+};
+
 httpClient.setToken = function (token) {
     localStorage.setItem('token', token);
     return token;
+};
+
+httpClient.setAdmin = function (isAdmin) {
+    localStorage.setAdmin('admin', isAdmin);
+    return isAdmin;
 };
 
 httpClient.getCurrentUser = function () {
@@ -23,8 +32,10 @@ httpClient.logIn = function (credentials) {
     return this({method: 'post', url: '/api/users/authenticate', data: credentials})
         .then((serverResponse) => {
             const token = serverResponse.data.token;
+            const admin = serverResponse.data.admin;
             if (token) {
                 // sets token as an included header for all subsequent api requests
+                this.setAdmin(admin);
                 this.defaults.headers.common.token = this.setToken(token);
                 return jwtDecode(token)
             } else {
@@ -40,16 +51,17 @@ httpClient.signUp = function (userInfo) {
             const token = serverResponse.data.token;
             if (token) {
                 // sets token as an included header for all subsequent api requests
-                this.defaults.headers.common.token = this.setToken(token);
-                return jwtDecode(token)
+                //this.defaults.headers.common.token = this.setToken(token);
+                return {message: 'New User Added', success: true};
             } else {
-                return false;
+                return {message: 'User Not Added', success: false};
             }
         })
 };
 
 httpClient.logOut = function () {
     localStorage.removeItem('token');
+    localStorage.removeItem('admin');
     delete this.defaults.headers.common.token;
     return true
 };

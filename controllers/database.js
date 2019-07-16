@@ -66,7 +66,7 @@ console.log('insert data');
             );
         }
 
-        //this.close();
+        //this.open();
     }
 
 
@@ -88,7 +88,7 @@ console.log('insert data');
             }
         );
 
-        //this.close();
+        //this.open();
 
     }
 
@@ -111,7 +111,7 @@ console.log('insert data');
 
         });
 
-        //this.close();
+        //this.open();
         return rows;
 
     }
@@ -148,7 +148,7 @@ console.log('insert data');
             //});
         });
 
-        //this.close();
+        //this.open();
 
     }
 

@@ -1,5 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+import './Navmenu.css';
+
 const homeicon = require('../icons/icons8-home-50.png');
 const dashboardicon = require('../icons/icons8-dashboard-50.png');
 const garageicon = require('../icons/icons8-garage-50-7.png');
@@ -14,13 +16,18 @@ const Navmenu = (props) => {
 
             {props.currentUser
                 ? (<div>
-                <Link className='nav-link' to="/"><img alt="" className="icon" src={homeicon} height='32' />Home</Link>
-                <Link className='nav-link' to="/main/dashboard"><img alt="" className="icon" src={dashboardicon} height='32' />Dashboard</Link>
-                <Link className='nav-link' to="/main/garage"><img alt="" className="icon" src={garageicon} height='32' />Garage</Link>
-                <Link className='nav-link' to="/main/climate"><img alt="" className="icon" src={climateicon} height='32' />Climate</Link>
-                <Link className='nav-link' to="/main/test"><img alt="" className="icon" src={othericon} height='32' />Other Controls</Link>
-                <Link className='nav-link' to="/signup"><img alt="" className="icon" src={adminicon} height='32' />Admin</Link>
-                <Link className='nav-link' to="/logout"><img alt="" className="icon" src={logouticon} height='32' />Log Out</Link>
+                <Link className='nav-link' to="/" onClick={props.toggleNavMenu}><img alt="" className="icon" src={homeicon} height='32' />Home</Link>
+                <Link className='nav-link' to="/main/dashboard" onClick={props.toggleNavMenu}><img alt="" className="icon" src={dashboardicon} height='32' />Dashboard</Link>
+                <Link className='nav-link' to="/main/garage" onClick={props.toggleNavMenu}><img alt="" className="icon" src={garageicon} height='32' />Garage</Link>
+                <Link className='nav-link' to="/main/climate" onClick={props.toggleNavMenu}><img alt="" className="icon" src={climateicon} height='32' />Climate</Link>
+                <Link className='nav-link' to="/main/test" onClick={props.toggleNavMenu}><img alt="" className="icon" src={othericon} height='32' />Other Controls</Link>
+                        {props.isAdmin ?
+                            <Link className='nav-link' to="/main/admin" onClick={props.toggleNavMenu}><img alt=""
+                                                                                                           className="icon"
+                                                                                                           src={adminicon}
+                                                                                                           height='32'/>Admin</Link> : null
+                        }
+                <Link className='nav-link' to="/logout" onClick={props.toggleNavMenu}><img alt="" className="icon" src={logouticon} height='32' />Log Out</Link>
                 </div>
                 )
                 : (

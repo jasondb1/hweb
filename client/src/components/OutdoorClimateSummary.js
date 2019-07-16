@@ -32,6 +32,10 @@ class OutdoorClimateSummary extends Component {
         });
     };
 
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
     handleClick() {
         this.props.history.push('/main/climate');
     };

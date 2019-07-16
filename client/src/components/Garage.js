@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import GarageButton from './GarageButton';
+import GarageControl from './GarageControl';
 
 class Garage extends Component {
 
     render() { return (<div className='Garage'>
         <h1>Garage</h1>
-            <GarageButton />
+            <GarageControl />
         </div>
     )};
 

@@ -56,7 +56,7 @@ module.exports = {
             }
 
             const token = signToken(user);
-            res.json({success: true, message: "Token attached.", token});
+            res.json({success: true, message: "Token attached.", token, admin: user.admin});
         })
     }
 };

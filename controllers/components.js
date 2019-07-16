@@ -5,13 +5,7 @@ const Dht22 = require('./Dht22');
 const Arduino = require('./Arduino');
 const Relay = require('./Relay');
 const Database = require('./database');
-
-// const sqlite3 = require('sqlite3').verbose();
-// const fs = require('fs');
-//
-// //Files
-// const DB_FILEPATH = './db/homeWeb.db';
-// const LOG_FILEPATH = 'log.csv';
+const Temperature = require('./TemperatureControl');
 
 //Set Raspberry Pi pins
 const LEDPIN = 4;
@@ -22,13 +16,15 @@ const DHT22PIN = 17;
 
 const SAMPLEINTERVAL = 10; //interval in seconds to sample temperature and humidity
 
-
-//components
+//output components
 let indicator = new Led(LEDPIN);
 let garageRelay = new GarageRelay(RELAY1PIN);
+let relay2 = new Relay(RELAY2PIN);
+
+//input components
 let arduino = new Arduino(ARDUINO_I2C_ADDR);
 let dht22 = new Dht22(DHT22PIN);
-let relay2 = new Relay(RELAY2PIN);
+let temperatureControl = new Temperature(dht22, relay2, relay2, null);
 
 class ComponentsCtrl {
 
@@ -38,11 +34,12 @@ class ComponentsCtrl {
         this.updateInterval = null;
         this.database = null;
         this.loggingEnabled = false;
+        this.status = {};
     }
 
     init() {
         this.component = {
-            ledIndicator: {obj: indicator, 
+            ledIndicator: {obj: indicator,
                             value: indicator.value },
         
             garageRelay: { obj: garageRelay,
@@ -66,34 +63,76 @@ class ComponentsCtrl {
             humidity_remote0: { obj: arduino,
                 value: arduino.getHumidity() },
 
+            temperatureControl: { obj: temperatureControl,
+                value: temperatureControl.getHeatingTemperature(),
+                //fanOff: temperatureControl.fanOff(),
+                fanOn: temperatureControl.fanOn(),
+                fanAuto: temperatureControl.setFanAuto(),
+                clearFanAuto: temperatureControl.clearFanAuto(),
+                enableCooling: temperatureControl.enableCooling(),
+                enableHeating: temperatureControl.enableHeating(),
+                disableHeating: temperatureControl.disableHeating(),
+                disableCooling: temperatureControl.disableCooling(),
+                temperatureUp: temperatureControl.temperatureUp(),
+                temperatureDown: temperatureControl.temperatureDown(),
+                runSchedule: temperatureControl.runSchedule(),
+                runAuto: temperatureControl.runAuto(),
+                setHold: temperatureControl.setHold(value),
+                start: temperatureControl.start(),
+
+            },
+
+            furnaceStatus: { obj: temperatureControl,
+                value: temperatureControl.getFurnaceStatus(), },
+
+            heatingTemperature: { obj: temperatureControl,
+                value: temperatureControl.getHeatingTemperature(), },
+
+            coolingTemperature: { obj: temperatureControl,
+                value: temperatureControl.getCoolingTemperature(), },
+
+            heatingEnabled: { obj: temperatureControl,
+                value: temperatureControl.heatingEnabled, },
+
+            coolingEnabled: { obj: temperatureControl,
+                value: temperatureControl.coolingEnabled, },
+
+            furnaceFan: { obj: temperatureControl,
+                value: temperatureControl.isFanOn, },
+
+            furnaceFanStatus: { obj: temperatureControl,
+                value: temperatureControl.fanAuto, },
+
+            temperatureHold: { obj: temperatureControl,
+                value: temperatureControl.hold,
+            }
+
+
         };
+
+        this.component.temperatureControl.start();
     }
-
-
 
     readAllSensors() {
 
         this.currentStatus();
 
         if (this.loggingEnabled) {
-            //open database
-            let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
-
+            //close database
+            //let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
+            let keys = Object.keys(this.component);
             let data = [];
 
-            for (let key of log_sensors) {
+            for (let key of keys) {
                 data.push({
                     description: this.component[key].name,
                     sensor: key,
                     value: this.component[key].value,
                     location: this.component[key].value
                 });
-
             }
-
             this.database.insert(data);
         }
-
     }
 
     enableLogging() {
@@ -102,18 +141,20 @@ class ComponentsCtrl {
     }
 
     currentStatus() {
-        let currentStatus = {};
         this.init();
-        currentStatus.ts = new Date().getTime();
+        this.status.ts = new Date().getTime();
 
-        //TODO: move keys to instance variable and method to change?
-        let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
-
+        //let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2', 'temperatureControl'];
+        let keys = Object.keys(this.component);
 
         for (let key of keys) {
-            currentStatus[key] = this.component[key].value;
+            this.status[key] = this.component[key].value;
         }
-        return currentStatus;
+        return this.status;
+    }
+
+    updateComponentStatus(comp) {
+        this.status[comp] = this.component[key].value;
     }
 
     start(interval = SAMPLEINTERVAL) {
@@ -130,5 +171,3 @@ class ComponentsCtrl {
 }
 
 module.exports = ComponentsCtrl;
-
-

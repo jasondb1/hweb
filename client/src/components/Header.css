@@ -1,0 +1,27 @@
+#header{
+    background-color: #EDEDED;
+    color: #5785d4;
+    white-space: nowrap;
+    overflow: hidden;
+    border-bottom-left-radius: 2rem;
+}
+
+#header #toggle-menu {
+    border-radius: 8px;
+    border: none;
+    background-color: #3332;
+    padding: 0.75em;
+    margin-right: 1em;
+}
+
+.btn-header {
+    max-height: 2.5em;
+}
+
+button:focus {
+    outline:0;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: 0 none;
+}

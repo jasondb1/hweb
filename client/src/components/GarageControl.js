@@ -23,8 +23,9 @@ class GarageControl extends Component {
         this.socket = getAuthSocket();
 
         //TODO: This should be a door sensor
-        this.socket.on('statusUpdate', (data) => {
-            this.setState({data});
+        //this.socket.on('statusUpdate', (data) => {
+        this.socket.on('componentStatusUpdate', (data) => {
+            this.setState(data);
         });
     }
 

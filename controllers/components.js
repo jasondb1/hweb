@@ -154,7 +154,7 @@ class ComponentsCtrl {
         console.log(this.status);
 
         if (this.loggingEnabled) {
-            let keys = Object.keys(this.status);
+            let keys = Object.keys(this.component);
             let data = [];
 
             for (let key of keys) {

@@ -24,7 +24,7 @@ class Dht22 extends ComponentInput {
         dht_sensor.setMaxRetries(10);
 
         if (!DEMO_MODE) {
-            dht_sensor.initialize(DHT_TYPE, this.pin_number);
+            dht_sensor.initialize(DHT_TYPE, this.pinNumber);
         } else {
             dht_sensor.initialize({
                 test: {

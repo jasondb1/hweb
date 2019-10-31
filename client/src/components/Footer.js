@@ -5,7 +5,7 @@ const coolingIcon = require('../icons/icons8-cooling-50-2.png');
 const heatingIcon = require('../icons/icons8-heating-50-2.png');
 const connectedIcon = require('../icons/icons8-connected-80.png');
 const disconnectedIcon = require('../icons/icons8-disconnected-80.png');
-const alertIcon = require('../icons/icons8-important-50.png');
+const alertIcon = require('../icons/icons8-box-important-50.png');
 const thermometerIcon = require('../icons/icons8-thermometer-50-2.png');
 
 const ListItems = (props) => {

@@ -1,4 +1,5 @@
 "use strict";
+const DEMO_MODE = false;
 const ComponentInput = require('./ComponentInput');
 const Gpio = require('onoff').Gpio;
 const dht_sensor = require('node-dht-sensor').promises;
@@ -15,53 +16,55 @@ class Dht22 extends ComponentInput {
 
         this.pin = new Gpio(this.pinNumber, 'in');
         this.value = {
-        humidity: null,
-        temperature: null,
+            humidity: null,
+            temperature: null,
         };
 
-        
-//temperature sensor (currently in simulation mode)
+        //temperature sensor (currently in simulation mode)
         dht_sensor.setMaxRetries(10);
-        //sensor.initialize(DHT_TYPE, this.pin_number);
-        dht_sensor.initialize({
-            test: {
-                fake: {
-                    temperature: 21.5,
-                    humidity: 60.25
+
+        if (!DEMO_MODE) {
+            dht_sensor.initialize(DHT_TYPE, this.pin_number);
+        } else {
+            dht_sensor.initialize({
+                test: {
+                    fake: {
+                        temperature: 21.5,
+                        humidity: 60.25
+                    }
                 }
-            }
-        });
+            })
+        };
     }
 
 
 
-//    init() {
-////temperature sensor (currently in simulation mode)
-//        dht_sensor.setMaxRetries(10);
-//        //sensor.initialize(DHT_TYPE, this.pin_number);
-//        dht_sensor.initialize({
-//            Test.js: {
-//                fake: {
-//                    temperature: 21.5,
-//                    humidity: 60.25
-//                }
-//            }
-//        });
-//    }
+    //    init() {
+    ////temperature sensor (currently in simulation mode)
+    //        dht_sensor.setMaxRetries(10);
+    //        //sensor.initialize(DHT_TYPE, this.pin_number);
+    //        dht_sensor.initialize({
+    //            Test.js: {
+    //                fake: {
+    //                    temperature: 21.5,
+    //                    humidity: 60.25
+    //                }
+    //            }
+    //        });
+    //    }
 
     readSensor() {
-dht_sensor.read(DHT_TYPE, this.pinNumber)
+        dht_sensor.read(DHT_TYPE, this.pinNumber)
             .then(res => {
-                    let datetime = new Date();
-//                    console.log(res);
-//                    console.log(`temp: ${res.temperature.toFixed(1)} deg C`
-//                        + `    humidity: ${res.humidity.toFixed(1)}%`
-//                        + `    ts:` + datetime.toLocaleString());
-//
-                    this.value.temperature = res.temperature.toFixed(2);
-                    this.value.humidity = res.humidity.toFixed(2);
-                },
-            )
+                let datetime = new Date();
+                //                    console.log(res);
+                //                    console.log(`temp: ${res.temperature.toFixed(1)} deg C`
+                //                        + `    humidity: ${res.humidity.toFixed(1)}%`
+                //                        + `    ts:` + datetime.toLocaleString());
+                //
+                this.value.temperature = res.temperature.toFixed(2);
+                this.value.humidity = res.humidity.toFixed(2);
+            }, )
             .catch(err => {
                 console.error('failed to read sensor data:', err);
             });
@@ -78,6 +81,5 @@ dht_sensor.read(DHT_TYPE, this.pinNumber)
     }
 
 }
-
 
 module.exports = Dht22;

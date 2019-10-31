@@ -18,7 +18,8 @@ httpClient.setToken = function (token) {
 };
 
 httpClient.setAdmin = function (isAdmin) {
-    localStorage.setAdmin('admin', isAdmin);
+    localStorage.setItem('admin', isAdmin);
+    //localStorage.setAdmin('admin', isAdmin);
     return isAdmin;
 };
 

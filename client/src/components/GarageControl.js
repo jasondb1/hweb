@@ -35,9 +35,11 @@ class GarageControl extends Component {
     handleClick() {
         if (this.state.isOpen) {
             this.socket.emit('componentClose', this.state.component);
+            console.log("close garage");
             //api.componentOpen(this.state.component).then(json => this.setState({isOpen: false}));
         } else {
             this.socket.emit('componentOpen', this.state.component);
+            console.log("open garage");
             //api.componentClose(this.state.component).then(json => this.setState({isOpen: true}));
         }
     };
@@ -46,7 +48,9 @@ class GarageControl extends Component {
         return (
             <div className='row align-items-center justify-content-center'>
                 <div id='garageButton'>
-                    <button >
+                    <button 
+                        onClick={this.handleClick}
+                    >
                         {this.state.isOpen ?
                             <span className="badge badge-danger notify-badge">OPEN</span> :
                             <span className="badge badge-success notify-badge">CLOSED</span>

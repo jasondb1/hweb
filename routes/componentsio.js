@@ -113,9 +113,11 @@ module.exports = function (io) {
         //fan on
         client.on('fanOn', (value) => {
             if (value) {
-                componentsCtrl.component.temperatureControl.fanOn;
+            console.log('routes fan on');
+                componentsCtrl.component.temperatureControl.obj.fanOn;
             } else {
-                componentsCtrl.component.temperatureControl.fanAuto;
+            console.log('routes fan off');
+                componentsCtrl.component.temperatureControl.obj.setFanAuto;
             }
             client.emit('statusUpdate', {furnaceFanMode: componentsCtrl.component.furnaceFanMode.value,})
         });

@@ -19,8 +19,9 @@ class OffAutoButton extends Component {
         this.socket.on('statusUpdate', (data) => {
         console.log(data);
         console.log(this.state);
-         this.setState({isOn: data[this.state.component].value})
+         this.setState({isOn: data[this.state.component]})
         });
+        console.log(this.state);
         //this.socket.emit('componentGetStatus', this.state.component);
 
             //api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));

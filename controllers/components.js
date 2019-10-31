@@ -39,39 +39,56 @@ class ComponentsCtrl {
 
     init() {
         this.component = {
-            ledIndicator: {obj: indicator,
-                            value: indicator.value },
-        
-            garageRelay: { obj: garageRelay,
-                            value: garageRelay.value },
+            ledIndicator: {
+                obj: indicator,
+                value: indicator.value
+            },
 
-            relay2: { obj: relay2,
-                            value: relay2.value },
-            
-            temp_local: { obj: dht22,
-                value: dht22.getTemperature() },
+            garageRelay: {
+                obj: garageRelay,
+                value: garageRelay.value
+            },
 
-            humidity_local: { obj: dht22,
-                value: dht22.getHumidity() },
+            relay2: {
+                obj: relay2,
+                value: relay2.value
+            },
 
-            presistor_remote0: { obj: arduino,
-                value: arduino.getLight() },
+            temp_local: {
+                obj: dht22,
+                value: dht22.getTemperature()
+            },
 
-            temp_remote0: { obj: arduino,
-                value: arduino.getTemperature() },
+            humidity_local: {
+                obj: dht22,
+                value: dht22.getHumidity()
+            },
 
-            humidity_remote0: { obj: arduino,
-                value: arduino.getHumidity() },
+            presistor_remote0: {
+                obj: arduino,
+                value: arduino.getLight()
+            },
 
-            temperatureControl: { obj: temperatureControl,
+            temp_remote0: {
+                obj: arduino,
+                value: arduino.getTemperature()
+            },
+
+            humidity_remote0: {
+                obj: arduino,
+                value: arduino.getHumidity()
+            },
+
+            temperatureControl: {
+                obj: temperatureControl,
                 value: temperatureControl.getHeatingTemperature(),
                 //fanOff: temperatureControl.fanOff(),
                 fanOn: temperatureControl.fanOn(),
                 fanAuto: temperatureControl.setFanAuto(),
                 clearFanAuto: temperatureControl.clearFanAuto(),
                 enableCooling: temperatureControl.enableCooling(),
-                enableHeating: () => {temperatureControl.enableHeating()},
-                disableHeating: () => {temperatureControl.disableHeating()},
+                enableHeating: () => { temperatureControl.enableHeating() },
+                disableHeating: () => { temperatureControl.disableHeating() },
                 disableCooling: temperatureControl.disableCooling(),
                 temperatureUp: temperatureControl.temperatureUp(),
                 temperatureDown: temperatureControl.temperatureDown(),
@@ -82,28 +99,43 @@ class ComponentsCtrl {
 
             },
 
-            furnaceStatus: { obj: temperatureControl,
-                value: temperatureControl.getFurnaceStatus(), },
+            furnaceStatus: {
+                obj: temperatureControl,
+                value: temperatureControl.getFurnaceStatus(),
+            },
 
-            heatingTemperature: { obj: temperatureControl,
-                value: temperatureControl.getHeatingTemperature(), },
+            heatingTemperature: {
+                obj: temperatureControl,
+                value: temperatureControl.getHeatingTemperature(),
+            },
 
-            coolingTemperature: { obj: temperatureControl,
-                value: temperatureControl.getCoolingTemperature(), },
+            coolingTemperature: {
+                obj: temperatureControl,
+                value: temperatureControl.getCoolingTemperature(),
+            },
 
-            heatingEnabled: { obj: temperatureControl,
-                value: temperatureControl.heatingEnabled, },
+            heatingEnabled: {
+                obj: temperatureControl,
+                value: temperatureControl.heatingEnabled,
+            },
 
-            coolingEnabled: { obj: temperatureControl,
-                value: temperatureControl.coolingEnabled, },
+            coolingEnabled: {
+                obj: temperatureControl,
+                value: temperatureControl.coolingEnabled,
+            },
 
-            furnaceFanStatus: { obj: temperatureControl,
-                value: temperatureControl.isFanOn, },
+            furnaceFanStatus: {
+                obj: temperatureControl,
+                value: temperatureControl.isFanOn,
+            },
 
-            furnaceFanMode: { obj: temperatureControl,
-                value: temperatureControl.fanAuto, },
+            furnaceFanMode: {
+                obj: temperatureControl,
+                value: temperatureControl.fanAuto,
+            },
 
-            temperatureHold: { obj: temperatureControl,
+            temperatureHold: {
+                obj: temperatureControl,
                 value: temperatureControl.hold,
             }
 
@@ -116,22 +148,20 @@ class ComponentsCtrl {
     //update sensor values and log if enabled
     readAllSensors() {
 
-        this.currentStatus();
+        this.updateSensors();
 
         console.log("readall sensors");
         console.log(this.status);
 
         if (this.loggingEnabled) {
-            //close database
-            //let log_sensors = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2'];
-            let keys = Object.keys(this.component);
+            let keys = Object.keys(this.status);
             let data = [];
 
             for (let key of keys) {
                 data.push({
                     description: this.component[key].name,
                     sensor: key,
-                    value: this.component[key].value,
+                    value: this.status[key].value,
                     location: this.component[key].value
                 });
             }
@@ -146,7 +176,7 @@ class ComponentsCtrl {
     }
 
     //get the current status of each component
-    currentStatus() {
+    updateSensors() {
         this.init();
         this.status.ts = new Date().getTime();
 
@@ -158,12 +188,12 @@ class ComponentsCtrl {
         }
         console.log("update current status");
         console.log(this.status);
-        
+
         return this.status;
     }
 
     // returns the current status of the sensors
-    getStatus () {
+    currentStatus() {
         return this.status;
     }
 
@@ -177,8 +207,7 @@ class ComponentsCtrl {
     start(interval = SAMPLEINTERVAL) {
         this.updateInterval = interval;
         this.update = setInterval(
-            this.readAllSensors.bind(this)
-            , (this.updateInterval * 1000));
+            this.readAllSensors.bind(this), (this.updateInterval * 1000));
     }
 
     //stop sampling sensors

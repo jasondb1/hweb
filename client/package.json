@@ -6,11 +6,11 @@
     "axios": "^0.18.1",
     "bootstrap": "^4.3.1",
     "jwt-decode": "^2.2.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.0",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -26,7 +26,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "css-loader": "^3.0.0",
+    "css-loader": "^3.2.0",
     "style-loader": "^0.23.1"
   }
 }

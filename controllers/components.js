@@ -113,9 +113,13 @@ class ComponentsCtrl {
         this.component.temperatureControl.start;
     }
 
+    //update sensor values and log if enabled
     readAllSensors() {
 
         this.currentStatus();
+
+        console.log("readall sensors");
+        console.log(this.status);
 
         if (this.loggingEnabled) {
             //close database
@@ -135,11 +139,13 @@ class ComponentsCtrl {
         }
     }
 
+    //enable data logging
     enableLogging() {
         this.loggingEnabled = true;
         this.database = new Database();
     }
 
+    //get the current status of each component
     currentStatus() {
         this.init();
         this.status.ts = new Date().getTime();
@@ -150,13 +156,24 @@ class ComponentsCtrl {
         for (let key of keys) {
             this.status[key] = this.component[key].value;
         }
+        console.log("update current status");
+        console.log(this.status);
+        
         return this.status;
     }
 
-    updateComponentStatus(comp) {
-        this.status[comp] = this.component[key].value;
+    // returns the current status of the sensors
+    getStatus () {
+        return this.status;
     }
 
+
+    //update an individual component
+    updateComponentStatus(comp) {
+        this.status[comp] = this.component[comp].value;
+    }
+
+    //start sampling sensors at specified interval
     start(interval = SAMPLEINTERVAL) {
         this.updateInterval = interval;
         this.update = setInterval(
@@ -164,6 +181,7 @@ class ComponentsCtrl {
             , (this.updateInterval * 1000));
     }
 
+    //stop sampling sensors
     stop() {
         clearInterval(this.update);
     }

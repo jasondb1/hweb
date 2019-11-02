@@ -17,7 +17,7 @@ const Header = (props) => {
                         {/* <span>Status Icons</span> */}
                     </div>
                     <div className=''>
-                        <button className='btn btn-outline-primary btn-rounded btn-header'><img alt="" src={usericon} height='32' /></button>
+                        <button className='btn btn-outline-primary btn-rounded btn-header' onClick={props.toggleUserMenu}><img alt="" src={usericon} height='32' /></button>
                 </div>
             </div>
         </div>

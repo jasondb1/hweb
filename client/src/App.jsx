@@ -67,7 +67,6 @@ class App extends React.Component {
                         return currentUser
                             ? <Main {...props} currentUser={currentUser} isAdmin={isAdmin}/>
                             : <Redirect to="/login"/>
-
                     }}/>
 
                 </Switch>

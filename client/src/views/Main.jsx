@@ -50,6 +50,13 @@ class Main extends Component {
                     ) : null}
                 </div>
 
+                <div className="userMenu row ml-3" id="userMenu">
+                    {this.state.isUserMenuOpen ? (<nav>
+                            <Usermenu currentUser={currentUser} isAdmin={this.state.isAdmin} toggleNavMenu={this.toggleUserMenu} />
+                        </nav>
+                    ) : null}
+                </div>
+
                 <div className="content-main row">
                     <div className="col-12">
                         <Route path={`${match.path}/`} {...this.props} component={Dashboard} exact/>

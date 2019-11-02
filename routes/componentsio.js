@@ -15,6 +15,8 @@ componentsCtrl.init();
 componentsCtrl.enableLogging();
 componentsCtrl.start();
 
+counter = 0;
+
 module.exports = function(io) {
 
     io.use(function(socket, next) {
@@ -32,6 +34,7 @@ module.exports = function(io) {
 
     io.on('connection', client => {
 
+
         client.emit('updates', componentsCtrl.currentStatus());
 
         //updates the client automatically on the interval
@@ -39,11 +42,11 @@ module.exports = function(io) {
             client.emit('updates', componentsCtrl.currentStatus());
         }, UPDATEINTERVAL);
 
-
+        console.log("Connection:" + counter++);
 
         //user disconnects
         client.on('disconnect', () => {
-            console.log('client disconnected');
+            console.log('client disconnected:' + counter);
         });
 
         //client.on('componentGetStatus', comp => {
@@ -135,6 +138,13 @@ module.exports = function(io) {
             componentsCtrl.component.temperatureControl.setHold(value);
             client.emit('statusUpdate', { temperatureHold: componentsCtrl.component.temperatureHold.value, })
         });
+
+        //export data to logfile
+        client.on('exportData', () => {
+            componentsCtrl.database.exportData();
+            //client.emit('statusMessage', {"Success"})
+        });
+
 
         //TODO: getSchedule, setSchedule, set coolingdifferential
 

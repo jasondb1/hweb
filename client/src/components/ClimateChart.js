@@ -1,75 +1,78 @@
-import React, {Component} from 'react';
-import {getAuthSocket} from "../services/socket";
+import React, { Component } from 'react';
+import './ClimateChart.css';
+import { getAuthSocket } from "../services/socket";
+import * as d3 from 'd3';
 
-function drawChart(){
-     var svg = d3.select("svg"),
-         margin = 200, width = svg.attr("width") - margin,
-         height = svg.attr("height") - margin;
-         
-         svg.append("text")
-            .attr("transform", "translate(100,0)")
-            .attr("x", 50).attr("y", 50)
-            .attr("font-size", "20px")
-            .attr("class", "title")
-            .text("Population bar chart")
-            
-         var x = d3.scaleBand().range([0, width]).padding(0.4),
-         y = d3.scaleLinear().range([height, 0]);
-            
-         var g = svg.append("g")
-            .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
-        //  d3.csv("data.csv", function(error, data) {
-        //     if (error) {
-        //        throw error;
-        //     }
+let data = [
+    {date:"1-May-12",close:"58.13"},
+    {date:"30-Apr-12",close:"53.98"},
+    {date:"27-Apr-12",close:"67.00"},
+    {date:"26-Apr-12",close:"89.70"},
+    {date:"25-Apr-12",close:"99.00"}
+];
 
-        data = [16.2, 17.0, 18.5, 20.50, 24.0, 23.0, 22.2];
-               
-            x.domain(data.map(function(d) { return d.year; }));
-            y.domain([0, d3.max(data, function(d) { return d.population; })]);
-                     
-            g.append("g")
-               .attr("transform", "translate(0," + height + ")")
-               .call(d3.axisBottom(x))
-               .append("text")
-               .attr("y", height - 250)
-               .attr("x", width - 100)
-               .attr("text-anchor", "end")
-               .attr("font-size", "18px")
-               .attr("stroke", "blue").text("year");
-               
-            g.append("g")
-               .append("text")
-               .attr("transform", "rotate(-90)")
-               .attr("y", 6)
-               .attr("dy", "-5.1em")
-               .attr("text-anchor", "end")
-               .attr("font-size", "18px")
-               .attr("stroke", "blue")
-               .text("population");
-                         
-            g.append("g")
-               .attr("transform", "translate(0, 0)")
-               .call(d3.axisLeft(y))
+function drawChart() {
 
-            g.selectAll(".bar")
-               .data(data)
-               .enter()
-               .append("rect")
-               .attr("class", "bar")
-               .on("mouseover", onMouseOver) 
-               .on("mouseout", onMouseOut)   
-               .attr("x", function(d) { return x(d.year); })
-               .attr("y", function(d) { return y(d.population); })
-               .attr("width", x.bandwidth()).transition()
-               .ease(d3.easeLinear).duration(200)
-               .delay(function (d, i) {
-                  return i * 25;
-               })
-                  
-            .attr("height", function(d) { return height - y(d.population); });
-         //});
+   // set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+let parseTime = d3.timeParse("%d-%b-%y");
+
+// set the ranges
+let x = d3.scaleTime().range([0, width]);
+let y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+let valueline = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+let svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+// d3.csv("data.csv", function(error, data) {
+//   if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+      d.date = parseTime(d.date);
+      d.close = +d.close;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("d", valueline);
+
+  // Add the X Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the Y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+//});
+
+
 }
 
 
@@ -92,7 +95,7 @@ class ClimateChart extends Component {
         //TODO: Change this to get temp data
         this.socket.on('componentStatusUpdate', (data) => {
             if (data.component === this.state.component) {
-                this.setState({isOpen: data.isOpen});
+                this.setState({ isOpen: data.isOpen });
             }
         });
 
@@ -105,9 +108,11 @@ class ClimateChart extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <svg width = "500" height = "500"></svg>
+        return ( <div id="chart">
+            {/* <svg id = "visualisation"
+            width = "600"
+            height = "400"> 
+            </svg>  */}
             </div>
         );
     }

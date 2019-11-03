@@ -3,24 +3,28 @@ import './ClimateChart.css';
 import { getAuthSocket } from "../services/socket";
 import * as d3 from 'd3';
 
+let CHART_WIDTH = 600;
+let CHART_HEIGHT = 400;
 
 let data = [
-    {date:"1-May-12",close:"58.13"},
-    {date:"30-Apr-12",close:"53.98"},
-    {date:"27-Apr-12",close:"67.00"},
-    {date:"26-Apr-12",close:"89.70"},
-    {date:"25-Apr-12",close:"99.00"}
+    {date:"2019-11-03 16:01:17",close:"16.5"},
+    {date:"2019-11-03 16:02:17",close:"18.0"},
+    {date:"2019-11-03 16:03:17",close:"19.0"},
+    {date:"2019-11-03 16:04:17",close:"20.50"},
+    {date:"2019-11-03 16:05:17",close:"21.2"}
 ];
 
 function drawChart() {
 
    // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = CHART_WIDTH - margin.left - margin.right,
+    height = CHART_HEIGHT - margin.top - margin.bottom;
 
 // parse the date / time
-let parseTime = d3.timeParse("%d-%b-%y");
+//let parseTime = d3.timeParse("%H:%M");
+let parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+//let parseTime = d3.timeParse("%d-%b-%y");
 
 // set the ranges
 let x = d3.scaleTime().range([0, width]);

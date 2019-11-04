@@ -11,7 +11,7 @@ const logouticon = require('../icons/icons8-exit-50.png');
 
 const exportData = () => {
     console.log ("export data");
-    socket = getAuthSocket();
+    let socket = getAuthSocket();
     socket.emit('exportData', "");
 
 }
@@ -24,7 +24,7 @@ const Usermenu = (props) => {
                 ? (<div>
                 <Link className='nav-link' to="/" onClick={props.toggleUserMenu}><img alt="" className="icon" src={homeicon} height='32' />Home</Link>
                 <Link className='nav-link' to="/main/dashboard" onClick={props.toggleUserMenu}><img alt="" className="icon" src={dashboardicon} height='32' />Change Password</Link>
-                <Link className='nav-link' to="/main/dashboard" onClick={ exportData()}><img alt="" className="icon" src={dashboardicon} height='32' />Export Log Data</Link>
+                <Link className='nav-link' to="/main/dashboard" onClick={ () => exportData()}><img alt="" className="icon" src={dashboardicon} height='32' />Export Log Data</Link>
                 <Link className='nav-link' to="/main/dashboard" onClick={props.toggleUserMenu}><img alt="" className="icon" src={dashboardicon} height='32' />Clear Log Data</Link>
                         
                         {props.isAdmin ?

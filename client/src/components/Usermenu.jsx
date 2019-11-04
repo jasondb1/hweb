@@ -11,8 +11,8 @@ const logouticon = require('../icons/icons8-exit-50.png');
 
 const exportData = () => {
     console.log ("export data");
-    //socket = getAuthSocket();
-    //socket.emit('exportData', "");
+    socket = getAuthSocket();
+    socket.emit('exportData', "");
 
 }
 

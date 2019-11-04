@@ -141,6 +141,7 @@ module.exports = function(io) {
 
         //export data to logfile
         client.on('exportData', () => {
+            console.log("export data");
             componentsCtrl.database.exportData();
             //client.emit('statusMessage', {"Success"})
         });

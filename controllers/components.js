@@ -155,8 +155,8 @@ class ComponentsCtrl {
 
         this.updateSensors();
 
-        console.log("readall sensors");
-        console.log(this.status);
+        //console.log("readall sensors");
+        //console.log(this.status);
 
         if (this.loggingEnabled) {
             let keys = Object.keys(this.component);
@@ -164,7 +164,7 @@ class ComponentsCtrl {
 
 
             for (let key of keys) {
-                console.log(key);
+                //console.log(key);
                 if (this.status[key] != undefined) {
                     data.push({
                         description: this.component[key].name,
@@ -196,8 +196,8 @@ class ComponentsCtrl {
         for (let key of keys) {
             this.status[key] = this.component[key].value;
         }
-        console.log("update current status");
-        console.log(this.status);
+        //console.log("update current status");
+        //console.log(this.status);
 
         return this.status;
     }

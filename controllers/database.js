@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 
 const DB_FILEPATH = './db/homeWeb.db';
-const LOG_FILEPATH = 'log.csv';
+const LOG_FILEPATH = 'current_log.csv';
 let table = 'sensor_data';
 
 class Database {
@@ -55,8 +55,7 @@ class Database {
         let datetime = new Date();
 
         for (let row of data) {
-            this.db.run('INSERT INTO '+ this.table +' (timestamp, description, location, sensor, value) VALUES( ?, ?, ?, ?, ?)',
-                [datetime.getTime(), row.description, row.location, row.sensor, row.value],
+            this.db.run('INSERT INTO ' + this.table + ' (timestamp, description, location, sensor, value) VALUES( ?, ?, ?, ?, ?)', [datetime.getTime(), row.description, row.location, row.sensor, row.value],
                 (err) => {
                     if (err) {
                         console.error(err);
@@ -91,7 +90,7 @@ class Database {
 
     }
 
-    getSensorData(sensor, time_prev = ( 24 * 60 * 60 * 1000)) {
+    getSensorData(sensor, time_prev = (24 * 60 * 60 * 1000)) {
 
         //this.connect();
         //let datetime = new Date();
@@ -100,7 +99,7 @@ class Database {
         let rows = null;
 
         //TODO: limit, allow user to specify columns
-        this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_prev], function (err, rows) {
+        this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_prev], function(err, rows) {
 
             if (err) {
                 throw err;
@@ -117,10 +116,11 @@ class Database {
 
     exportData(filter = '1', filename = LOG_FILEPATH) {
 
+        console.log("In export function");
         //this.connect();
         let datetime = new Date();
 
-        this.db.each(`SELECT * FROM ${this.table} WHERE ?`, [filter], function (err, row) {
+        this.db.each(`SELECT * FROM ${this.table} WHERE ?`, [filter], function(err, row) {
 
             if (err) {
                 throw err;
@@ -141,8 +141,8 @@ class Database {
                 row.sensor +
                 "," +
                 row.value +
-                "\n", function (err) {
-                }
+                "\n",
+                function(err) {}
             );
             //});
         });
@@ -155,4 +155,3 @@ class Database {
 }
 
 module.exports = Database;
-

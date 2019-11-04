@@ -162,17 +162,17 @@ class ComponentsCtrl {
             let keys = Object.keys(this.component);
             let data = [];
 
-            
+
             for (let key of keys) {
-            console.log(key);
-                if (this.status[key].value != undefined){
-                data.push({
-                    description: this.component[key].name,
-                    sensor: key,
-                    value: this.status[key].value,
-                    location: this.component[key].value
-                    
-                });
+                console.log(key);
+                if (this.status[key] != undefined) {
+                    data.push({
+                        description: this.component[key].name,
+                        sensor: key,
+                        value: this.status[key].value,
+                        location: this.component[key].value
+
+                    });
                 }
             }
             this.database.insert(data);

@@ -75,8 +75,6 @@ let svg = d3.select("#chart").append("svg")
       .call(d3.axisLeft(y));
 
 //});
-
-
 }
 
 

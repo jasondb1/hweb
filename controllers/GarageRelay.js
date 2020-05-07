@@ -13,26 +13,23 @@ class GarageRelay extends ComponentOutput {
         this.lowOn = lowOn;
 
         this.pin = new Gpio(this.pinNumber, 'out');
-        
+
         //default is closed
         this.pin.writeSync(1);
-        
+
         this.value = this.pin.readSync();
-
-        
-
 
         this.open.bind(this);
         this.close.bind(this);
     }
 
-    open(){
+    open() {
         this.on();
         //Keep relay engaged for set time
         setTimeout(this.off.bind(this), HOLDOPEN);
     }
 
-    close(){
+    close() {
         this.on();
         //Keep relay engaged for set time
         setTimeout(this.off.bind(this), HOLDOPEN);

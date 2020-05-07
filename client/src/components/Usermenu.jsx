@@ -13,7 +13,12 @@ const exportData = () => {
     console.log ("export data");
     let socket = getAuthSocket();
     socket.emit('exportData', "");
+}
 
+const clearLog = () => {
+    console.log ("clear log");
+    let socket = getAuthSocket();
+    socket.emit('clearLog', "");
 }
 
 const Usermenu = (props) => {
@@ -25,7 +30,7 @@ const Usermenu = (props) => {
                 <Link className='nav-link' to="/" onClick={props.toggleUserMenu}><img alt="" className="icon" src={homeicon} height='32' />Home</Link>
                 <Link className='nav-link' to="/main/dashboard" onClick={props.toggleUserMenu}><img alt="" className="icon" src={dashboardicon} height='32' />Change Password</Link>
                 <Link className='nav-link' to="/main/dashboard" onClick={ () => exportData()}><img alt="" className="icon" src={dashboardicon} height='32' />Export Log Data</Link>
-                <Link className='nav-link' to="/main/dashboard" onClick={props.toggleUserMenu}><img alt="" className="icon" src={dashboardicon} height='32' />Clear Log Data</Link>
+                <Link className='nav-link' to="/main/dashboard" onClick={() => clearLog()}><img alt="" className="icon" src={dashboardicon} height='32' />Clear Log Data</Link>
                         
                         {props.isAdmin ?
                             <Link className='nav-link' to="/main/admin" onClick={props.toggleNavMenu}><img alt="" className="icon" src={adminicon} height='32'/>Admin</Link> 

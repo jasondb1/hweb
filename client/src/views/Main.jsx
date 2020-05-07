@@ -7,6 +7,7 @@ import Usermenu from "../components/Usermenu";
 import Garage from "../components/Garage";
 import Climate from "../components/Climate";
 import Dashboard from "../components/Dashboard";
+import Hydroponics from "../components/Hydroponic";
 import SignUp from "../components/SignUp";
 import Test from "../components/Test";
 import Footer from "../components/Footer";
@@ -64,6 +65,7 @@ class Main extends Component {
                         <Route path={`${match.path}/dashboard`} {...this.props} component={Dashboard}/>
                         <Route path={`${match.path}/garage`} {...this.props} component={Garage}/>
                         <Route path={`${match.path}/climate`} {...this.props} component={Climate}/>
+                        <Route path={`${match.path}/hydroponics`} {...this.props} component={Hydroponics}/>
                         <Route path={`${match.path}/admin`} {...this.props} isAdmin={this.state.isAdmin} component={SignUp}/>
                         <Route path={`${match.path}/test`} {...this.props} component={Test}/>
                     </div>

@@ -12,6 +12,7 @@ class Dashboard extends Component {
                 <DoorSummary {...this.props} />
                 <IndoorClimateSummary {...this.props} />
                 <OutdoorClimateSummary {...this.props} />
+                <HydroponicSummary {...this.props} />
             </div>
         )
     };

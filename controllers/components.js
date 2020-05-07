@@ -79,6 +79,25 @@ class ComponentsCtrl {
                 value: arduino.getHumidity()
             },
 
+            hydroponicLight: {
+                obj: arduino,
+                value: arduino.lightStatus()
+            },
+
+            hydroponicPump: {
+                obj: arduino,
+                value: arduino.pumpStatus()
+            },
+
+            hydroponicControl: {
+                obj: arduino,
+                value: arduino.modeStatus()
+            },
+
+            //add arduino toggle light on/off
+            //add arduino toggle pump on/off
+            //set mode
+
             temperatureControl: {
                 obj: temperatureControl,
                 value: temperatureControl.getHeatingTemperature(),
@@ -162,15 +181,14 @@ class ComponentsCtrl {
             let keys = Object.keys(this.component);
             let data = [];
 
-
             for (let key of keys) {
                 //console.log(key);
                 if (this.status[key] != undefined) {
                     data.push({
-                        description: this.component[key].name,
+                        description: this.component[key].obj.name,
                         sensor: key,
                         value: this.status[key].value,
-                        location: this.component[key].value
+                        location: this.component[key].obj.value
 
                     });
                 }

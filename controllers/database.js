@@ -85,11 +85,21 @@ class Database {
                 }
             }
         );
-
-        //this.open();
-
     }
 
+    clearLog() {
+        let where = 1;
+
+        this.db.run((`DELETE FROM sensor_data WHERE ?`), [where],
+            (err) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+    }
+
+    //retrieve sensor data
     getSensorData(sensor, time_prev = (24 * 60 * 60 * 1000)) {
 
         //this.connect();
@@ -114,6 +124,7 @@ class Database {
 
     }
 
+    //export the data to a csv file
     exportData(filter = '1', filename = LOG_FILEPATH) {
 
         console.log("In export function");

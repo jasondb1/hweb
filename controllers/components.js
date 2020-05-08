@@ -158,6 +158,7 @@ class ComponentsCtrl {
             let data = [];
 
             for (let key of keys) {
+		    //console.log("key:" + key);
                 data.push({
                     description: this.component[key].name,
                     sensor: key,

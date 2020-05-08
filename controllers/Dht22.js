@@ -23,9 +23,9 @@ class Dht22 extends ComponentInput {
         //temperature sensor (currently in simulation mode)
         dht_sensor.setMaxRetries(10);
 
-        if (!DEMO_MODE) {
-            dht_sensor.initialize(DHT_TYPE, this.pinNumber);
-        } else {
+        if (!dht_sensor.initialize(DHT_TYPE, this.pinNumber)) {
+	    console.warn("Failed to initialize sensor - Demo values being used");
+	} else {
             dht_sensor.initialize({
                 test: {
                     fake: {

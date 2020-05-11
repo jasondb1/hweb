@@ -59,45 +59,45 @@ class HydroponicControl extends Component {
                     <button 
                         onClick={this.handleClickOff}
                     >
-                        {this.state.systemMode == 1 ?
+                        {this.state.systemMode === 1 ?
                             <span className="badge badge-danger notify-badge">Off</span> :
                             <span className="badge badge-success notify-badge">Off</span>
                         }
 
-                        <img src={this.state.systemMode == 1 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
+                        <img src={this.state.systemMode === 1 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
                     </button>
                     
                     <button 
                         onClick={this.handleClickAuto}
                     >
-                        {this.state.systemMode == 2 ?
+                        {this.state.systemMode === 2 ?
                             <span className="badge badge-danger notify-badge">Auto</span> :
                             <span className="badge badge-success notify-badge">Auto</span>
                         }
 
-                        <img src={this.state.systemMode == 2 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
+                        <img src={this.state.systemMode === 2 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
                     </button>
                                         
                     <button 
                         onClick={this.handleClickManualPumpOn}
                     >
-                        {this.state.systemMode == 3 ?
+                        {this.state.systemMode === 3 ?
                             <span className="badge badge-danger notify-badge">Manual Pump On</span> :
                             <span className="badge badge-success notify-badge">Manual Pump on</span>
                         }
 
-                        <img src={this.state.systemMode == 3 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
+                        <img src={this.state.systemMode === 3 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
                     </button>
                                         
                     <button 
                         onClick={this.handleClickManualPumpOff}
                     >
-                        {this.state.systemMode == 4 ?
+                        {this.state.systemMode === 4 ?
                             <span className="badge badge-danger notify-badge">Manual Pump Off</span> :
                             <span className="badge badge-success notify-badge">Manual Pump Off</span>
                         }
 
-                        <img src={this.state.systemMode == 4 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
+                        <img src={this.state.systemMode === 4 ? garageIconOpen : garageIconClosed} alt="" width="240" height="240" />
                     </button>
 
 

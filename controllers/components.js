@@ -1,4 +1,6 @@
 "use strict";
+const DEBUG = false;
+
 const Led = require('./Led.js');
 const GarageRelay = require('./GarageRelay.js');
 const Dht22 = require('./Dht22');
@@ -150,8 +152,8 @@ class ComponentsCtrl {
 
         this.updateSensors();
 
-        console.log("readall sensors");
-        console.log(this.status);
+        //console.log("readall sensors");
+        //console.log(this.status);
 
         if (this.loggingEnabled) {
             let keys = Object.keys(this.component);
@@ -187,8 +189,11 @@ class ComponentsCtrl {
         for (let key of keys) {
             this.status[key] = this.component[key].value;
         }
-        console.log("update current status");
-        console.log(this.status);
+
+        if (DEBUG){
+	    console.log("update current status");
+            console.log(this.status);
+	}
 
         return this.status;
     }

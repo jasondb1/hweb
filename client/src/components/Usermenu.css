@@ -1,0 +1,20 @@
+.nav-pills .nav-link {
+    border-radius: 0;
+    border-left: 1px solid #65abf0;
+    border-bottom-left-radius: 1rem;
+
+
+}
+
+.nav-link {
+    border-bottom: 1px solid #65abf0;
+    border-left: 1px solid #65abf0;
+    font-weight: 300;
+    border-radius: 0;
+    border-bottom-left-radius: 1rem;
+}
+
+.nav-link .icon{
+    margin-right: 1em;
+
+}

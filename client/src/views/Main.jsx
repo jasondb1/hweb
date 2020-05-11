@@ -3,9 +3,11 @@ import {Route} from 'react-router-dom'
 
 import Header from "../components/Header";
 import Navmenu from "../components/Navmenu";
+import Usermenu from "../components/Usermenu";
 import Garage from "../components/Garage";
 import Climate from "../components/Climate";
 import Dashboard from "../components/Dashboard";
+import Hydroponics from "../components/Hydroponic";
 import SignUp from "../components/SignUp";
 import Test from "../components/Test";
 import Footer from "../components/Footer";
@@ -50,12 +52,20 @@ class Main extends Component {
                     ) : null}
                 </div>
 
+                <div className="userMenu row ml-3" id="userMenu">
+                    {this.state.isUserMenuOpen ? (<nav>
+                            <Usermenu currentUser={currentUser} isAdmin={this.state.isAdmin} toggleNavMenu={this.toggleUserMenu} />
+                        </nav>
+                    ) : null}
+                </div>
+
                 <div className="content-main row">
                     <div className="col-12">
                         <Route path={`${match.path}/`} {...this.props} component={Dashboard} exact/>
                         <Route path={`${match.path}/dashboard`} {...this.props} component={Dashboard}/>
                         <Route path={`${match.path}/garage`} {...this.props} component={Garage}/>
                         <Route path={`${match.path}/climate`} {...this.props} component={Climate}/>
+                        <Route path={`${match.path}/hydroponics`} {...this.props} component={Hydroponics}/>
                         <Route path={`${match.path}/admin`} {...this.props} isAdmin={this.state.isAdmin} component={SignUp}/>
                         <Route path={`${match.path}/test`} {...this.props} component={Test}/>
                     </div>

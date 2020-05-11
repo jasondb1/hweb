@@ -15,6 +15,8 @@ componentsCtrl.init();
 componentsCtrl.enableLogging();
 componentsCtrl.start();
 
+counter = 0;
+
 module.exports = function(io) {
 
     io.use(function(socket, next) {
@@ -32,18 +34,20 @@ module.exports = function(io) {
 
     io.on('connection', client => {
 
+        //send data as soon as connection is made
         client.emit('updates', componentsCtrl.currentStatus());
 
         //updates the client automatically on the interval
+        //Could move this to a .on 
         autoUpdate = setInterval(() => {
             client.emit('updates', componentsCtrl.currentStatus());
         }, UPDATEINTERVAL);
 
-
+        console.log("Connection:" + counter++);
 
         //user disconnects
         client.on('disconnect', () => {
-            console.log('client disconnected');
+            console.log('client disconnected:' + counter);
         });
 
         //client.on('componentGetStatus', comp => {
@@ -90,7 +94,6 @@ module.exports = function(io) {
                 heatingTemperature: componentsCtrl.component.heatingTemperature.value,
                 coolingTemperature: componentsCtrl.component.coolingTemperature.value
             });
-
         });
 
         //heat enabled
@@ -136,7 +139,36 @@ module.exports = function(io) {
             client.emit('statusUpdate', { temperatureHold: componentsCtrl.component.temperatureHold.value, })
         });
 
+        //export data to logfile
+        client.on('exportData', () => {
+            console.log("export data");
+            componentsCtrl.database.exportData();
+            //client.emit('statusMessage', {"Success"})
+        });
+
+        //clear the logfile
+        client.on('clearLog', () => {
+            console.log("clear log");
+            componentsCtrl.database.clearLog();
+            //client.emit('statusMessage', {"Success"})
+        });
+
+        //TODO: get sensor data
+        client.on('getData', (sensor, timeBack) => {
+            let payload = componentsCtrl.database.getSensorData(sensor, timeBack);
+            client.emit('sensorData', payload);
+        });
+
         //TODO: getSchedule, setSchedule, set coolingdifferential
+
+
+        //TODO: setmode on hydroponic garden
+        client.on('setMode', (value) => {
+            componentsCtrl.component.hydroponicControl.obj.setMode(value);
+            //TODO: update status on client
+
+            client.emit('componentStatusUpdate', { component: hydroponicControl, systemMode: value });
+        });
 
 
     });

@@ -67,4 +67,4 @@ class HydroponicSummary extends Component {
     }
 }
 
-export default GarageSummary;
+export default HydroponicSummary;

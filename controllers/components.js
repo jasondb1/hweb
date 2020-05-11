@@ -79,16 +79,6 @@ class ComponentsCtrl {
                 value: arduino.getHumidity()
             },
 
-            hydroponicLight: {
-                obj: arduino,
-                value: arduino.lightStatus()
-            },
-
-            hydroponicPump: {
-                obj: arduino,
-                value: arduino.pumpStatus()
-            },
-
             hydroponicControl: {
                 obj: arduino,
                 value: arduino.modeStatus()

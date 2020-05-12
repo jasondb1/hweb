@@ -23,12 +23,12 @@ const i2c_bus = i2c.open(1, err => {
 let DATA_LENGTH = 0x20;
 let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
-const modes = {
-	OFF : "Off",
-    AUTO : "Auto",
-    PUMP_MANUAL_ON : "Pump On",
-    PUMP_MANUAL_OFF : "Pump Off"
-}
+//const modes = {
+//	OFF : "Off",
+//    AUTO : "Auto",
+//    PUMP_MANUAL_ON : "Pump On",
+//    PUMP_MANUAL_OFF : "Pump Off"
+//}
 
 
 class Arduino extends ComponentInput {
@@ -38,7 +38,7 @@ class Arduino extends ComponentInput {
         this.slaveAddress = slave_address;
         this.name = name;
         this.location = location;
-        this.mode = modes.AUTO;
+        this.mode = 1;
 
         this.pin = null;
         this.value = {
@@ -53,9 +53,10 @@ class Arduino extends ComponentInput {
 
     readSensor() {
         //i2c_bus.i2cReadSync(this.slaveAddress, DATA_LENGTH, buffer_arduino);
+    let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
         
-	i2c_bus.readWord(this.slaveAddress, DATA_LENGTH, (err, rawData) => {
-		
+	i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
+		console.log(rawData);
 	    if (!err) {
 	        let string = rawData
                 let vals = string.split(/[\s,\0]+/, 3);
@@ -63,6 +64,7 @@ class Arduino extends ComponentInput {
                 this.value.p_resistor = vals[0];
                 this.value.temperature = vals[1];
                 this.value.humidity = vals[2];
+		this.value.mode = vals[3]; //TODO: edit the arduino code to ensure this    
 	    } else {
 		this.value.p_resistor = 0;
 		this.value.temperature = 0;
@@ -111,7 +113,7 @@ class Arduino extends ComponentInput {
 	    	console.log("Arduino Error: check connection");
 	    });
 	}
-	this.value.mode;
+	this.value.mode = systemMode;
     }
 
     modeStatus() {

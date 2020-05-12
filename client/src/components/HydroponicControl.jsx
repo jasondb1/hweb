@@ -34,6 +34,12 @@ class HydroponicControl extends Component {
 		//this.setState({ systemMode: data.systemMode});
 		console.log(this.state);
         });
+
+		this.socket.on('updates', (payload) => {
+			this.setState({status: payload});
+		});
+
+	    
     }
 
     componentWillUnmount() {
@@ -63,30 +69,30 @@ class HydroponicControl extends Component {
                 <div id='hydroponicButton'>
                     <button 
                         onClick={this.handleClickOff}
-		        className={this.state.systemMode === 1 ? "selected" : "notSelected"}
+		                className={this.state.systemMode === 1 ? "selected" : "notSelected"}
                     >
-		    <span>OFF</span>
+		            <span>OFF</span>
                     </button>
                     
                     <button 
                         onClick={this.handleClickAuto}
-		        className={this.state.systemMode === 2 ? "selected" : "notSelected"}
+		                className={this.state.systemMode === 2 ? "selected" : "notSelected"}
                     >
-		    <span>AUTO</span>
+		            <span>AUTO</span>
                     </button>
                                         
                     <button 
                         onClick={this.handleClickManualPumpOn}
-		        className={this.state.systemMode === 3 ? "selected" : "notSelected"}
+		                className={this.state.systemMode === 3 ? "selected" : "notSelected"}
                     >
-		    <span>MANUAL - PUMP ON</span>
+		            <span>MANUAL - PUMP ON</span>
                     </button>
                                         
                     <button 
                         onClick={this.handleClickManualPumpOff}
-		        className={this.state.systemMode === 4 ? "selected" : "notSelected"}
+		                className={this.state.systemMode === 4 ? "selected" : "notSelected"}
                     >
-		    <span>MANUAL - PUMP OFF</span>
+		            <span>MANUAL - PUMP OFF</span>
                     </button>
 
                 </div>

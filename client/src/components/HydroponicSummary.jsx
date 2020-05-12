@@ -51,16 +51,16 @@ class HydroponicSummary extends Component {
 
                             <ul className='status-list'>
                                 <li>Mode:  
-				{this.state.systemMode === 1 ?
-                                    <span className="badge badge-danger">Off</span> :
-					 this.state.systemMode === 2 ?
+				                    {this.state.systemMode === 1 ?
+                                        <span className="badge badge-danger">Off</span> :
+					                    this.state.systemMode === 2 ?
                                     	 <span className="badge badge-success">Auto</span> :
-					 	this.state.systemMode === 3 ?
-                                    	        <span className="badge badge-success">Manual Pump On</span> :
-                                			this.state.systemMode === 4 ?
-                                    	                <span className="badge badge-success">Manual Pump Off</span> :
-                                    	                <span className="badge badge-success">Unknown/span>
-				}
+					 	                this.state.systemMode === 3 ?
+                                    	<span className="badge badge-success">Manual Pump On</span> :
+                                		this.state.systemMode === 4 ?
+                                    	<span className="badge badge-success">Manual Pump Off</span> :
+                                    	<span className="badge badge-success">Unknown</span>
+				                    }
 						
 			
                                 </li>

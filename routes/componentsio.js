@@ -166,11 +166,12 @@ module.exports = function(io) {
 
 
         //TODO: setmode on hydroponic garden
-        client.on('setMode', (value) => {
-            componentsCtrl.component.hydroponicControl.obj.setMode(value);
+        client.on('hydroponicMode', (value) => {
+            console.log("socket received message: hydroponicMode: " + value);
+	    componentsCtrl.component.hydroponicControl.obj.setMode(value);
             //TODO: update status on client
 
-            client.emit('componentStatusUpdate', { component: hydroponicControl, systemMode: value });
+            client.emit('componentStatusUpdate', { systemMode: value });
         });
 
 

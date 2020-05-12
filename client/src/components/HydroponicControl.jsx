@@ -24,11 +24,15 @@ class HydroponicControl extends Component {
     componentDidMount() {
 
         this.socket = getAuthSocket();
-	console.log(this.socket);
+	//console.log(this.socket);
 
         //this.socket.on('statusUpdate', (data) => {
         this.socket.on('componentStatusUpdate', (data) => {
-            this.setState(data);
+            console.log("received update on hydro mode");
+		console.log (data);
+		this.setState(data);
+		//this.setState({ systemMode: data.systemMode});
+		console.log(this.state);
         });
     }
 
@@ -37,7 +41,7 @@ class HydroponicControl extends Component {
     }
 
     handleClickOff() {
-	    console.log(this.socket);
+	    //console.log(this.socket);
             this.socket.emit('hydroponicMode', 1 );
     };
 
@@ -59,33 +63,31 @@ class HydroponicControl extends Component {
                 <div id='hydroponicButton'>
                     <button 
                         onClick={this.handleClickOff}
-		        className={this.state.SystemMode === 1 ? "selected" : "notSelected"}
+		        className={this.state.systemMode === 1 ? "selected" : "notSelected"}
                     >
 		    <span>OFF</span>
                     </button>
                     
                     <button 
                         onClick={this.handleClickAuto}
-		        className={this.state.SystemMode === 2 ? "selected" : "notSelected"}
+		        className={this.state.systemMode === 2 ? "selected" : "notSelected"}
                     >
 		    <span>AUTO</span>
                     </button>
                                         
                     <button 
                         onClick={this.handleClickManualPumpOn}
-		        className={this.state.SystemMode === 3 ? "selected" : "notSelected"}
+		        className={this.state.systemMode === 3 ? "selected" : "notSelected"}
                     >
 		    <span>MANUAL - PUMP ON</span>
                     </button>
                                         
                     <button 
                         onClick={this.handleClickManualPumpOff}
-		        className={this.state.SystemMode === 4 ? "selected" : "notSelected"}
+		        className={this.state.systemMode === 4 ? "selected" : "notSelected"}
                     >
 		    <span>MANUAL - PUMP OFF</span>
                     </button>
-
-
 
                 </div>
             </div>

@@ -50,10 +50,19 @@ class HydroponicSummary extends Component {
                             <h5 className="card-title mt-md-2">Hydroponic</h5>
 
                             <ul className='status-list'>
-                                <li>Mode:  {this.state.isOpen ?
-                                    <span className="badge badge-danger">OPEN</span> :
-                                    <span className="badge badge-success">CLOSED</span>
-                                }
+                                <li>Mode:  
+				{this.state.systemMode === 1 ?
+                                    <span className="badge badge-danger">Off</span> :
+					 this.state.systemMode === 2 ?
+                                    	 <span className="badge badge-success">Auto</span> :
+					 	this.state.systemMode === 3 ?
+                                    	        <span className="badge badge-success">Manual Pump On</span> :
+                                			this.state.systemMode === 4 ?
+                                    	                <span className="badge badge-success">Manual Pump Off</span> :
+                                    	                <span className="badge badge-success">Unknown/span>
+				}
+						
+			
                                 </li>
 
                             </ul>

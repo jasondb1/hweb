@@ -91,10 +91,10 @@ class ComponentsCtrl {
             //    value: arduino.pumpStatus()
             //},
 
-            //hydroponicControl: {
-            //    obj: arduino,
-            //    value: arduino.modeStatus()
-            //},
+            hydroponicControl: {
+                obj: arduino,
+                value: arduino.modeStatus()
+            },
 
             //add arduino toggle light on/off
             //add arduino toggle pump on/off

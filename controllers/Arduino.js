@@ -1,15 +1,21 @@
 "use strict";
 const ComponentInput = require('./ComponentInput');
 const Gpio = require('onoff').Gpio;
+let i2c_connected = false;
 
 const i2c = require('i2c-bus');
 // const i2c_bus = i2c.openSync(1);
 const i2c_bus = i2c.open(1, err => {
 
     if (err) {
-        console.log("Error opening arduino");
+	console.log("Error opening arduino");
 	//throw err;
+    } else {
+	i2c_connected = true;
+	console.log("Connected");
     }
+
+
   });
 
 
@@ -100,7 +106,16 @@ class Arduino extends ComponentInput {
 
     setMode(systemMode) {
         buffer_arduino = Buffer.from([systemMode])
-        i2c_bus.i2cWriteSync(thi.slaveAddress, 1, buffer_arduino);
+        if (i2c_connected) {
+	    i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
+	    	console.log("Arduino Error: check connection");
+	    });
+	}
+	this.value.mode;
+    }
+
+    modeStatus() {
+        return this.value.mode;
     }
 
 }

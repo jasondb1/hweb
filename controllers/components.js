@@ -81,20 +81,20 @@ class ComponentsCtrl {
                 value: arduino.getHumidity()
             },
 
-            hydroponicLight: {
-                obj: arduino,
-                value: arduino.lightStatus()
-            },
+            //hydroponicLight: {
+            //    obj: arduino,
+            //    value: arduino.lightStatus()
+            //},
+//
+            //hydroponicPump: {
+            //    obj: arduino,
+            //    value: arduino.pumpStatus()
+            //},
 
-            hydroponicPump: {
-                obj: arduino,
-                value: arduino.pumpStatus()
-            },
-
-            hydroponicControl: {
-                obj: arduino,
-                value: arduino.modeStatus()
-            },
+            //hydroponicControl: {
+            //    obj: arduino,
+            //    value: arduino.modeStatus()
+            //},
 
             //add arduino toggle light on/off
             //add arduino toggle pump on/off
@@ -184,15 +184,6 @@ class ComponentsCtrl {
             let data = [];
 
             for (let key of keys) {
-<<<<<<< HEAD
-		    //console.log("key:" + key);
-                data.push({
-                    description: this.component[key].name,
-                    sensor: key,
-                    value: this.status[key].value,
-                    location: this.component[key].value
-                });
-=======
                 //console.log(key);
                 if (this.status[key] != undefined) {
                     data.push({
@@ -203,7 +194,6 @@ class ComponentsCtrl {
 
                     });
                 }
->>>>>>> 3e2a14979f15cb3a48608e0707a765f023ce30f6
             }
             this.database.insert(data);
         }
@@ -226,16 +216,11 @@ class ComponentsCtrl {
         for (let key of keys) {
             this.status[key] = this.component[key].value;
         }
-<<<<<<< HEAD
 
         if (DEBUG){
 	    console.log("update current status");
             console.log(this.status);
 	}
-=======
-        //console.log("update current status");
-        //console.log(this.status);
->>>>>>> 3e2a14979f15cb3a48608e0707a765f023ce30f6
 
         return this.status;
     }

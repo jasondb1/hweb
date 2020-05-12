@@ -34,7 +34,7 @@ class HydroponicSummary extends Component {
     }
 
     handleClick() {
-        this.props.history.push('/main/hydroponic');
+        this.props.history.push('/main/hydroponics');
     };
 
     render() {
@@ -67,4 +67,4 @@ class HydroponicSummary extends Component {
     }
 }
 
-export default GarageSummary;
+export default HydroponicSummary;

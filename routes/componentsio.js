@@ -1,5 +1,5 @@
 const ComponentsCtrl = require('../controllers/components');
-//const verifyToken = require('../serverAuth.js').verifyToken;
+const verifyToken = require('../serverAuth.js').verifyToken;
 const { JWT_SECRET } = process.env;
 
 const io = require('socket.io')();
@@ -19,6 +19,8 @@ counter = 0;
 
 module.exports = function(io) {
 
+    console.log("Initializing componentsio");	
+
     io.use(function(socket, next) {
         if (socket.handshake.query && socket.handshake.query.token) {
             jwt.verify(socket.handshake.query.token, JWT_SECRET, function(err, decoded) {
@@ -26,6 +28,7 @@ module.exports = function(io) {
                 socket.decoded = decoded;
                 next();
             });
+	console.log("socket authenticated");	
         } else {
             console.log('authentication error');
             next(new Error('Authentication error'));

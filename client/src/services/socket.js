@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-const SOCKET_SERVER = 'http://192.168.1.108:3001';
+const SOCKET_SERVER = 'http://192.168.1.161:3001';
 
 
 function getAuthSocket() {

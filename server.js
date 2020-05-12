@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const logger = require('morgan');
 const bodyParser = require('body-parser');
@@ -26,7 +27,7 @@ const sslOptions = {
     passphrase: 'mysslcert'
 };
 
-
+app.use(cors());
 
 
 //connect to database

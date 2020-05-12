@@ -18,10 +18,10 @@ let DATA_LENGTH = 0x20;
 let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
 const modes = {
-    OFF = "Off",
-    AUTO = "Auto",
-    PUMP_MANUAL_ON = "Pump On",
-    PUMP_MANUAL_OFF = "Pump Off"
+	OFF : "Off",
+    AUTO : "Auto",
+    PUMP_MANUAL_ON : "Pump On",
+    PUMP_MANUAL_OFF : "Pump Off"
 }
 
 
@@ -63,18 +63,9 @@ class Arduino extends ComponentInput {
 		this.value.humidity = 0;    
 	    }
 
-<<<<<<< HEAD
 	});
 	    
 	//let string = buffer_arduino.toString();
-=======
-        this.value.p_resistor = vals[0];
-        this.value.temperature = vals[1];
-        this.value.humidity = vals[2];
-        this.value.lightStatus = vals[3];
-        this.value.pumpStatus = vals[4];
-        this.value.mode = vals[5];
->>>>>>> 3e2a14979f15cb3a48608e0707a765f023ce30f6
         //console.log(string.split(/[\s,\0]+/, 3));
     }
 

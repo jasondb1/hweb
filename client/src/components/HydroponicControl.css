@@ -9,6 +9,9 @@
     border-radius: 12px;
     background-color: #f2f6ff;
     padding: 3em;
+    width: 20em;
+    margin-left: 2em;
+    margin-top: 2em;
 }
 
 .notify-badge {
@@ -21,3 +24,12 @@
     padding: 5px 10px;
     font-size: 20px;
 }
+
+.selected {
+    background-color: #40cc40;
+}
+
+.notSelected {
+
+}
+

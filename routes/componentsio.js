@@ -169,12 +169,15 @@ module.exports = function(io) {
 	        componentsCtrl.component.hydroponicControl.obj.setMode(value);
             client.emit('componentStatusUpdate', { systemMode: value });
         });
-        
-
+       
         client.on('requestClimateData', () => {
             console.log("climate data");
+            payload = componentsCtrl.database.getSensorData("temp_local");
             //request data from database
-            let payload = [{date: "2020-05-01", close:12.2}];
+            //let payload = [{date: "2020-05-01", close:12.2}];
+            
+            console.log("payload");
+            console.log(payload);
             client.emit('incomingClimateData', payload);
         });
         

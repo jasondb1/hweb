@@ -43,7 +43,11 @@ class Database {
 
     insert(data) {
         //this.connect();
+        
+        //console.log("insert data:");
+        //console.log(data);
 
+            
         this.db.run(`CREATE TABLE IF NOT EXISTS ${this.table} (` +
             "timestamp INTEGER," +
             "description TEXT," +
@@ -104,6 +108,7 @@ class Database {
     //default time is 24 hours
     getSensorData(sensor, time_prev = (24 * 60 * 60 * 1000)) {
 
+        console.log("getSensorData");
         //this.connect();
         //let time_now = new Date().getTime;
         //let time_now = datetime.getTime();
@@ -118,7 +123,7 @@ class Database {
                 throw err;
             }
 
-            //console.log(rows);
+            console.log(rows);
 
         });
 

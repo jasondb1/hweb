@@ -189,8 +189,9 @@ class ComponentsCtrl {
                     data.push({
                         description: this.component[key].obj.name,
                         sensor: key,
-                        value: this.status[key].value,
-                        location: this.component[key].obj.value
+                        value: this.status[key],
+                        //value: this.component.obj.value,
+                        location: this.component[key].obj.location
 
                     });
                 }
@@ -217,7 +218,7 @@ class ComponentsCtrl {
             this.status[key] = this.component[key].value;
         }
 
-        if (DEBUG){
+    if (DEBUG){
 	    console.log("update current status");
             console.log(this.status);
 	}

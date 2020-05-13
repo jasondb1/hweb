@@ -23,8 +23,11 @@ class HydroponicSummary extends Component {
 
         //TODO: This should be a door sensor
         this.socket.on('componentStatusUpdate', (data) => {
-            if (data.component === this.state.component) {
-                this.setState({isOpen: data.systemMode});
+            
+                console.log("update sensor in hydroponic summary");
+                console.log(data);
+                if (data.component === this.state.component) {
+                this.setState({systemMode: data.systemMode});
             }
         });
     }

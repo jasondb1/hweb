@@ -164,16 +164,19 @@ module.exports = function(io) {
 
         //TODO: getSchedule, setSchedule, set coolingdifferential
 
-
-        //TODO: setmode on hydroponic garden
         client.on('hydroponicMode', (value) => {
             console.log("socket received message: hydroponicMode: " + value);
-	    componentsCtrl.component.hydroponicControl.obj.setMode(value);
-            //TODO: update status on client
-
+	        componentsCtrl.component.hydroponicControl.obj.setMode(value);
             client.emit('componentStatusUpdate', { systemMode: value });
         });
+        
 
-
+        client.on('requestClimateData', () => {
+            console.log("climate data");
+            //request data from database
+            let payload = [{date: "2020-05-01", close:12.2}];
+            client.emit('incomingClimateData', payload);
+        });
+        
     });
 };

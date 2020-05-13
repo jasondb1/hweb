@@ -52,10 +52,11 @@ class Database {
             "location TEXT" +
             ")");
 
-        let datetime = new Date();
+        //let datetime = new Date();
+        let datetime = Date.now();
 
         for (let row of data) {
-            this.db.run('INSERT INTO ' + this.table + ' (timestamp, description, location, sensor, value) VALUES( ?, ?, ?, ?, ?)', [datetime.getTime(), row.description, row.location, row.sensor, row.value],
+            this.db.run('INSERT INTO ' + this.table + ' (timestamp, description, location, sensor, value) VALUES( ?, ?, ?, ?, ?)', [datetime, row.description, row.location, row.sensor, row.value],
                 (err) => {
                     if (err) {
                         console.error(err);
@@ -87,8 +88,8 @@ class Database {
         );
     }
 
-    clearLog() {
-        let where = 1;
+    clearLog(where = 1) {
+        //let where = 1;
 
         this.db.run((`DELETE FROM sensor_data WHERE ?`), [where],
             (err) => {
@@ -100,16 +101,18 @@ class Database {
     }
 
     //retrieve sensor data
+    //default time is 24 hours
     getSensorData(sensor, time_prev = (24 * 60 * 60 * 1000)) {
 
         //this.connect();
-        //let datetime = new Date();
+        //let time_now = new Date().getTime;
         //let time_now = datetime.getTime();
-        //let time = time_now - time_prev;
+        let time_threshold = Date.now() - time_prev;
         let rows = null;
 
         //TODO: limit, allow user to specify columns
-        this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_prev], function(err, rows) {
+        this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_threshold], function(err, rows) {
+        // this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_prev], function(err, rows) {
 
             if (err) {
                 throw err;
@@ -127,7 +130,7 @@ class Database {
     //export the data to a csv file
     exportData(filter = '1', filename = LOG_FILEPATH) {
 
-        console.log("In export function");
+        console.log("Exporting Data");
         //this.connect();
         let datetime = new Date();
 
@@ -136,10 +139,6 @@ class Database {
             if (err) {
                 throw err;
             }
-
-            //rows.forEach(function (row) {
-            //console.log(row.id + ": " + row.info);
-            console.log(row);
 
             fs.appendFile(
                 filename,
@@ -155,7 +154,6 @@ class Database {
                 "\n",
                 function(err) {}
             );
-            //});
         });
 
         //this.open();

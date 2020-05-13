@@ -6,7 +6,7 @@ import * as d3 from 'd3';
 let CHART_WIDTH = 600;
 let CHART_HEIGHT = 400;
 
-let data = [
+let testdata = [
     {date:"2019-11-03 16:01:17",close:"16.5"},
     {date:"2019-11-03 16:02:17",close:"18.0"},
     {date:"2019-11-03 16:03:17",close:"19.0"},
@@ -14,7 +14,7 @@ let data = [
     {date:"2019-11-03 16:05:17",close:"21.2"}
 ];
 
-function drawChart() {
+function drawChart(data) {
 
    // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -86,22 +86,40 @@ class ClimateChart extends Component {
         this.state = {
             label: 'Door Sensor',
             isOpen: props.isOpen,
-            component: 'doorSensor'
+            component: 'climate',
+            data: testdata,
         };
+    
+    
     }
 
     componentDidMount() {
 
         this.socket = getAuthSocket();
 
+        this.socket.emit('requestClimateData');
+        
         //TODO: Change this to get temp data
+        
         this.socket.on('componentStatusUpdate', (data) => {
             if (data.component === this.state.component) {
                 this.setState({ isOpen: data.isOpen });
             }
         });
 
-        drawChart();
+
+        this.socket.on('incomingClimateData', (payload) => {
+            console.log(payload);
+            console.log(this.state);
+            this.setState({ data: payload });
+            console.log(this.state);
+            //this.data = payload;
+            drawChart(this.state.data);
+
+        });
+
+
+        //drawChart();
 
     }
 

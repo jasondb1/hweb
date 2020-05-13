@@ -56,7 +56,7 @@ class Arduino extends ComponentInput {
     let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
         
 	i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
-		console.log(rawData);
+		//console.log(rawData);
 	    if (!err) {
 	        let string = rawData
                 let vals = string.split(/[\s,\0]+/, 3);

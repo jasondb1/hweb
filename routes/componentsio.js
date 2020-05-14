@@ -19,7 +19,7 @@ counter = 0;
 
 module.exports = function(io) {
 
-    console.log("Initializing componentsio");	
+    console.log("Initializing componentsio");
 
     io.use(function(socket, next) {
         if (socket.handshake.query && socket.handshake.query.token) {
@@ -28,7 +28,7 @@ module.exports = function(io) {
                 socket.decoded = decoded;
                 next();
             });
-	console.log("socket authenticated");	
+            console.log("socket authenticated");
         } else {
             console.log('authentication error');
             next(new Error('Authentication error'));
@@ -166,23 +166,37 @@ module.exports = function(io) {
 
         client.on('hydroponicMode', (value) => {
             console.log("socket received message: hydroponicMode: " + value);
-	        componentsCtrl.component.hydroponicControl.obj.setMode(value);
+            componentsCtrl.component.hydroponicControl.obj.setMode(value);
             client.emit('componentStatusUpdate', { systemMode: value });
         });
-       
+
         client.on('requestClimateData', () => {
             //console.log("climate data");
-            payload = componentsCtrl.database.getSensorData("temp_local", (24*60*60*1000), (err, payload) => {
+            payload = componentsCtrl.database.getSensorData("temp_local", (24 * 60 * 60 * 1000), (err, payload) => {
                 //request data from database
                 //let payload = [{date: "2020-05-01", close:12.2}];
-            
+
                 //console.log("\n\npayload:");
                 //console.log(payload);
                 //console.log("-----");
                 client.emit('incomingClimateData', payload);
             })
-            
+
         });
-        
+
+        client.on('requestData', (sensor) => {
+            //console.log("climate data");
+            payload = componentsCtrl.database.getSensorData(sensor, (24 * 60 * 60 * 1000), (err, payload) => {
+                //request data from database
+                //let payload = [{date: "2020-05-01", close:12.2}];
+
+                //console.log("\n\npayload:");
+                //console.log(payload);
+                //console.log("-----");
+                client.emit('incomingData', payload);
+            })
+
+        });
+
     });
 };

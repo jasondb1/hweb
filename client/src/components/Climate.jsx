@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 import FurnaceControl from './FurnaceControl';
-import ClimateChart from './ClimateChart';
+import Chart from './Chart';
 
 class Climate extends Component {
+
+
 
     render() { return (<div className='Climate'>
             <h1>Climate</h1>
             <FurnaceControl />
-            <ClimateChart />
+            <Chart sensor="temp_local"/>
         </div>
     )};
 

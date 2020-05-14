@@ -5,14 +5,8 @@ import * as d3 from 'd3';
 
 let CHART_WIDTH = 600;
 let CHART_HEIGHT = 400;
+//const UPDATE_INTERVAL = 5 * 60 * 1000 // 5 minute intervals;
 
-let testdata = [
-    {date:"2019-11-03 16:01:17",close:"16.5"},
-    {date:"2019-11-03 16:02:17",close:"18.0"},
-    {date:"2019-11-03 16:03:17",close:"19.0"},
-    {date:"2019-11-03 16:04:17",close:"20.50"},
-    {date:"2019-11-03 16:05:17",close:"21.2"}
-];
 
 function drawChart(data) {
 
@@ -23,7 +17,7 @@ let margin = {top: 20, right: 20, bottom: 30, left: 50},
 
 // parse the date / time
 //let parseTime = d3.timeParse("%H:%M");
-let parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+//let parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 //let parseTime = d3.timeParse("%d-%b-%y");
 
 // set the ranges
@@ -32,8 +26,8 @@ let y = d3.scaleLinear().range([height, 0]);
 
 // define the line
 let valueline = d3.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.close); });
+    .x(function(d) { return x(d.timestamp); })
+    .y(function(d) { return y(d.value); });
 
 // append the svg obgect to the body of the page
 // appends a 'group' element to 'svg'
@@ -41,23 +35,28 @@ let valueline = d3.line()
 let svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
-// d3.csv("data.csv", function(error, data) {
+//currently this is coming from the database query
+        // d3.csv("data.csv", function(error, data) {
 //   if (error) throw error;
 
   // format the data
   data.forEach(function(d) {
-      d.date = parseTime(d.date);
-      d.close = +d.close;
+      console.log(d.timestamp);
+      //d.timestamp = parseTime(d.timestamp);
+      //d.timestamp = parseTime(new Date(d.timestamp));
+      d.timestamp = new Date(d.timestamp);
+      console.log(d.timestamp);
+      d.value= +d.value;
   });
 
   // Scale the range of the data
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+  x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+  y.domain([d3.min(data, function(d) {return d.value - 2}), d3.max(data, function(d) { return d.value + 2; })]);
 
   // Add the valueline path.
   svg.append("path")
@@ -84,42 +83,30 @@ class ClimateChart extends Component {
         super(props);
 
         this.state = {
-            label: 'Door Sensor',
-            isOpen: props.isOpen,
+            label: 'Climate Data',
             component: 'climate',
-            data: testdata,
+            data: {},
         };
-    
-    
     }
 
     componentDidMount() {
 
         this.socket = getAuthSocket();
 
-        this.socket.emit('requestClimateData');
-        
-        //TODO: Change this to get temp data
-        
         this.socket.on('componentStatusUpdate', (data) => {
             if (data.component === this.state.component) {
                 this.setState({ isOpen: data.isOpen });
             }
         });
 
-
+        this.socket.emit('requestClimateData');
+        
+        //retrieve data
         this.socket.on('incomingClimateData', (payload) => {
-            console.log(payload);
-            console.log(this.state);
+            //console.log(payload);
             this.setState({ data: payload });
-            console.log(this.state);
-            //this.data = payload;
             drawChart(this.state.data);
-
         });
-
-
-        //drawChart();
 
     }
 

@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
 import './HydroponicControl.css';
-//const garageIconClosed = require('../icons/icons8-warehouse-80.png');
-//const garageIconOpen = require('../icons/icons8-depot-80.png');
+//const gardenIcon = require('../icons/icons8-outside-50-2.png');
 
 class HydroponicControl extends Component {
 
@@ -28,8 +27,8 @@ class HydroponicControl extends Component {
 
         //this.socket.on('statusUpdate', (data) => {
         this.socket.on('componentStatusUpdate', (data) => {
-            console.log("received update on hydro mode");
-		console.log (data);
+        //console.log("received update on hydro mode");
+		//console.log (data);
 		this.setState(data);
 		//this.setState({ systemMode: data.systemMode});
 		console.log(this.state);

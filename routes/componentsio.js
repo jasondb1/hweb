@@ -171,14 +171,17 @@ module.exports = function(io) {
         });
        
         client.on('requestClimateData', () => {
-            console.log("climate data");
-            payload = componentsCtrl.database.getSensorData("temp_local");
-            //request data from database
-            //let payload = [{date: "2020-05-01", close:12.2}];
+            //console.log("climate data");
+            payload = componentsCtrl.database.getSensorData("temp_local", (24*60*60*1000), (err, payload) => {
+                //request data from database
+                //let payload = [{date: "2020-05-01", close:12.2}];
             
-            console.log("payload");
-            console.log(payload);
-            client.emit('incomingClimateData', payload);
+                //console.log("\n\npayload:");
+                //console.log(payload);
+                //console.log("-----");
+                client.emit('incomingClimateData', payload);
+            })
+            
         });
         
     });

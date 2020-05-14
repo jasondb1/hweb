@@ -106,9 +106,9 @@ class Database {
 
     //retrieve sensor data
     //default time is 24 hours
-    getSensorData(sensor, time_prev = (24 * 60 * 60 * 1000)) {
+    getSensorData(sensor, time_prev, callback) {
 
-        console.log("getSensorData");
+        //console.log("getSensorData");
         //this.connect();
         //let time_now = new Date().getTime;
         //let time_now = datetime.getTime();
@@ -120,15 +120,17 @@ class Database {
         // this.db.all(`SELECT * FROM ${this.table} WHERE sensor = ? AND timestamp > ?`, [sensor, time_prev], function(err, rows) {
 
             if (err) {
-                throw err;
+                // throw err;
+                return callback(new Error("Error Retrieving Data"));
             }
-
-            console.log(rows);
-
+            
+            //console.log("database data:");
+            //console.log(rows);
+            return callback(null,rows);
         });
 
         //this.open();
-        return rows;
+        //return rows;
 
     }
 

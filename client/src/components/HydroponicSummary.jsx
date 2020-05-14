@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
+<<<<<<< HEAD
 const HydroponicIcon = require('../icons/icons8-irrigation-50.png');
+=======
+const gardenIcon = require('../icons/icons8-warehouse-80.png');
+>>>>>>> 05cad429876735e93f7e94aa7ef1cf6f5054039a
 
 class HydroponicSummary extends Component {
 
@@ -22,7 +26,6 @@ class HydroponicSummary extends Component {
 
         //TODO: This should be a door sensor
         this.socket.on('componentStatusUpdate', (data) => {
-            
                 console.log("update sensor in hydroponic summary");
                 console.log(data);
                 if (data.component === this.state.component) {
@@ -44,7 +47,11 @@ class HydroponicSummary extends Component {
             <div className='card border-primary mt-3' onClick={this.handleClick}>
                 <div className="row no-gutters d-inline-flex">
                     <div className="p-1 summary-icon">
+<<<<<<< HEAD
                         <img src={HydroponicIcon} alt="" width="80" height="80" />
+=======
+                        <img src={gardenIcon} alt="" width="80" height="80" />
+>>>>>>> 05cad429876735e93f7e94aa7ef1cf6f5054039a
 
                     </div>
                     <div className="">
@@ -63,12 +70,10 @@ class HydroponicSummary extends Component {
                                     	<span className="badge badge-success">Manual Pump Off</span> :
                                     	<span className="badge badge-danger">Error</span>
 				                    }
-						
-			
+
                                 </li>
-
                             </ul>
-
+                            {this.state.systemMode}
                         </div>
                     </div>
                 </div>

@@ -24,6 +24,7 @@ class HydroponicControl extends Component {
         this.socket = getAuthSocket();
 
         this.socket.on('componentStatusUpdate', (data) => {
+
 		this.setState(data);
 		//this.setState({ systemMode: data.systemMode});
         });

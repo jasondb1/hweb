@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {getAuthSocket} from "../services/socket";
-const garageIconClosed = require('../icons/icons8-warehouse-80.png');
-const garageIconOpen = require('../icons/icons8-depot-80.png');
+const HydroponicIcon = require('../icons/icons8-irrigation-50.png');
 
 class HydroponicSummary extends Component {
 
@@ -45,7 +44,7 @@ class HydroponicSummary extends Component {
             <div className='card border-primary mt-3' onClick={this.handleClick}>
                 <div className="row no-gutters d-inline-flex">
                     <div className="p-1 summary-icon">
-                        <img src={this.state.isOpen ? garageIconOpen : garageIconClosed} alt="" width="80" height="80" />
+                        <img src={HydroponicIcon} alt="" width="80" height="80" />
 
                     </div>
                     <div className="">
@@ -62,7 +61,7 @@ class HydroponicSummary extends Component {
                                     	<span className="badge badge-success">Manual Pump On</span> :
                                 		this.state.systemMode === 4 ?
                                     	<span className="badge badge-success">Manual Pump Off</span> :
-                                    	<span className="badge badge-success">Unknown</span>
+                                    	<span className="badge badge-danger">Error</span>
 				                    }
 						
 			

@@ -5,7 +5,17 @@ const UserList = () => {
   return(<ul>
           <li>User list (del) (chg password)</li>
       </ul>
+
+   // <ul>
+            //     {
+            //         this.state.data.map((item, key) => {
+            //             return <li key={key}>{item.timeM} {item.description}</li>
+            //         })
+            //     }
+            // </ul>
+
   );
+
 };
 
 //TODO: use httpClient.getAdmin
@@ -26,13 +36,20 @@ class SignUp extends React.Component {
         })
     }
 
+    //new function to get data
+    // this.setState({
+    //data: resoponseArray.map(item => {description: item.description, timeM: item.timeM})})
+
     onFormSubmit(evt) {
         evt.preventDefault();
         httpClient.signUp(this.state.fields).then(user => {
             this.setState({fields: {name: '', email: '', admin: false, password: ''}});
+            console.log(this.props);
             if (user) {
                 //TODO: this might need to be removed
-                this.props.onSignUpSuccess(user);
+                if ('onSignUpSuccess' in this.props) {
+                    this.props.onSignUpSuccess(user);
+                }
                 this.props.history.push('/dashboard')
             }
         })

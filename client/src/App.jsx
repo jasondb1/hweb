@@ -55,7 +55,8 @@ class App extends React.Component {
                         return currentUser
                             ? <Dashboard/>
                             : <Redirect to="/login"/>
-                    }}/> */}
+                    }}/> 
+                    Note: This is a testing dashboard can likely delete*/}
 
                     <Route path="/main" render={(props) => {
                         return currentUser

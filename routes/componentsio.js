@@ -170,6 +170,13 @@ module.exports = function(io) {
             client.emit('componentStatusUpdate', { systemMode: value });
         });
 
+        client.on('hydroponicCommand', (value) => {
+            console.log("socket received message: hydroponicCommand: " + value);
+            componentsCtrl.component.hydroponicControl.obj.sendCommand(value);
+            client.emit('componentStatusUpdate', { systemMode: value });
+        });
+
+        //requests sensor data from inside database with data being 24 hours back
         client.on('requestClimateData', () => {
             //console.log("climate data");
             payload = componentsCtrl.database.getSensorData("temp_local", (24 * 60 * 60 * 1000), (err, payload) => {
@@ -184,6 +191,7 @@ module.exports = function(io) {
 
         });
 
+        //generic request for any sensor 24 hours back
         client.on('requestData', (sensor) => {
             //console.log("climate data");
             payload = componentsCtrl.database.getSensorData(sensor, (24 * 60 * 60 * 1000), (err, payload) => {

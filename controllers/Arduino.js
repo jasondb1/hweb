@@ -12,16 +12,16 @@ const i2c_bus = i2c.open(1, err => {
 	//throw err;
     } else {
 	i2c_connected = true;
-	console.log("Connected");
+	console.log("Arduino Connected");
     }
-
-
   });
 
 
 //i2c comm settings for arduino
 let DATA_LENGTH = 0x20;
 let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
+
+const READINTERVAL = 5000; //limit read to every 5 seconds
 
 //const modes = {
 //	OFF : "Off",
@@ -39,6 +39,7 @@ class Arduino extends ComponentInput {
         this.name = name;
         this.location = location;
         this.mode = 1;
+        this.lastRead = Date.now() - 5000; //ensure sensor is read right away
 
         this.pin = null;
         this.value = {
@@ -48,33 +49,45 @@ class Arduino extends ComponentInput {
             lightStatus: null,
             pumpStatus: null,
             mode: null,
+            secondsToLightOff: 0,
         };
     }
 
     readSensor() {
-        //i2c_bus.i2cReadSync(this.slaveAddress, DATA_LENGTH, buffer_arduino);
-    let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
-        
-	i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
-		//console.log(rawData);
-	    if (!err) {
-	        let string = rawData
-                let vals = string.split(/[\s,\0]+/, 3);
+        if (Date.now() > (this.lastRead + READINTERVAL)){
 
-                this.value.p_resistor = vals[0];
-                this.value.temperature = vals[1];
-                this.value.humidity = vals[2];
-		this.value.mode = vals[3]; //TODO: edit the arduino code to ensure this    
-	    } else {
-		this.value.p_resistor = 0;
-		this.value.temperature = 0;
-		this.value.humidity = 0;    
-	    }
+            let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
-	});
-	    
-	//let string = buffer_arduino.toString();
-        //console.log(string.split(/[\s,\0]+/, 3));
+            i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
+                console.log("---Arduino Data");
+                console.log(buffer_arduino);
+	            if (!err) {
+	                //let string = rawData;
+                    let string = buffer_arduino.toString('utf-8');
+                    console.log("String:" + string);
+                    let vals = string.split(/[\s,\0]+/, 3);
+
+                    this.value.p_resistor = vals[0];
+                    this.value.temperature = vals[1];
+                    this.value.humidity = vals[2];
+		            this.value.mode = vals[3]; //TODO: edit the arduino code to ensure this    
+                    
+                    this.value.pumpStatus = vals[4];
+                    this.value.lightStatus = vals[5];
+                    this.secondsToLightOff = vals[6];
+	            } else {
+		            this.value.p_resistor = -99;
+		            this.value.temperature = -99;
+		            this.value.humidity = -99;
+                    this.value.mode = -99;
+                    this.value.pumpStatus = -99;
+                    this.value.lightStatus = -99;
+	            }
+            });
+
+        this.lastRead = Date.now();
+        console.log("end data request");   
+        }
     }
 
     getTemperature() {
@@ -96,27 +109,35 @@ class Arduino extends ComponentInput {
         return this.value.mode;
     }
 
-    togglePump() {
-        //TODO: pump on/off
-        //this.value.pumpStatus = true/false;
+
+    getLightStatus(){
+        return this.lightStatus;
     }
 
-    toggleLight() {
-        //TODO light on/off
-        //this.value.pumpStatus = true/false;
+    getPumpStatus(){
+        return this.pumpStatus;
     }
 
     setMode(systemMode) {
         buffer_arduino = Buffer.from([systemMode])
         if (i2c_connected) {
-	    i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
+	        i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
 	    	console.log("Arduino Error: check connection");
-	    });
-	}
-	this.value.mode = systemMode;
+	        });
+	    }
+	    this.value.mode = systemMode;
     }
 
-    modeStatus() {
+    sendCommand(command) {
+        buffer_arduino = Buffer.from([command])
+        if (i2c_connected) {
+	        i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
+	    	console.log("Arduino Error: check connection");
+	        });
+	    }
+    }
+
+    getMode() {
         return this.value.mode;
     }
 

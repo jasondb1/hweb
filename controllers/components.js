@@ -93,7 +93,7 @@ class ComponentsCtrl {
 
             hydroponicControl: {
                 obj: arduino,
-                value: arduino.modeStatus()
+                value: arduino.getmode()
             },
 
             //add arduino toggle light on/off

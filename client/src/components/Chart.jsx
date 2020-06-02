@@ -107,12 +107,44 @@ class Chart extends Component {
         this.setState({sensor: sensor});
     }
 
+    handleClickButton(value){
+        //value is in minutes
+        //
+        //change time back value
+        
+        
+
+        //request new data
+        //this.socket.emit('requestData', this.props.sensor);
+    }
+
     render() {
         return ( <div id="chart">
             {/* <svg id = "visualisation"
             width = "600"
             height = "400"> 
             </svg>  */}
+                {/*</div>
+            <div>*/}
+                <button
+                        onClick={this.handleClickButton.bind(this, 10080)}
+                >1 week
+                </button>
+                <button
+                        onClick={this.handleClickButton.bind(this, 1440)}
+                >24 hours
+                </button>
+                <button
+                    onClick={this.handleClickButton.bind(this, 720)}
+                >12 hour
+                </button>
+                <button
+                    onClick={this.handleClickButton.bind(this, 360)}
+                >6 hour
+                </button>
+                <button
+                    onClick={this.handleClickButton.bind(this, 60)}
+                >1 hour</button>
             </div>
         );
     }

@@ -101,7 +101,12 @@ class ComponentsCtrl {
                 value: arduino.getLightOffSeconds(),
             },
             
-                //add arduino toggle light on/off
+            hydroponicControl: {
+                obj:arduino,
+                value: arduino.getValues(),
+            },
+                
+            //add arduino toggle light on/off
             //add arduino toggle pump on/off
             //set mode
 

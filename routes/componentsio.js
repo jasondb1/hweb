@@ -181,19 +181,12 @@ module.exports = function(io) {
             //client.emit('componentStatusUpdate', { hydropoincMode: value });
         });
 
-        //requests sensor data from inside database with data being 24 hours back
-        client.on('requestClimateData', () => {
-            console.log("request climate data");
-            payload = componentsCtrl.database.getSensorData("temp_local", (24 * 60 * 60 * 1000), (err, payload) => {
-            client.emit('incomingClimateData', payload);
-            })
 
-        });
-
-        //generic request for any sensor 24 hours back
-        client.on('requestData', (sensor) => {
+        //generic request for any sensor 24 hours back - timeback in ms
+        client.on('requestData', (args) => {
             //console.log("request data");
-            payload = componentsCtrl.database.getSensorData(sensor, (24 * 60 * 60 * 1000), (err, payload) => {
+            //console.log(args);
+            payload = componentsCtrl.database.getSensorData(args.sensor, (args.timeback * 60 * 1000), (err, payload) => {
                 //request data from database
                 //let payload = [{date: "2020-05-01", close:12.2}];
             if (err){

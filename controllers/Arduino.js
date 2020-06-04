@@ -58,10 +58,21 @@ class Arduino extends ComponentInput {
                     //console.log("String:" + string);
                     
                     
-                    this.value.p_resistor = buffer_arduino.readUInt16BE(0);
-                    this.value.temperature = (buffer_arduino.readUInt16BE(2) ) / 100;
-                    this.value.humidity = (buffer_arduino.readUInt16BE(4)) / 10;
-		            this.value.mode = buffer_arduino.readUInt8(22);    
+                    this.value.p_resistor = buffer_arduino.readInt16BE(0);
+                    
+                    //check if temperatures are valid
+                    let val = (buffer_arduino.readInt16BE(2)) / 100;
+                    if (val > -99 && val < 150){
+                        this.value.temperature = val;
+                    }
+
+                    //check for valid humidity values                                               
+                    val = (buffer_arduino.readInt16BE(4)) / 10;
+                    if (val > -1 && val < 150){
+                        this.value.humidity = val;
+                    }
+                        
+                    this.value.mode = buffer_arduino.readUInt8(22);    
                     this.value.lightStatus = buffer_arduino.readUInt8(23);
                     this.value.pumpStatus = buffer_arduino.readUInt8(24);
                     this.value.secondsToLightOff = (buffer_arduino.readUInt32BE(6)/1000 );
@@ -72,9 +83,9 @@ class Arduino extends ComponentInput {
                     //console.log(this.value);
                         
 	            } else {
-		            this.value.p_resistor = -99;
-		            this.value.temperature = -99;
-		            this.value.humidity = -99;
+		            //this.value.p_resistor = -99;
+		            //this.value.temperature = -99;
+		            //this.value.humidity = -99;
                     this.value.mode = -99;
                     this.value.pumpStatus = -99;
                     this.value.lightStatus = -99;
@@ -86,6 +97,11 @@ class Arduino extends ComponentInput {
         }
     }
 
+    getValues() {
+        this.readSensor();
+        return this.value;
+    }
+        
     getTemperature() {
         this.readSensor();
         return this.value.temperature;

@@ -9,7 +9,7 @@ import * as d3 from 'd3';
 
 
 function drawLineChart(data, chartWidth, chartHeight, chartId) {
-console.log(chartId);
+//console.log(chartId);
 
    // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},

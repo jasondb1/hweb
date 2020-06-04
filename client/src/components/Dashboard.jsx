@@ -9,11 +9,11 @@ class Dashboard extends Component {
 
     render() {
         return (<div className='Dashboard'>
+                <HydroponicSummary {...this.props} />
                 <GarageSummary {...this.props} />
                 <DoorSummary {...this.props} />
                 <IndoorClimateSummary {...this.props} />
                 <OutdoorClimateSummary {...this.props} />
-                <HydroponicSummary {...this.props} />
             </div>
         )
     };

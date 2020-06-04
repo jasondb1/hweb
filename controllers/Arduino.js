@@ -8,13 +8,13 @@ const i2c = require('i2c-bus');
 const i2c_bus = i2c.open(1, err => {
 
     if (err) {
-	console.log("Error opening arduino");
-	//throw err;
+        console.log("Error opening arduino");
+        //throw err;
     } else {
-	i2c_connected = true;
-	console.log("Arduino Connected");
+        i2c_connected = true;
+        console.log("Arduino Connected");
     }
-  });
+});
 
 
 //i2c comm settings for arduino
@@ -41,59 +41,59 @@ class Arduino extends ComponentInput {
             lightStatus: null,
             pumpStatus: null,
             mode: null,
-            secondsToLightOff: 0,
+            secondsToLightOnOff: 0,
         };
     }
 
     readSensor() {
-        if (Date.now() > (this.lastRead + READINTERVAL)){
+        if (Date.now() > (this.lastRead + READINTERVAL)) {
 
             buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
             i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
                 //console.log("---Arduino Data");
                 //console.log(buffer_arduino);
-	            if (!err) {
+                if (!err) {
                     let string = buffer_arduino.toString('utf-8');
                     //console.log("String:" + string);
-                    
-                    
+
+
                     this.value.p_resistor = buffer_arduino.readInt16BE(0);
-                    
+
                     //check if temperatures are valid
                     let val = (buffer_arduino.readInt16BE(2)) / 100;
-                    if (val > -99 && val < 150){
+                    if (val > -99 && val < 150) {
                         this.value.temperature = val;
                     }
 
                     //check for valid humidity values                                               
                     val = (buffer_arduino.readInt16BE(4)) / 10;
-                    if (val > -1 && val < 150){
+                    if (val > -1 && val < 150) {
                         this.value.humidity = val;
                     }
-                        
-                    this.value.mode = buffer_arduino.readUInt8(22);    
+
+                    this.value.mode = buffer_arduino.readUInt8(22);
                     this.value.lightStatus = buffer_arduino.readUInt8(23);
                     this.value.pumpStatus = buffer_arduino.readUInt8(24);
-                    this.value.secondsToLightOff = (buffer_arduino.readUInt32BE(6)/1000 );
-                    this.value.lightDuration = (buffer_arduino.readUInt32BE(10) );
-                    this.value.floodInterval = (buffer_arduino.readUInt32BE(14) );
-                    this.value.floodDuration = (buffer_arduino.readUInt32BE(18) );
-                    
+                    this.value.secondsToLightOnOff = (buffer_arduino.readUInt32BE(6) / 1000);
+                    this.value.lightDuration = (buffer_arduino.readUInt32BE(10));
+                    this.value.floodInterval = (buffer_arduino.readUInt32BE(14));
+                    this.value.floodDuration = (buffer_arduino.readUInt32BE(18));
+
                     //console.log(this.value);
-                        
-	            } else {
-		            //this.value.p_resistor = -99;
-		            //this.value.temperature = -99;
-		            //this.value.humidity = -99;
+
+                } else {
+                    //this.value.p_resistor = -99;
+                    //this.value.temperature = -99;
+                    //this.value.humidity = -99;
                     this.value.mode = -99;
                     this.value.pumpStatus = -99;
                     this.value.lightStatus = -99;
-	            }
+                }
             });
 
-        this.lastRead = Date.now();
-        //console.log("end data request");   
+            this.lastRead = Date.now();
+            //console.log("end data request");   
         }
     }
 
@@ -101,7 +101,7 @@ class Arduino extends ComponentInput {
         this.readSensor();
         return this.value;
     }
-        
+
     getTemperature() {
         this.readSensor();
         return this.value.temperature;
@@ -122,42 +122,42 @@ class Arduino extends ComponentInput {
         return this.value.mode;
     }
 
-    getLightStatus(){
+    getLightStatus() {
         this.readSensor();
         return this.value.lightStatus;
     }
 
-    getPumpStatus(){
+    getPumpStatus() {
         this.readSensor();
         return this.value.pumpStatus;
     }
 
-    getLightOffSeconds(){
+    getLightOffSeconds() {
         this.readSensor();
-        return this.value.secondsToLightOff;
+        return this.value.secondsToLightOnOff;
     }
 
     setMode(systemMode) {
         buffer_arduino = Buffer.from([systemMode])
         if (i2c_connected) {
-	        i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
-	    	    if (err) {
+            i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
+                if (err) {
                     console.log("Arduino Error: check connection");
                 }
-	        });
-	    }
-	    this.value.mode = systemMode;
+            });
+        }
+        this.value.mode = systemMode;
     }
 
     sendCommand(command) {
         buffer_arduino = Buffer.from([command])
         if (i2c_connected) {
-	        i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
-	    	    if (err){
+            i2c_bus.i2cWrite(this.slaveAddress, 1, buffer_arduino, err => {
+                if (err) {
                     console.log("Arduino Error: check connection");
                 }
-	        });
-	    }
+            });
+        }
     }
 
     getMode() {

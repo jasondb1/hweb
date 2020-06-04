@@ -10,7 +10,8 @@ class Led extends ComponentOutput {
         this.name = name;
         this.location = location;
 
-        this.pin = new Gpio(this.pinNumber, 'out');
+        //this.pin = new Gpio(this.pinNumber, 'out');
+        this.pin = new Gpio(pin_number, 'out');
         this.value = this.pin.readSync();
     }
 

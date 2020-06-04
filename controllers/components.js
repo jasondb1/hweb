@@ -66,36 +66,46 @@ class ComponentsCtrl {
                 value: dht22.getHumidity()
             },
 
-            presistor_remote0: {
+            hydroponicLightLevel: {
                 obj: arduino,
-                value: arduino.getLight()
+                value: arduino.getLightValue()
             },
 
-            temp_remote0: {
+            hydroponicTemperature: {
                 obj: arduino,
                 value: arduino.getTemperature()
             },
 
-            humidity_remote0: {
+            hydroponicHumidity: {
                 obj: arduino,
                 value: arduino.getHumidity()
             },
 
-            //hydroponicLight: {
-            //    obj: arduino,
-            //    value: arduino.lightStatus()
-            //},
-//
-            //hydroponicPump: {
-            //    obj: arduino,
-            //    value: arduino.pumpStatus()
-            //},
-
-            hydroponicControl: {
+            hydroponicLightStatus: {
                 obj: arduino,
-                value: arduino.modeStatus()
+                value: arduino.getLightStatus()
+            },
+//
+            hydroponicPumpStatus: {
+                obj: arduino,
+                value: arduino.getPumpStatus()
             },
 
+            hydroponicMode: {
+                obj: arduino,
+                value: arduino.getMode()
+            },
+            
+            hydroponicCycleOn:{
+                obj: arduino,
+                value: arduino.getLightOffSeconds(),
+            },
+            
+            hydroponicControl: {
+                obj:arduino,
+                value: arduino.getValues(),
+            },
+                
             //add arduino toggle light on/off
             //add arduino toggle pump on/off
             //set mode
@@ -211,7 +221,6 @@ class ComponentsCtrl {
         this.init();
         this.status.ts = new Date().getTime();
 
-        //let keys = ['temp_local', 'humidity_local', 'temp_remote0', 'humidity_remote0', 'presistor_remote0', 'ledIndicator', 'garageRelay', 'relay2', 'temperatureControl'];
         let keys = Object.keys(this.component);
 
         for (let key of keys) {
@@ -220,7 +229,7 @@ class ComponentsCtrl {
 
     if (DEBUG){
 	    console.log("update current status");
-            console.log(this.status);
+        console.log(this.status);
 	}
 
         return this.status;
@@ -231,7 +240,6 @@ class ComponentsCtrl {
         return this.status;
     }
 
-
     //update an individual component
     updateComponentStatus(comp) {
         this.status[comp] = this.component[comp].value;
@@ -241,7 +249,7 @@ class ComponentsCtrl {
     start(interval = SAMPLEINTERVAL) {
         this.updateInterval = interval;
         this.update = setInterval(
-            this.readAllSensors.bind(this), (this.updateInterval * 1000));
+        this.readAllSensors.bind(this), (this.updateInterval * 1000));
     }
 
     //stop sampling sensors

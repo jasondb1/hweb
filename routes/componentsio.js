@@ -1,9 +1,10 @@
 const ComponentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 const { JWT_SECRET } = process.env;
-
 const io = require('socket.io')();
 const jwt = require('jsonwebtoken');
+
+const DEBUG = false;
 
 let subscribedUpdate = null;
 let UPDATEINTERVAL = 10000;
@@ -28,7 +29,7 @@ module.exports = function(io) {
                 socket.decoded = decoded;
                 next();
             });
-            console.log("socket authenticated");
+            if (DEBUG) console.log("socket authenticated");
         } else {
             console.log('authentication error');
             next(new Error('Authentication error'));
@@ -46,11 +47,11 @@ module.exports = function(io) {
             client.emit('updates', componentsCtrl.currentStatus());
         }, UPDATEINTERVAL);
 
-        console.log("Connection:" + counter++);
+        if (DEBUG) console.log("Connection:" + counter++);
 
         //user disconnects
         client.on('disconnect', () => {
-            console.log('client disconnected:' + counter);
+            if (DEBUG) console.log('client disconnected:' + counter);
         });
 
         //client.on('componentGetStatus', comp => {
@@ -156,7 +157,7 @@ module.exports = function(io) {
             //client.emit('statusMessage', {"Success"})
         });
 
-        //TODO: get sensor data
+        //Gets historic data from a sensor
         client.on('getData', (sensor, timeBack) => {
             let payload = componentsCtrl.database.getSensorData(sensor, timeBack);
             client.emit('sensorData', payload);
@@ -164,32 +165,33 @@ module.exports = function(io) {
 
         //TODO: getSchedule, setSchedule, set coolingdifferential
 
+        //sets the hydroponic mode on the sensor
         client.on('hydroponicMode', (value) => {
             console.log("socket received message: hydroponicMode: " + value);
-            componentsCtrl.component.hydroponicControl.obj.setMode(value);
-            client.emit('componentStatusUpdate', { systemMode: value });
+            componentsCtrl.component.hydroponicMode.obj.setMode(value);
+            client.emit('componentStatusUpdate', { hydroponicMode: value });
         });
 
-        client.on('requestClimateData', () => {
-            //console.log("climate data");
-            payload = componentsCtrl.database.getSensorData("temp_local", (24 * 60 * 60 * 1000), (err, payload) => {
-                //request data from database
-                //let payload = [{date: "2020-05-01", close:12.2}];
-
-                //console.log("\n\npayload:");
-                //console.log(payload);
-                //console.log("-----");
-                client.emit('incomingClimateData', payload);
-            })
-
+        //sneds a command to the hydroponic bed
+        client.on('hydroponicCommand', (value) => {
+            console.log("socket received message: hydroponicCommand: " + value);
+            
+            //TODO: Maybe add a return for success/fail    
+            componentsCtrl.component.hydroponicMode.obj.sendCommand(value);
+            //client.emit('componentStatusUpdate', { hydropoincMode: value });
         });
 
-        client.on('requestData', (sensor) => {
-            //console.log("climate data");
-            payload = componentsCtrl.database.getSensorData(sensor, (24 * 60 * 60 * 1000), (err, payload) => {
+
+        //generic request for any sensor 24 hours back - timeback in ms
+        client.on('requestData', (args) => {
+            //console.log("request data");
+            //console.log(args);
+            payload = componentsCtrl.database.getSensorData(args.sensor, (args.timeback * 60 * 1000), (err, payload) => {
                 //request data from database
                 //let payload = [{date: "2020-05-01", close:12.2}];
-
+            if (err){
+                console.log(err);
+            }
                 //console.log("\n\npayload:");
                 //console.log(payload);
                 //console.log("-----");

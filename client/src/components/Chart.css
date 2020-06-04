@@ -3,3 +3,21 @@
     stroke: steelblue;
     stroke-width: 2px;
 }
+
+#hydroponicButton.controlButton button{
+    width: 6em;
+    padding: 0.2em;
+    margin-left: 0.7em;
+}
+
+#hydroponicButton button{
+    width: 6em;
+    padding: 0.2em;
+    margin-left: 0.7em;
+}
+
+button{
+    width: 6em;
+    padding: 0.2em;
+    margin-left: 0.7em;
+}

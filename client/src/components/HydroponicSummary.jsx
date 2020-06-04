@@ -11,7 +11,8 @@ class HydroponicSummary extends Component {
         this.state = {
             label: 'Hydroponic',
             systemMode: props.systemMode,
-            component: 'Hydroponic Arduino'
+            component: 'Hydroponic Arduino',
+            status: {}
         };
 
         this.handleClick = this.handleClick.bind(this);
@@ -20,13 +21,17 @@ class HydroponicSummary extends Component {
     componentDidMount() {
 
         this.socket = getAuthSocket();
+    
+        this.socket.on('updates', (payload) => {
+            this.setState({status: payload});
+            console.log(this.state);
+        });
 
-        //TODO: This should be a door sensor
         this.socket.on('componentStatusUpdate', (data) => {
-                console.log("update sensor in hydroponic summary");
-                console.log(data);
+                //console.log("update sensor in hydroponic summary");
+                //console.log(data);
                 if (data.component === this.state.component) {
-                this.setState({systemMode: data.systemMode});
+                    this.setState({hydroponicMode: data.hydroponicMode});
             }
         });
     }
@@ -54,20 +59,34 @@ class HydroponicSummary extends Component {
 
                             <ul className='status-list'>
                                 <li>Mode:  
-				                    {this.state.systemMode === 1 ?
-                                        <span className="badge badge-danger">Off</span> :
-					                    this.state.systemMode === 2 ?
+				                    {this.state.status.hydroponicMode === 1 ?
+                                        <span className="badge badge-danger">Standby</span> :
+					                    this.state.status.hydroponicMode === 2 ?
                                     	 <span className="badge badge-success">Auto</span> :
-					 	                this.state.systemMode === 3 ?
+					 	                this.state.status.hydroponicMode === 3 ?
                                     	<span className="badge badge-success">Manual Pump On</span> :
-                                		this.state.systemMode === 4 ?
+                                		this.state.status.hydroponicMode === 4 ?
                                     	<span className="badge badge-success">Manual Pump Off</span> :
                                     	<span className="badge badge-danger">Error</span>
 				                    }
 
                                 </li>
+                                <li>
+                                    Temperature: {this.state.status.hydroponicTemperature}
+                                </li>
+                                <li>
+                                    Humidity: {this.state.status.hydroponicHumidity}
+                                </li>
+                                <li>
+                                    Light Level: {this.state.status.hydroponicLightLevel}
+                                </li>
+                                <li>
+                                    Light Status: {this.state.status.hydroponicLightStatus === 0 ? <span className="badge badge-danger">OFF</span> : <span className="badge badge-success">ON</span> }
+                                </li>
+                                <li>
+                                    Pump Status: {this.state.status.hydroponicPumpStatus === 0 ? <span className="badge badge-danger">OFF</span> : <span className="badge badge-success">ON</span> }
+                                </li>
                             </ul>
-                            {this.state.systemMode}
                         </div>
                     </div>
                 </div>

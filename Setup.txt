@@ -27,3 +27,44 @@ ssh pi@homeweb.local
 sudo apt install mongodb
 sudo systemctl enable mongodb
 
+
+https://nodesource.com/blog/running-your-node-js-app-with-systemd-part-1/
+
+Using systemctl To Control Our App
+
+The hard part is done! We will now learn how to use the system provided tools to control our app. To being with, enter the command
+
+$ sudo systemctl daemon-reload
+
+You have to do this whenever any of the service files change at all so that systemd picks up the new info.
+
+Next, let's launch our app with
+
+$ sudo systemctl start hello_env
+
+After you do this, you should be able to go to
+
+http://11.22.33.44:3001
+
+in your web browser and see the output. If it's there, congratulations, you've launched your app using systemd! If the output looks very different than it did when you launched the app manually don't worry, that's normal. When systemd kicks off an application, it does so from a much more minimal environment than the one you have when you ssh into a machine. In particular, the $HOME environment variable may not be set by default, so be sure to pay attention to this if your app makes use of any environment variables. You may need to set them yourself when using systemd.
+
+You may be interested in what state systemd thinks the app is in, and if so, you can find out with
+
+$ sudo systemctl status hello_env
+
+Now, if you want to stop your app, the command is simply
+
+$ sudo systemctl stop hello_env
+
+and unsurprisingly, the following will restart things for us
+
+$ sudo systemctl restart hello_env
+
+If you want to make the application start up when the machine boots, you accomplish that by enabling it
+
+$ sudo systemtl enable hello_env
+
+and finally, if you previously enabled the app, but you change your mind and want to stop it from coming up when the machine starts, you correspondingly disable it
+
+$ sudo systemctl disable hello_env
+

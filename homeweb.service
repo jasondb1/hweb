@@ -1,0 +1,15 @@
+[Unit]
+Description=homeWeb Server
+Documentation=https://homeweb.com
+After=network.target
+
+[Service]
+Environment=NODE_PORT=3001
+Type=simple
+User=pi
+ExecStart=/usr/bin/node /home/pi/homeweb
+WorkingDirectory=/home/pi/homeweb
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

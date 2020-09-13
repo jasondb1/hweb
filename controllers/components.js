@@ -16,7 +16,7 @@ const RELAY2PIN = 23;
 let ARDUINO_I2C_ADDR = 0x08;
 const DHT22PIN = 17;
 
-const SAMPLEINTERVAL = 10; //interval in seconds to sample temperature and humidity
+const SAMPLEINTERVAL = 10000; //interval in seconds to sample temperature and humidity
 
 //output components
 let indicator = new Led(LEDPIN);
@@ -25,6 +25,8 @@ let relay2 = new Relay(RELAY2PIN);
 
 //input components
 let arduino = new Arduino(ARDUINO_I2C_ADDR);
+arduino.start(SAMPLEINTERVAL);
+
 let dht22 = new Dht22(DHT22PIN);
 let temperatureControl = new Temperature(dht22, relay2, relay2, null);
 
@@ -43,69 +45,88 @@ class ComponentsCtrl {
         this.component = {
             ledIndicator: {
                 obj: indicator,
-                value: indicator.value
+                value: indicator.value,
+                logValue: false
             },
 
             garageRelay: {
                 obj: garageRelay,
-                value: garageRelay.value
+                value: garageRelay.value,
+                logValue: false
             },
 
             relay2: {
                 obj: relay2,
-                value: relay2.value
+                value: relay2.value,
+                logValue: false
             },
 
             temp_local: {
                 obj: dht22,
-                value: dht22.getTemperature()
+                value: dht22.getTemperature(),
+                logValue: false
             },
 
             humidity_local: {
                 obj: dht22,
-                value: dht22.getHumidity()
+                value: dht22.getHumidity(),
+                logValue: false
             },
 
             hydroponicLightLevel: {
                 obj: arduino,
-                value: arduino.getLightValue()
+                value: arduino.getLightValue(),
+                logValue: false
             },
 
             hydroponicTemperature: {
                 obj: arduino,
-                value: arduino.getTemperature()
+                value: arduino.getTemperature(),
+                logValue: true
             },
 
             hydroponicHumidity: {
                 obj: arduino,
-                value: arduino.getHumidity()
+                value: arduino.getHumidity(),
+                logValue: true
+            },
+
+            hydroponicReservoirDepth: {
+                obj: arduino,
+                value: arduino.getReservoirDepth(),
+                logValue: true
             },
 
             hydroponicLightStatus: {
                 obj: arduino,
-                value: arduino.getLightStatus()
+                value: arduino.getLightStatus(),
+                logValue: true
             },
-//
+            //
             hydroponicPumpStatus: {
                 obj: arduino,
-                value: arduino.getPumpStatus()
+                value: arduino.getPumpStatus(),
+                logValue: true
             },
 
             hydroponicMode: {
                 obj: arduino,
-                value: arduino.getMode()
+                value: arduino.getMode(),
+                logValue: true
             },
-            
-            hydroponicCycleOn:{
+
+            hydroponicCycleOn: {
                 obj: arduino,
                 value: arduino.getLightOffSeconds(),
+                logValue: false
             },
-            
+
             hydroponicControl: {
-                obj:arduino,
+                obj: arduino,
                 value: arduino.getValues(),
+                logValue: false
             },
-                
+
             //add arduino toggle light on/off
             //add arduino toggle pump on/off
             //set mode
@@ -127,47 +148,56 @@ class ComponentsCtrl {
                 runAuto: temperatureControl.runAuto(),
                 //setHold: temperatureControl.setHold(value),
                 start: temperatureControl.start(),
+                logValue: false
 
             },
 
             furnaceStatus: {
                 obj: temperatureControl,
                 value: temperatureControl.getFurnaceStatus(),
+                logValue: false
             },
 
             heatingTemperature: {
                 obj: temperatureControl,
                 value: temperatureControl.getHeatingTemperature(),
+                logValue: false
             },
 
             coolingTemperature: {
                 obj: temperatureControl,
                 value: temperatureControl.getCoolingTemperature(),
+                logValue: false
             },
 
             heatingEnabled: {
                 obj: temperatureControl,
                 value: temperatureControl.heatingEnabled,
+                logValue: false
             },
 
             coolingEnabled: {
                 obj: temperatureControl,
                 value: temperatureControl.coolingEnabled,
+                logValue: false
             },
 
             furnaceFanStatus: {
                 obj: temperatureControl,
                 value: temperatureControl.isFanOn,
+                logValue: false
             },
 
             furnaceFanMode: {
                 obj: temperatureControl,
                 value: temperatureControl.fanAuto,
+                logValue: false
             },
 
             temperatureHold: {
                 obj: temperatureControl,
                 value: temperatureControl.hold,
+                logValue: false
             },
 
             //this will need to be the garage door sensor 
@@ -196,14 +226,15 @@ class ComponentsCtrl {
             for (let key of keys) {
                 //console.log(key);
                 if (this.status[key] != undefined) {
-                    data.push({
-                        description: this.component[key].obj.name,
-                        sensor: key,
-                        value: this.status[key],
-                        //value: this.component.obj.value,
-                        location: this.component[key].obj.location
-
-                    });
+                    if (this.component.logValue) {
+                        data.push({
+                            description: this.component[key].obj.name,
+                            sensor: key,
+                            value: this.status[key],
+                            //value: this.component.obj.value,
+                            location: this.component[key].obj.location
+                        });
+                    }
                 }
             }
             this.database.insert(data);
@@ -227,10 +258,10 @@ class ComponentsCtrl {
             this.status[key] = this.component[key].value;
         }
 
-    if (DEBUG){
-	    console.log("update current status");
-        console.log(this.status);
-	}
+        if (DEBUG) {
+            console.log("update current status");
+            console.log(this.status);
+        }
 
         return this.status;
     }
@@ -249,7 +280,7 @@ class ComponentsCtrl {
     start(interval = SAMPLEINTERVAL) {
         this.updateInterval = interval;
         this.update = setInterval(
-        this.readAllSensors.bind(this), (this.updateInterval * 1000));
+            this.readAllSensors.bind(this), (this.updateInterval));
     }
 
     //stop sampling sensors

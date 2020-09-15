@@ -21,7 +21,8 @@ const i2c_bus = i2c.open(1, err => {
 let DATA_LENGTH = 0x20;
 let buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
-const READINTERVAL = 5000; //limit read to every 5 seconds
+//const READINTERVAL = 5000; //limit read to every 5 seconds
+const SAMPLEINTERVAL = 10000; //interval in seconds to sample temperature and humidity
 
 class Arduino extends ComponentInput {
 
@@ -32,6 +33,8 @@ class Arduino extends ComponentInput {
         this.location = location;
         this.mode = 1;
         this.lastRead = Date.now() - 5000; //ensure sensor is read right away
+        this.updateInterval = SAMPLEINTERVAL;
+        this.update = null;
 
         this.pin = null;
         this.value = {
@@ -42,43 +45,47 @@ class Arduino extends ComponentInput {
             pumpStatus: null,
             mode: null,
             secondsToLightOnOff: 0,
+            reservoirDepth: null,
         };
     }
 
     readSensor() {
-        if (Date.now() > (this.lastRead + READINTERVAL)) {
-
+        //if (Date.now() > (this.lastRead + READINTERVAL)) {
+        if (true) {
             buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
             i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
                 //console.log("---Arduino Data");
                 //console.log(buffer_arduino);
                 if (!err) {
+
+                    //parse input from arduino
                     let string = buffer_arduino.toString('utf-8');
                     //console.log("String:" + string);
-
 
                     this.value.p_resistor = buffer_arduino.readInt16BE(0);
 
                     //check if temperatures are valid
+                    //TODO: this may be able to be removed if filtering is done on arduino
                     let val = (buffer_arduino.readInt16BE(2)) / 100;
                     if (val > -99 && val < 150) {
                         this.value.temperature = val;
                     }
 
-                    //check for valid humidity values                                               
+                    //TODO: this may be able to be removed if filtering is done on arduino                                            
                     val = (buffer_arduino.readInt16BE(4)) / 10;
                     if (val > -1 && val < 150) {
                         this.value.humidity = val;
                     }
 
-                    this.value.mode = buffer_arduino.readUInt8(22);
-                    this.value.lightStatus = buffer_arduino.readUInt8(23);
-                    this.value.pumpStatus = buffer_arduino.readUInt8(24);
                     this.value.secondsToLightOnOff = (buffer_arduino.readUInt32BE(6) / 1000);
                     this.value.lightDuration = (buffer_arduino.readUInt32BE(10));
                     this.value.floodInterval = (buffer_arduino.readUInt32BE(14));
                     this.value.floodDuration = (buffer_arduino.readUInt32BE(18));
+                    this.value.mode = buffer_arduino.readUInt8(22);
+                    this.value.lightStatus = buffer_arduino.readUInt8(23);
+                    this.value.pumpStatus = buffer_arduino.readUInt8(24);
+                    this.value.reservoirDepth = buffer_arduino.readUInt16BE(25);
 
                     //console.log(this.value);
 
@@ -98,43 +105,52 @@ class Arduino extends ComponentInput {
     }
 
     getValues() {
-        this.readSensor();
+        //this.readSensor();
         return this.value;
     }
 
     getTemperature() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.temperature;
     }
 
+    getReservoirDepth() {
+        //this.readSensor();
+        return this.value.reservoirDepth;
+    }
+
     getHumidity() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.humidity;
     }
 
     getLightValue() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.p_resistor;
     }
 
     getMode() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.mode;
     }
 
     getLightStatus() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.lightStatus;
     }
 
     getPumpStatus() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.pumpStatus;
     }
 
     getLightOffSeconds() {
-        this.readSensor();
+        //this.readSensor();
         return this.value.secondsToLightOnOff;
+    }
+
+    getMode() {
+        return this.value.mode;
     }
 
     setMode(systemMode) {
@@ -160,8 +176,16 @@ class Arduino extends ComponentInput {
         }
     }
 
-    getMode() {
-        return this.value.mode;
+    //start sampling sensors at specified interval
+    start(interval = SAMPLEINTERVAL) {
+        this.updateInterval = interval;
+        this.update = setInterval(
+            this.readSensor.bind(this), (this.updateInterval));
+    }
+
+    //stop sampling sensors
+    stop() {
+        clearInterval(this.update);
     }
 
 }

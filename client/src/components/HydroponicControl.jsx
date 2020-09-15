@@ -4,6 +4,7 @@ import './HydroponicControl.css';
 import Chart from './Chart';
 const climateIcon = require('../icons/icons8-temperature-50.png');
 const humidityIcon = require('../icons/icons8-humidity-80.png');
+const reservoirIcon = require('../icons/icons8-hygrometer-50.png');
 const lightIcon = require('../icons/icons8-light-on-80.png');
 const floodIcon = require('../icons/icons8-irrigation-50.png');
 const lightOffIcon = require('../icons/icons8-light-off-80.png');
@@ -112,6 +113,9 @@ class HydroponicControl extends Component {
                             <img className="mr-3" src={lightIcon} alt="" width="40"
                                 height="40" />
                             {this.state.status.hydroponicLightLevel}
+                        </li>
+                        <li><img src={reservoirIcon} alt="" width="40"
+                            height="40" /> {this.state.status.reservoirDepth}
                         </li>
                         <li>
                             <img className="mr-3" src={floodIcon} alt="" width="40"

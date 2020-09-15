@@ -8,8 +8,8 @@ const reservoirIcon = require('../icons/icons8-hygrometer-50.png');
 const lightIcon = require('../icons/icons8-light-on-80.png');
 const floodIcon = require('../icons/icons8-irrigation-50.png');
 const lightOffIcon = require('../icons/icons8-light-off-80.png');
-const upIcon = require('../icons/icons8-sort-down-50.png');
-const downIcon = require('../icons/icons8-sort-up-50.png');
+const upIcon = require('../icons/icons8-sort-up-50.png');
+const downIcon = require('../icons/icons8-sort-down-50.png');
 
 function pad(n) {
     return (n < 10) ? ("0" + n) : n;
@@ -104,13 +104,13 @@ class HydroponicControl extends Component {
 
                 <div className='mt-2 col-12'>
                     <ul className='status-list'>
-                        <li><img src={climateIcon} alt="" width="40"
+                        <li><img className="mr-3" src={climateIcon} alt="" width="40"
                             height="40" /> {this.state.status.hydroponicTemperature} &#8451;</li>
-                        <li><img src={humidityIcon} alt="" width="40"
+                        <li><img className="mr-3" src={humidityIcon} alt="" width="40"
                             height="40" /> {this.state.status.hydroponicHumidity} %
                         </li>
                         <li>
-                            <img src={lightIcon} alt="" width="40"
+                            <img className="mr-3" src={lightIcon} alt="" width="40"
                                 height="40" />
                             {this.state.status.hydroponicLightLevel}
                         </li>
@@ -118,18 +118,22 @@ class HydroponicControl extends Component {
                             height="40" /> {this.state.status.reservoirDepth}
                         </li>
                         <li>
-                            <img src={floodIcon} alt="" width="40"
+                            <img className="mr-3" src={floodIcon} alt="" width="40"
                                 height="40" />
                             {this.state.status.hydroponicPumpStatus === 0 ? <span className="badge badge-danger">OFF</span> : <span className="badge badge-success">ON</span>}
                         </li>
                         <li>
-                            <img src={lightOffIcon} alt="" width="40"
+                            <img className="mr-3" src={lightOffIcon} alt="" width="40"
                                 height="40" />
                             {this.state.status.hydroponicLightStatus === 0 ? <span className="badge badge-danger">OFF</span> : <span className="badge badge-success">ON</span>}
                         </li>
+                       <li>
+                            Light {this.state.status.hydroponicControl.lightStatus === 0 ? "On" : "Off"}: {Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff / 3660)}:{pad(Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff % 3600 / 60))} Hours
+                            <br /> ({timeLightOnOff(this.state.status.hydroponicControl.secondsToLightOnOff).toLocaleString()})
+                    </li>
                     </ul>
                 </div>
-                <div className='mt-2 col-12' id='hydroponicButton'>
+                <div className='col-12' id='hydroponicButton'>
                     <hr />
                     <button
                         onClick={this.handleClickOff}
@@ -160,91 +164,72 @@ class HydroponicControl extends Component {
                     </button>
 
                     <hr />
-                    <ul>
-                        {/*
-                        <li>
-                            Light Duration: {this.state.status.hydroponicControl.lightDuration / 3600000} hours
-                    </li>
-                        <li>
-                            Pump Duration: {this.state.status.hydroponicControl.floodDuration / 60000} minutes
-                    </li>
-                        <li>
-                            Pump Cycle: {this.state.status.hydroponicControl.floodInterval / 60000} minutes
-                    </li>
-                    */}
-                        <li>
-                            Light {this.state.status.hydroponicControl.lightStatus === 0 ? "On" : "Off"}: {Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff / 3660)}:{pad(Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff % 3600 / 60))}
-                            <br /> ({timeLightOnOff(this.state.status.hydroponicControl.secondsToLightOnOff).toString()})
-                    </li>
-
-                    </ul>
-                    <hr />
 
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 12)}
                     >
-                        <span>-15 Light Cycle Start</span>
+                        <span>-15</span>
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-
+                    <span className="buttonLabel">Light Cycle Start</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 11)}
                     >
                         <img src={upIcon} alt="" width="20"
                             height="20" />
-                        <span>+15 Light Cycle Start</span>
+                        <span>+15</span>
                     </button>
 
                     <br />
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 6)}
                     >
-                        <span>-15 Light On Duration</span>
+                        <span>-15</span>
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-                    <span className="ml-2">{this.state.status.hydroponicControl.lightDuration / 3600000} hours </span>
+                    <span className="buttonLabel">{this.state.status.hydroponicControl.lightDuration / 3600000} hrs Light On Duration</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 5)}
                     >
                         <img src={upIcon} alt="" width="20"
                             height="20" />
-                        <span>+15 Light On Duration</span>
+                        <span>+15</span>
                     </button>
                     <br />
 
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 8)}
                     >
-                        <span>-5 Pump Cycle Time</span>
+                        <span>-5</span>
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-                    <span className="ml-2">{this.state.status.hydroponicControl.floodInterval / 60000} min </span>
+                    <span className="buttonLabel">{this.state.status.hydroponicControl.floodInterval / 60000} min Pump Cycle</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 7)}
                     >
                         <img src={upIcon} alt="" width="20"
                             height="20" />
-                        <span>+5 Pump Cycle Time</span>
+                        <span>+5</span>
                     </button>
 
                     <br />
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 10)}
                     >
-                        <span>-1 Pump On Duration</span>
+                        <span>-1</span>
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-                    <span className="ml-2">{this.state.status.hydroponicControl.floodDuration / 60000} min </span>
+                    <span className="buttonLabel">{this.state.status.hydroponicControl.floodDuration / 60000} min Pump Duration</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 9)}
                     >
                         <img src={upIcon} alt="" width="20"
                             height="20" />
-                        <span>+1 Pump On Duration</span>
+                        <span>+1</span>
                     </button>
 
                     <br />

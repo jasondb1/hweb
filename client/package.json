@@ -4,9 +4,10 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.1",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^4.5.2",
+    "dotenv": "^8.2.0",
     "jwt-decode": "^2.2.0",
-    "npm": "^6.14.5",
+    "npm": "^6.14.8",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^4.3.1",
@@ -27,7 +28,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "css-loader": "^3.2.0",
+    "css-loader": "^3.6.0",
     "style-loader": "^0.23.1"
   }
 }

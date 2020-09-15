@@ -5,6 +5,7 @@ const io = require('socket.io')();
 const jwt = require('jsonwebtoken');
 
 const DEBUG = false;
+//const DEBUG = true;
 
 let subscribedUpdate = null;
 let UPDATEINTERVAL = 10000;
@@ -184,17 +185,17 @@ module.exports = function(io) {
 
         //generic request for any sensor 24 hours back - timeback in ms
         client.on('requestData', (args) => {
-            //console.log("request data");
-            //console.log(args);
+            if (DEBUG) console.log("request data");
+            if (DEBUG)console.log(args);
             payload = componentsCtrl.database.getSensorData(args.sensor, (args.timeback * 60 * 1000), (err, payload) => {
                 //request data from database
                 //let payload = [{date: "2020-05-01", close:12.2}];
             if (err){
                 console.log(err);
             }
-                //console.log("\n\npayload:");
-                //console.log(payload);
-                //console.log("-----");
+                if (DEBUG) console.log("\n\npayload:");
+                if (DEBUG) console.log(payload);
+                if (DEBUG)console.log("-----");
                 client.emit('incomingData', payload);
             })
 

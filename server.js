@@ -24,7 +24,7 @@ const https = require('https');
 const sslOptions = {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem'),
-    passphrase: 'mysslcert'
+    passphrase: process.env.SSL_PASSPHRASE
 };
 
 app.use(cors());

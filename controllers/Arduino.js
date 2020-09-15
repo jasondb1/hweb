@@ -2,6 +2,7 @@
 const ComponentInput = require('./ComponentInput');
 const Gpio = require('onoff').Gpio;
 let i2c_connected = false;
+const DEBUG = true;
 
 const i2c = require('i2c-bus');
 // const i2c_bus = i2c.openSync(1);
@@ -52,11 +53,12 @@ class Arduino extends ComponentInput {
     readSensor() {
         //if (Date.now() > (this.lastRead + READINTERVAL)) {
         if (true) {
+            if (DEBUG) console.log("reading sensor");
             buffer_arduino = Buffer.alloc(DATA_LENGTH, 0x00);
 
             i2c_bus.i2cRead(this.slaveAddress, DATA_LENGTH, buffer_arduino, (err, rawData) => {
-                //console.log("---Arduino Data");
-                //console.log(buffer_arduino);
+                if (DEBUG) console.log("---Arduino Data");
+                if (DEBUG) console.log(buffer_arduino);
                 if (!err) {
 
                     //parse input from arduino
@@ -79,17 +81,19 @@ class Arduino extends ComponentInput {
                     }
 
                     this.value.secondsToLightOnOff = (buffer_arduino.readUInt32BE(6) / 1000);
-                    this.value.lightDuration = (buffer_arduino.readUInt32BE(10));
-                    this.value.floodInterval = (buffer_arduino.readUInt32BE(14));
-                    this.value.floodDuration = (buffer_arduino.readUInt32BE(18));
-                    this.value.mode = buffer_arduino.readUInt8(22);
-                    this.value.lightStatus = buffer_arduino.readUInt8(23);
-                    this.value.pumpStatus = buffer_arduino.readUInt8(24);
-                    this.value.reservoirDepth = buffer_arduino.readUInt16BE(25);
+                    this.value.lightDuration = (buffer_arduino.readUInt32BE(8));
+                    this.value.floodInterval = (buffer_arduino.readUInt32BE(10));
+                    this.value.floodDuration = (buffer_arduino.readUInt32BE(12));
+                    this.value.mode = buffer_arduino.readUInt8(13);
+                    this.value.lightStatus = buffer_arduino.readUInt8(14);
+                    this.value.pumpStatus = buffer_arduino.readUInt8(15);
+                    this.value.reservoirDepth = buffer_arduino.readUInt16BE(16);
 
-                    //console.log(this.value);
+                    if (DEBUG) console.log("received from arduino:");
+                    if (DEBUG) console.log(this.value);
 
                 } else {
+                    console.log("error reading arduino");
                     //this.value.p_resistor = -99;
                     //this.value.temperature = -99;
                     //this.value.humidity = -99;

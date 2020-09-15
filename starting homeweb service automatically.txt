@@ -1,0 +1,15 @@
+Autorun with systemd
+
+place homeweb.service file into /lib/systemd/system/homeweb.service
+
+once this is done ensure this is running: sudo systemctl daemon-reload
+
+turn on: sudo systemctl enable homeweb.service
+sudo systemctl stop homeweb.service
+sudo systemctl start homeweb.service
+sudo systemctl disable homeweb.service - disable service on boot
+
+troubleshoot
+journalctl -u homewbe.service
+
+log to a file :ExecStart=/bin/bash -c '/usr/bin/node /home/pi/homeweb > /home/pi/homeweb.log 2>&1'

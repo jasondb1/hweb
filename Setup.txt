@@ -1,3 +1,36 @@
+enable i2c and spi in raspi-config on raspberry pi
+
+
+need to configure .env files in both the server root and client root folders
+
+
+enable permissions to use raspberry pi gpio - this must be run under the same user account as the server is run
+sudo sh -c "echo 2 >/sys/class/gpio/export"
+
+install node
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt -y install nodejs
+
+install ssl certificate
+# run the following in the terminal
+
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days XXX
+
+req - utility used to request the certificate.
+    -x509 - tells the computer we want a self signed certificate and not to actually request one from a certificate authority.
+        -newkey - takes a paramater rsa:n-bits. It will generate a new key and certificate with RSA encryption of n-bits that are passed in. Here we are passing in the request for RSA of 2048 bits.
+            -keyout key.pem - puts out a key file that is the same name as the argument being passed to -keyout. In this case, we are generating a key file named key.pem.
+                -out cert.pem - puts out a file (in this case a certificate) with the name being passed to -out. Here we are certificate cert.pem.
+                    -days XXX - how many days the certificate should be for. Defaults to 30 days.
+
+
+fill out questions:
+
+specify localhost for Common Name
+for Common Name (server FQDN or YOUR name) []: localhost
+passphrase: <whatever you want> - needs to be placed into .env
+
+
 After 
 
 npm update - updates npm packages

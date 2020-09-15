@@ -458,29 +458,31 @@ void requestEvent() {
   //do this to send integers and split float into integers
   int valTemp = valueTemperature * 100;
   int valHum = valueHumidity * 10;
-  unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
+  //unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
   if (outputText){
     //buffer
     sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysmode, statusLightOn, statusPumpOn, secondsToLightOff);
   
   } else {
-    //compose custom buffer output - buffer size for wire library is 32 bytes/characters customize this for application
+    //compose custom buffer output - buffer size for wire library is 32 bytes/characters, customize this for application
     intToCharBuffer(buffer_out, 0, valuePhotoResistor);
     intToCharBuffer(buffer_out, 2, valTemp);
     intToCharBuffer(buffer_out, 4, valHum);
     if (statusLightOn){
-      longToCharBuffer(buffer_out, 6, (lightOffAt - millis()) );
+      unsigned int minutesToLightOff = (lightOffAt - millis()) / 60000;
+      //longToCharBuffer(buffer_out, 6, (lightOffAt - millis()) );
+      intToCharBuffer(buffer_out, 6, (minutesToLightOff);
     } else {
-      longToCharBuffer(buffer_out, 6, (lightOnAt - millis()) );
+      unsigned int minutesToLightOn = (lightOnAt - millis()) / 60000;
+      intToCharBuffer(buffer_out, 6, minutesToLightOn );
     }
-    longToCharBuffer(buffer_out, 10, lightDurMillis);
-    longToCharBuffer(buffer_out, 14, floodIntMillis);
-    longToCharBuffer(buffer_out, 18, floodDurMillis);
-    buffer_out[22] = sysmode;
-    buffer_out[23] = statusLightOn;
-    buffer_out[24] = statusPumpOn;
-    intToCharBuffer(buffer_out, 25, valueReservoirDepth);
-    //longToCharBuffer(buffer_out, 25,lightOnAt);
+    longToCharBuffer(buffer_out, 8, lightDurMillis /60000);
+    longToCharBuffer(buffer_out, 10, floodIntMillis / 60000);
+    longToCharBuffer(buffer_out, 12, floodDurMillis / 60000);
+    buffer_out[13] = sysmode;
+    buffer_out[14] = statusLightOn;
+    buffer_out[15] = statusPumpOn;
+    intToCharBuffer(buffer_out, 16, valueReservoirDepth);
     //reserve byte for fan status
 
   }

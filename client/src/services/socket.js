@@ -1,5 +1,7 @@
 import io from 'socket.io-client';
-const SOCKET_SERVER = 'http://192.168.1.161:3001';
+require('dotenv').config();
+const SOCKET_SERVER = process.env.SOCKET_SERVER;
+//const SOCKET_SERVER = 'http://192.168.1.20:3001';
 
 
 function getAuthSocket() {

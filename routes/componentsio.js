@@ -1,7 +1,7 @@
 const ComponentsCtrl = require('../controllers/components');
 const verifyToken = require('../serverAuth.js').verifyToken;
 const { JWT_SECRET } = process.env;
-const io = require('socket.io')();
+//const io = require('socket.io')();
 const jwt = require('jsonwebtoken');
 
 const DEBUG = false;
@@ -10,18 +10,18 @@ const DEBUG = false;
 let subscribedUpdate = null;
 let UPDATEINTERVAL = 10000;
 
-
-//start updating components at regular intervals
-let componentsCtrl = new ComponentsCtrl();
-componentsCtrl.init();
-componentsCtrl.enableLogging();
-componentsCtrl.start();
-
 counter = 0;
 
-module.exports = function(io) {
+module.exports = function(io, db) {
 
     console.log("Initializing componentsio");
+    //console.log(db);
+        //start updating components at regular intervals
+    let componentsCtrl = new ComponentsCtrl();
+    componentsCtrl.init(db);
+    componentsCtrl.enableLogging(db);
+    componentsCtrl.start();
+
 
     io.use(function(socket, next) {
         if (socket.handshake.query && socket.handshake.query.token) {

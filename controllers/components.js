@@ -1,13 +1,17 @@
 "use strict";
 const DEBUG = false;
 
+const dbController = require('./db_new.js');
+
 const Led = require('./Led.js');
 const GarageRelay = require('./GarageRelay.js');
 const Dht22 = require('./Dht22');
 const Arduino = require('./Arduino');
 const Relay = require('./Relay');
-const Database = require('./database');
+//const Database = require('./database');
+//const Database = require('../models/Sequelize.js');
 const Temperature = require('./TemperatureControl');
+
 
 //Set Raspberry Pi pins
 const LEDPIN = 4;
@@ -41,7 +45,10 @@ class ComponentsCtrl {
         this.status = {};
     }
 
-    init() {
+    init(db) {
+
+        this.database = dbController(db);
+
         this.component = {
             ledIndicator: {
                 obj: indicator,
@@ -237,6 +244,8 @@ class ComponentsCtrl {
                     }
                 }
             }
+            console.log(this.database);
+            //this.database.sensor.insert(data);
             this.database.insert(data);
         }
     }
@@ -244,12 +253,11 @@ class ComponentsCtrl {
     //enable data logging
     enableLogging() {
         this.loggingEnabled = true;
-        this.database = new Database();
     }
 
     //get the current status of each component
     updateSensors() {
-        this.init();
+        //this.init();
         this.status.ts = new Date().getTime();
 
         let keys = Object.keys(this.component);

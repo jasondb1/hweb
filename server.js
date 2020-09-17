@@ -12,7 +12,9 @@ const PORT = process.env.PORT || 3001;
 const fs = require('fs');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const componentsio = require('./routes/componentsio.js')(io);
+const db = require("./models/Sequelize.js");
+const componentsio = require('./routes/componentsio.js')(io, db);
+
 
 const components = require('./routes/components');
 const usersRoutes = require('./routes/users.js');
@@ -31,6 +33,12 @@ app.use(cors());
 
 
 //connect to database
+db.sequelize.sync({ force: true }).then(() => {
+  console.log("Drop and re-sync db.");
+});
+
+
+
 mongoose.set('useCreateIndex', true);
 mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
     console.log(err || `Connected to MongoDB.`)

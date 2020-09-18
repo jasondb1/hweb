@@ -34,13 +34,14 @@
 #define MAX_SENT_BYTES 3
 
 //Reservoir - distance from sensor to bottom of reservoir
-#define RESERVOIR_BOTTOM 45
+#define RESERVOIR_BOTTOM 38 //Distance to Reservoir bottom from sensor
+#define RESERVOIR_TOP 5 //Distance to reservoir top from sensor
 
 
 //convenience definitions
 #define ONEDAY 86400000
 #define ONEHOUR 3600000
-#define ONEMINUTEs 60000
+#define ONEMINUTE 60000
 #define FIVEMINUTES 300000
 #define FIFTEENMINUTES 900000
 
@@ -52,8 +53,8 @@ byte receivedCommands[MAX_SENT_BYTES];
 byte outputText = false; //1 - text, 2 - binary
 
 const String swName = "Ebb and Flow Timer with Light";
-const String swVer = "1.1";
-const String swRel = "2020-05-03";
+const String swVer = "1.2";
+const String swRel = "2020-09-18";
 
 /* Common Millis equivalents
    24 hours = 86400000; 16 hours = 57600000; 8 hours = 28800000; 4 hours = 14400000; 2 hours = 7200000; 1 hour = 3600000
@@ -146,7 +147,7 @@ void setup() {
   Wire.onReceive(receiveEvent);
 
 #ifdef DEBUG
-  Serial.begin(57600);
+  //Serial.begin(57600);
   Serial.begin(9600);
 #endif
 
@@ -458,9 +459,10 @@ void requestEvent() {
   //do this to send integers and split float into integers
   int valTemp = valueTemperature * 100;
   int valHum = valueHumidity * 10;
-  //unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
+
   if (outputText){
     //buffer
+    unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
     sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysmode, statusLightOn, statusPumpOn, secondsToLightOff);
   
   } else {
@@ -469,20 +471,20 @@ void requestEvent() {
     intToCharBuffer(buffer_out, 2, valTemp);
     intToCharBuffer(buffer_out, 4, valHum);
     if (statusLightOn){
-      unsigned int minutesToLightOff = (lightOffAt - millis()) / 60000;
+      unsigned int minutesToLightOff = ((lightOffAt - millis()) / 60000);
       //longToCharBuffer(buffer_out, 6, (lightOffAt - millis()) );
-      intToCharBuffer(buffer_out, 6, (minutesToLightOff);
+      intToCharBuffer(buffer_out, 6, (minutesToLightOff));
     } else {
-      unsigned int minutesToLightOn = (lightOnAt - millis()) / 60000;
+      unsigned int minutesToLightOn = ((lightOnAt - millis()) / 60000);
       intToCharBuffer(buffer_out, 6, minutesToLightOn );
     }
-    longToCharBuffer(buffer_out, 8, lightDurMillis /60000);
-    longToCharBuffer(buffer_out, 10, floodIntMillis / 60000);
-    longToCharBuffer(buffer_out, 12, floodDurMillis / 60000);
-    buffer_out[13] = sysmode;
-    buffer_out[14] = statusLightOn;
-    buffer_out[15] = statusPumpOn;
-    intToCharBuffer(buffer_out, 16, valueReservoirDepth);
+    intToCharBuffer(buffer_out, 8, (unsigned int)(lightDurMillis /60000));
+    intToCharBuffer(buffer_out, 10, (unsigned int)(floodIntMillis / 60000));
+    intToCharBuffer(buffer_out, 12, (unsigned int)(floodDurMillis / 60000));
+    buffer_out[14] = sysmode;
+    buffer_out[15] = statusLightOn;
+    buffer_out[16] = statusPumpOn;
+    intToCharBuffer(buffer_out, 17, valueReservoirDepth);
     //reserve byte for fan status
 
   }

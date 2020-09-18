@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Chart.css';
+import './SensorChart.css';
 import { getAuthSocket } from "../services/socket";
 import * as d3 from 'd3';
 
@@ -10,6 +10,8 @@ import * as d3 from 'd3';
 
 function drawLineChart(data, chartWidth, chartHeight, chartId) {
 //console.log(chartId);
+console.log("chart data");
+console.log(data);
 
    // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -22,9 +24,8 @@ let y = d3.scaleLinear().range([height, 0]);
 
 // define the line
 let valueline = d3.line()
-    .x(function(d) { return x(d.timestamp); })
-    .y(function(d) { return y(d.value); });
-
+    .x(function(d) { return x(d.Timestamp); })
+    .y(function(d) { return y(d.Value); });
 
 //remove old chart
     d3.select("#" + chartId + ' svg').remove()
@@ -43,13 +44,13 @@ let svg = d3.select("#" + chartId).append("svg")
 
   // format the data
   data.forEach(function(d) {
-      d.timestamp = new Date(d.timestamp);
-      d.value= +d.value;
+      d.Timestamp = new Date(d.Timestamp);
+      d.Value= +d.Value;
   });
 
   // Scale the range of the data
-  x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-  y.domain([d3.min(data, function(d) {return d.value - 2}), d3.max(data, function(d) { return d.value + 2; })]);
+  x.domain(d3.extent(data, function(d) { return d.Timestamp; }));
+  y.domain([d3.min(data, function(d) {return d.Value - 2}), d3.max(data, function(d) { return d.Value + 2; })]);
 
   // Add the valueline path.
   svg.append("path")
@@ -94,6 +95,7 @@ class Chart extends Component {
         
         //retrieve data
         this.socket.on('incomingData', (payload) => {
+            console.log(payload);
             this.setState({ data: payload });
             drawLineChart(this.state.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);
         });

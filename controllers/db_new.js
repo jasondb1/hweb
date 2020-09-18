@@ -20,8 +20,8 @@ class Database {
   insert(data) {
 
     if (DEBUG){
-      //console.log("insert data:");
-      //console.log(data);
+      console.log("insert data:");
+      console.log(data);
     }
     //verification if needed
 
@@ -96,11 +96,11 @@ class Database {
             return callback(new Error("Error Retrieving Data"));
           }
 
-        //if (DEBUG) {
+        if (DEBUG) {
           console.log("[getSensorData]");
           console.log("database data:");
           console.log(values);
-        //}
+        }
       
       return callback(null, values);
 

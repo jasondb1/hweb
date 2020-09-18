@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { getAuthSocket } from "../services/socket";
 import './HydroponicControl.css';
-import Chart from './Chart';
+import Chart from './SensorChart';
 const climateIcon = require('../icons/icons8-temperature-50.png');
 const humidityIcon = require('../icons/icons8-humidity-80.png');
 const reservoirIcon = require('../icons/icons8-hygrometer-50.png');

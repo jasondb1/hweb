@@ -31,14 +31,6 @@ const sslOptions = {
 
 app.use(cors());
 
-
-//connect to database
-db.sequelize.sync({ force: true }).then(() => {
-  console.log("Drop and re-sync db.");
-});
-
-
-
 mongoose.set('useCreateIndex', true);
 mongoose.connect(MONGODB_URI, {useNewUrlParser: true}, (err) => {
     console.log(err || `Connected to MongoDB.`)

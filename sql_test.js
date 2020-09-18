@@ -53,18 +53,19 @@ const errHandler = err => {
 db.sensor.sync({force: true})
 .then(() => {
     console.log('sensor table created');
-})
 
-db.user.sync({force: true})
-.then(() => {
-    console.log('user table created');
-     //We also use await, you can use standard then callback.
+    //We also use await, you can use standard then callback.
         db.sensor.create({
         Sensor: "test",
         value: "12.23"
         })
         .then(console.log("entry created"))
-        .catch(errHandler) ///< Catch any errors that gets thrown
+        .catch(errHandler) 
+})
+
+db.user.sync({force: true})
+.then(() => {
+    console.log('user table created');
 
 })
 

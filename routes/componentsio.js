@@ -4,8 +4,8 @@ const { JWT_SECRET } = process.env;
 //const io = require('socket.io')();
 const jwt = require('jsonwebtoken');
 
-const DEBUG = false;
-//const DEBUG = true;
+//const DEBUG = false;
+const DEBUG = true;
 
 let subscribedUpdate = null;
 let UPDATEINTERVAL = 10000;
@@ -17,8 +17,8 @@ module.exports = function(io, db) {
     console.log("Initializing componentsio");
     //console.log(db);
         //start updating components at regular intervals
-    let componentsCtrl = new ComponentsCtrl();
-    componentsCtrl.init(db);
+    let componentsCtrl = new ComponentsCtrl(db);
+    componentsCtrl.init();
     componentsCtrl.enableLogging(db);
     componentsCtrl.start();
 
@@ -198,8 +198,6 @@ module.exports = function(io, db) {
                 if (DEBUG)console.log("-----");
                 client.emit('incomingData', payload);
             })
-
         });
-
     });
 };

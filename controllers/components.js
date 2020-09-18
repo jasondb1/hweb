@@ -1,5 +1,5 @@
 "use strict";
-const DEBUG = false;
+const DEBUG = true;
 
 const dbController = require('./db_new.js');
 
@@ -36,19 +36,18 @@ let temperatureControl = new Temperature(dht22, relay2, relay2, null);
 
 class ComponentsCtrl {
 
-    constructor() {
+    constructor(db) {
         this.component = {};
         this.update = null;
         this.updateInterval = null;
         this.database = null;
         this.loggingEnabled = false;
         this.status = {};
+        this.database = new dbController(db);
     }
 
-    init(db) {
-
-        this.database = dbController(db);
-
+    init() {
+        //move components to config
         this.component = {
             ledIndicator: {
                 obj: indicator,
@@ -188,7 +187,6 @@ class ComponentsCtrl {
                 value: temperatureControl.coolingEnabled,
                 logValue: false
             },
-
             furnaceFanStatus: {
                 obj: temperatureControl,
                 value: temperatureControl.isFanOn,
@@ -221,31 +219,35 @@ class ComponentsCtrl {
     //update sensor values and log if enabled
     readAllSensors() {
 
+        //console.log('[ReadAllSensors]:');
         this.updateSensors();
 
-        //console.log("readall sensors");
         //console.log(this.status);
 
         if (this.loggingEnabled) {
             let keys = Object.keys(this.component);
             let data = [];
 
+            //console.log(keys);
+
             for (let key of keys) {
-                //console.log(key);
                 if (this.status[key] != undefined) {
-                    if (this.component.logValue) {
+                    if (this.component[key].logValue) {
                         data.push({
                             description: this.component[key].obj.name,
                             sensor: key,
                             value: this.status[key],
-                            //value: this.component.obj.value,
+                            //value: this.component.obj.value, //alternate way to read value
                             location: this.component[key].obj.location
                         });
                     }
                 }
             }
-            console.log(this.database);
+            //console.log(this.database);
             //this.database.sensor.insert(data);
+            //console.log('data-');
+            //console.log(data);
+
             this.database.insert(data);
         }
     }
@@ -257,7 +259,10 @@ class ComponentsCtrl {
 
     //get the current status of each component
     updateSensors() {
-        //this.init();
+
+        //console.log("update log");
+        this.init();
+
         this.status.ts = new Date().getTime();
 
         let keys = Object.keys(this.component);
@@ -267,8 +272,8 @@ class ComponentsCtrl {
         }
 
         if (DEBUG) {
-            console.log("update current status");
-            console.log(this.status);
+            //console.log("update current status");
+            //console.log(this.status);
         }
 
         return this.status;

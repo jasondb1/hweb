@@ -16,13 +16,14 @@ const sequelize = new Sequelize(
         },
         dialectOptions: {
             encrypt: true
-        }
+        },
+        query:{raw:true}
     }
 );
 
 let test = sequelize.authenticate()
     .then(function () {
-        console.log("CONNECTED! ");
+        console.log("MariaDB CONNECTED! ");
     })
     .catch(function (err) {
         console.log("SOMETHING WENT WRONG! CONNECTING:", err);
@@ -35,7 +36,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 //models/tables here
-db.users = require("./User_sql.js")(sequelize, Sequelize);
+db.user = require("./User_sql.js")(sequelize, Sequelize);
 db.sensor = require("./Sensor.js")(sequelize, Sequelize);
 
 
@@ -50,24 +51,23 @@ const errHandler = err => {
   console.error("Error: ", err);
 };
 
+//db.sensor.sync({force: true})
 db.sensor.sync({force: true})
 .then(() => {
     console.log('sensor table created');
+
+    //db.sensor.create({
+    //    Sensor: "test",
+    //    Value: "12.23"
+    //    })
+    //    .then(//console.log("entry created")
+    //    )
+    //    .catch(errHandler) 
 })
 
 db.user.sync({force: true})
 .then(() => {
     console.log('user table created');
-     //We also use await, you can use standard then callback.
-        db.sensor.create({
-        Sensor: "test",
-        value: "12.23"
-        })
-        .then(console.log("entry created"))
-        .catch(errHandler) ///< Catch any errors that gets thrown
-
 })
-
-
 
 module.exports = db;

@@ -2,7 +2,7 @@
 const ComponentInput = require('./ComponentInput');
 const Gpio = require('onoff').Gpio;
 let i2c_connected = false;
-const DEBUG = true;
+const DEBUG = false;
 
 const i2c = require('i2c-bus');
 // const i2c_bus = i2c.openSync(1);
@@ -91,6 +91,7 @@ class Arduino extends ComponentInput {
 
                     if (DEBUG) console.log("received from arduino:");
                     if (DEBUG) console.log(this.value);
+                    if (DEBUG) console.log("Finished reading from arduino");
 
                 } else {
                     console.log("error reading arduino");
@@ -104,6 +105,9 @@ class Arduino extends ComponentInput {
             });
 
             this.lastRead = Date.now();
+            
+            //console.log("this.value:")
+            //console.log(this.value);
             //console.log("end data request");   
         }
     }
@@ -114,42 +118,34 @@ class Arduino extends ComponentInput {
     }
 
     getTemperature() {
-        //this.readSensor();
         return this.value.temperature;
     }
 
     getReservoirDepth() {
-        //this.readSensor();
         return this.value.reservoirDepth;
     }
 
     getHumidity() {
-        //this.readSensor();
         return this.value.humidity;
     }
 
     getLightValue() {
-        //this.readSensor();
         return this.value.p_resistor;
     }
 
     getMode() {
-        //this.readSensor();
         return this.value.mode;
     }
 
     getLightStatus() {
-        //this.readSensor();
         return this.value.lightStatus;
     }
 
     getPumpStatus() {
-        //this.readSensor();
         return this.value.pumpStatus;
     }
 
     getLightOffSeconds() {
-        //this.readSensor();
         return this.value.secondsToLightOnOff;
     }
 

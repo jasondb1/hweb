@@ -52,9 +52,9 @@ const errHandler = err => {
 };
 
 //db.sensor.sync({force: true})
-db.sensor.sync({force: true})
+db.sensor.sync({alter: true})
 .then(() => {
-    console.log('sensor table created');
+    console.log('sensor table altered/created');
 
     //db.sensor.create({
     //    Sensor: "test",

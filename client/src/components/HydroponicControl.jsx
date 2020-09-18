@@ -94,7 +94,7 @@ class HydroponicControl extends Component {
     };
 
     handleClickButton(value) {
-        console.log(value);
+        //console.log(value);
         this.socket.emit('hydroponicCommand', value);
     }
 
@@ -189,7 +189,7 @@ class HydroponicControl extends Component {
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-                    <span className="buttonLabel">{this.state.status.hydroponicControl.lightDuration / 3600000} hrs Light On Duration</span>
+                    <span className="buttonLabel">{this.state.status.hydroponicControl.lightDuration / 60} hrs Light On Duration</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 5)}
                     >
@@ -206,7 +206,7 @@ class HydroponicControl extends Component {
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-                    <span className="buttonLabel">{this.state.status.hydroponicControl.floodInterval / 60000} min Pump Cycle</span>
+                    <span className="buttonLabel">{this.state.status.hydroponicControl.floodInterval} min Pump Cycle</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 7)}
                     >
@@ -223,7 +223,7 @@ class HydroponicControl extends Component {
                         <img src={downIcon} alt="" width="20"
                             height="20" />
                     </button>
-                    <span className="buttonLabel">{this.state.status.hydroponicControl.floodDuration / 60000} min Pump Duration</span>
+                    <span className="buttonLabel">{this.state.status.hydroponicControl.floodDuration} min Pump Duration</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 9)}
                     >

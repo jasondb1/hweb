@@ -48,6 +48,8 @@ class Arduino extends ComponentInput {
             secondsToLightOnOff: 0,
             reservoirDepth: null,
         };
+
+        this.readSensor.bind(this);
     }
 
     readSensor() {
@@ -80,14 +82,14 @@ class Arduino extends ComponentInput {
                         this.value.humidity = val;
                     }
 
-                    this.value.secondsToLightOnOff = (buffer_arduino.readUInt32BE(6) / 1000);
-                    this.value.lightDuration = (buffer_arduino.readUInt32BE(8));
-                    this.value.floodInterval = (buffer_arduino.readUInt32BE(10));
-                    this.value.floodDuration = (buffer_arduino.readUInt32BE(12));
-                    this.value.mode = buffer_arduino.readUInt8(13);
-                    this.value.lightStatus = buffer_arduino.readUInt8(14);
-                    this.value.pumpStatus = buffer_arduino.readUInt8(15);
-                    this.value.reservoirDepth = buffer_arduino.readUInt16BE(16);
+                    this.value.secondsToLightOnOff = (buffer_arduino.readUInt16BE(6) * 60);
+                    this.value.lightDuration = (buffer_arduino.readUInt16BE(8));
+                    this.value.floodInterval = (buffer_arduino.readUInt16BE(10));
+                    this.value.floodDuration = (buffer_arduino.readUInt16BE(12));
+                    this.value.mode = buffer_arduino.readUInt8(14);
+                    this.value.lightStatus = buffer_arduino.readUInt8(15);
+                    this.value.pumpStatus = buffer_arduino.readUInt8(16);
+                    this.value.reservoirDepth = buffer_arduino.readUInt16BE(17);
 
                     if (DEBUG) console.log("received from arduino:");
                     if (DEBUG) console.log(this.value);
@@ -163,6 +165,7 @@ class Arduino extends ComponentInput {
             });
         }
         this.value.mode = systemMode;
+        this.readSensor();
     }
 
     sendCommand(command) {
@@ -174,6 +177,7 @@ class Arduino extends ComponentInput {
                 }
             });
         }
+        this.readSensor();
     }
 
     //start sampling sensors at specified interval

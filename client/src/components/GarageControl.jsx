@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getAuthSocket} from "../services/socket";
+import {authSocket} from "../services/socket";
 import './GarageControl.css';
 const garageIconClosed = require('../icons/icons8-warehouse-80.png');
 const garageIconOpen = require('../icons/icons8-depot-80.png');
@@ -20,7 +20,8 @@ class GarageControl extends Component {
 
     componentDidMount() {
 
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket.getInstance();
 
         //TODO: This should be a door sensor
         //this.socket.on('statusUpdate', (data) => {

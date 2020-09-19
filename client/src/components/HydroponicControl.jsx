@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getAuthSocket } from "../services/socket";
+import { authSocket } from "../services/socket";
 import './HydroponicControl.css';
 import Chart from './SensorChart';
 const climateIcon = require('../icons/icons8-temperature-50.png');
@@ -57,7 +57,8 @@ class HydroponicControl extends Component {
 
     componentDidMount() {
 
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
 
         this.socket.on('componentStatusUpdate', (data) => {
             this.setState(data);
@@ -114,8 +115,9 @@ class HydroponicControl extends Component {
                                 height="40" />
                             {this.state.status.hydroponicLightLevel}
                         </li>
-                        <li><img src={reservoirIcon} alt="" width="40"
-                            height="40" /> {this.state.status.reservoirDepth}
+                        <li><img  className="mr-3" src={reservoirIcon} alt="" width="40"
+                            height="40" /> 
+                            {this.state.status.hydroponicReservoirDepth} cm
                         </li>
                         <li>
                             <img className="mr-3" src={floodIcon} alt="" width="40"
@@ -239,6 +241,9 @@ class HydroponicControl extends Component {
                     <hr />
                     <h3>Humidity</h3>
                     <Chart sensor="hydroponicHumidity" />
+                    <hr />
+                    <h3>Reservoir Depth</h3>
+                    <Chart sensor="hydroponicReservoirDepth" />
                 </div>
             </div>
         );

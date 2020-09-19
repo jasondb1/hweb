@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getAuthSocket} from "../services/socket";
+import {authSocket} from "../services/socket";
 
 const climateIcon = require('../icons/icons8-temperature-outside-50-2.png');
 
@@ -26,7 +26,8 @@ class OutdoorClimateSummary extends Component {
     }
 
     componentDidMount() {
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
         this.socket.on('updates', (payload) => {
             this.setState({status: payload});
         });

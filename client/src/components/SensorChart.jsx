@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './SensorChart.css';
-import { getAuthSocket } from "../services/socket";
+import { authSocket } from "../services/socket";
 import * as d3 from 'd3';
 
 //let CHART_WIDTH = 600;
@@ -10,8 +10,8 @@ import * as d3 from 'd3';
 
 function drawLineChart(data, chartWidth, chartHeight, chartId) {
 //console.log(chartId);
-console.log("chart data");
-console.log(data);
+//console.log("chart data");
+//console.log(data);
 
    // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -89,13 +89,15 @@ class Chart extends Component {
 
     componentDidMount() {
 
-        this.socket = getAuthSocket();
-        
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
+        //console.log (authSocket.getInstance());
+
         this.socket.emit('requestData', {sensor:this.props.sensor, timeback:1440} );
         
         //retrieve data
         this.socket.on('incomingData', (payload) => {
-            console.log(payload);
+            //console.log(payload);
             this.setState({ data: payload });
             drawLineChart(this.state.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);
         });

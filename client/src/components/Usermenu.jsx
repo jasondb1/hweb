@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import './Usermenu.css';
-import {getAuthSocket} from "../services/socket";
+import {authSocket} from "../services/socket";
 
 const homeicon = require('../icons/icons8-home-50.png');
 const dashboardicon = require('../icons/icons8-dashboard-50.png');
@@ -11,13 +11,15 @@ const logouticon = require('../icons/icons8-exit-50.png');
 
 const exportData = () => {
     console.log ("export data");
-    let socket = getAuthSocket();
+    //let socket = getAuthSocket();
+    let socket = authSocket();
     socket.emit('exportData', "");
 }
 
 const clearLog = () => {
-    console.log ("clear log");
-    let socket = getAuthSocket();
+    //console.log ("clear log");
+    //let socket = getAuthSocket();
+    let socket = authSocket();
     socket.emit('clearLog', "");
 }
 

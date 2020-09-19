@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getAuthSocket} from "../services/socket";
+import {authSocket} from "../services/socket";
 import './FurnaceControl.css';
 //import OnOff from "./OnOffButton";
 import EnableDisableButton from "./EnableDisableButton";
@@ -23,7 +23,8 @@ class IndoorClimateSummary extends Component {
     }
 
     componentDidMount() {
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
 
         this.socket.on('updates', (payload) => {
             this.setState({status: payload});

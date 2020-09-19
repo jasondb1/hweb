@@ -3,3 +3,5 @@ db/
 log.csv
 db/homeWeb.db
 client/node_modules
+.env
+client/.env

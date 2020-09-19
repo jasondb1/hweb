@@ -1,12 +1,11 @@
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(
-    'homeweb',
-    'jd_admin',
-    'pQvUM5ggebuw', {
-        //host: 'jd-personal-dev.mariadb.database.azure.com',
-        host: 'localhost',
-        dialect: 'mariadb',
+    process.env.DBNAME,
+    process.env.DBUSER,
+    process.env.DBPASSWORD, {
+        host: process.env.DBHOST,
+        dialect: process.env.DBDIALECT,
         logging: false,
         pool: {
             max: 10,

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getAuthSocket } from "../services/socket";
+import { authSocket } from "../services/socket";
 
 //const coolingIcon = require('../icons/icons8-cooling-50-2.png');
 //const heatingIcon = require('../icons/icons8-heating-50-2.png');
@@ -33,7 +33,8 @@ class Footer extends Component {
     }
 
     componentDidMount() {
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
         this.socket.on('updates', (payload) => {
             this.setState({ status: payload });
         });

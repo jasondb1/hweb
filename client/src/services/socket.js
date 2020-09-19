@@ -1,10 +1,37 @@
 import io from 'socket.io-client';
 require('dotenv').config();
 const SOCKET_SERVER = process.env.SOCKET_SERVER;
-//const SOCKET_SERVER = 'http://192.168.1.20:3001';
+
+// let authSocket = (function(){
+//     let socketInstance;
+
+//     let newSocket = function() {
+//         let token = localStorage.getItem('token');
+
+//         return io.connect(SOCKET_SERVER, {
+//             query: { token: token }
+//         });
+//     }
+
+//     return {
+//         getInstance: function(){
+//             if(!socketInstance){
+//                 console.log ("new socket")
+//                 socketInstance = newSocket();
+//             }
+//             console.log("socket returned");
+//             return socketInstance;
+//         }
+//     };
+
+// })();
 
 
-function getAuthSocket() {
+
+//new socket function
+//check if socket exists, if one exists then return socket otherwise new socket
+
+function authSocket() {
     let token = localStorage.getItem('token');
 
     return io.connect(SOCKET_SERVER, {
@@ -16,5 +43,5 @@ function getAuthSocket() {
 //check if socket exists, if one exists then return socket otherwise new socket
 
 export {
-    getAuthSocket,
+    authSocket,
 };

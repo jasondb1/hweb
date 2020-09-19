@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getAuthSocket} from "../services/socket";
+import {authSocket} from "../services/socket";
 
 class OffAutoButton extends Component {
 
@@ -14,7 +14,8 @@ class OffAutoButton extends Component {
     }
 
     componentDidMount() {
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
 
         this.socket.on('statusUpdate', (data) => {
         //console.log(data);

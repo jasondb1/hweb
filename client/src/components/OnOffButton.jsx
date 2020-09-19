@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getAuthSocket} from "../services/socket";
+import {authSocket} from "../services/socket";
 
 class OnOff extends Component {
 
@@ -16,7 +16,8 @@ class OnOff extends Component {
     }
 
     componentDidMount() {
-        this.socket = getAuthSocket();
+        //this.socket = getAuthSocket();
+        this.socket = authSocket();
 
         this.socket.on('componentStatusUpdate', (data) => {
             if (data.component === this.state.component) {

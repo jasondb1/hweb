@@ -2,7 +2,7 @@ const DEBUG = false;
 const fs = require('fs');
 const LOG_FILEPATH = 'current_log.csv'; //move this to a config file
 let table = 'sensor_data';
-
+const {OP} = require('sequelize');
 
 class Database {
 
@@ -77,17 +77,20 @@ class Database {
   //default time is 24 hours
   getSensorData(sensor, time_prev, callback) {
 
-    
+    //console.log(new Date());
+    //console.log(new Date(new Date() - time_prev));
     //let time_now = new Date().getTime;
     //let time_now = datetime.getTime();
-    let time_threshold = Date.now() - time_prev;
+    //let time_threshold = Date.now() - time_prev;
     let values = null;
 
     values = this.db.sensor.findAll({
       attributes: ['Timestamp', 'Value'],
       where: {
         Sensor: sensor,
-        //Timestamp: { [this.db.Sequelize.Op.gt]: time_threshold } //TODO: get this working
+        Timestamp: {
+          [this.db.Sequelize.Op.gt]: new Date(new Date() - time_prev)
+        }
       }
     })
     .then ( (values) => {

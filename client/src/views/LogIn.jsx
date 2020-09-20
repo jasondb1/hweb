@@ -5,7 +5,7 @@ import httpClient from '../services/httpClient'
 
 class LogIn extends React.Component {
     state = {
-        fields: {email: '', password: ''}
+        fields: {username: '', email: '', password: ''}
     };
 
     onInputChange(evt) {
@@ -21,7 +21,7 @@ class LogIn extends React.Component {
         evt.preventDefault();
         httpClient.logIn(this.state.fields)
             .then(user => {
-                this.setState({fields: {email: '', password: ''}});
+                this.setState({fields: {username: '', email: '', password: ''}});
                 if (user) {
                     this.props.onLoginSuccess(user);
                     this.props.history.push('/main/dashboard')
@@ -30,7 +30,7 @@ class LogIn extends React.Component {
     };
 
     render() {
-        const {email, password} = this.state.fields;
+        const {username, email, password} = this.state.fields;
         return (
             <div className='LogIn'>
                 <div className='row'>
@@ -44,7 +44,15 @@ class LogIn extends React.Component {
                                         <span className="input-group-text" id="inputGroup-sizing-default">Email</span>
                                     </div>
                                     <input className='form-control' type="text" placeholder="Email" name="email"
-                                           value={email}/>
+                                           defaultValue={email}/>
+                                </div>
+
+                                <div className="input-group mb-3">
+                                    <div className="input-group-prepend">
+                                        <span className="input-group-text" id="inputGroup-sizing-default">Username</span>
+                                    </div>
+                                    <input className='form-control' type="text" placeholder="username" name="username"
+                                           defaultValue={username}/>
                                 </div>
 
                                 <div className="input-group mb-3">
@@ -52,7 +60,7 @@ class LogIn extends React.Component {
                                         <span className="input-group-text" id="inputGroup-sizing-default">Password</span>
                                     </div>
                                     <input className='form-control' type="password" placeholder="Password" name="password"
-                                           value={password}/>
+                                           defaultValue={password}/>
                                 </div>
 
                                 <button className='btn btn-primary'>Log In</button>

@@ -6,6 +6,7 @@ const authorize = require('../middleware/authorize.js')
 const userService = require('../helpers/user.service.js');
 
 // routes
+//router.post('/authenticate', authenticateSchema, authenticate);
 router.post('/authenticate', authenticateSchema, authenticate);
 router.post('/register', registerSchema, register);
 router.get('/', authorize(), getAll);
@@ -17,16 +18,22 @@ router.delete('/:id', authorize(), _delete);
 module.exports = router;
 
 function authenticateSchema(req, res, next) {
+    //console.log("in authenticate schema");
     const schema = Joi.object({
         username: Joi.string().required(),
         password: Joi.string().required()
     });
+    //console.log(schema);
     validateRequest(req, next, schema);
 }
 
 function authenticate(req, res, next) {
+    console.log("in authenticate")
     userService.authenticate(req.body)
-        .then(user => res.json(user))
+        .then(user => {res.json(user);
+        console.log(user);
+        
+        })
         .catch(next);
 }
 

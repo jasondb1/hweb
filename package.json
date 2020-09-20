@@ -25,7 +25,6 @@
     "base64-arraybuffer": "^0.1.5",
     "base64id": "^1.0.0",
     "basic-auth": "^2.0.1",
-    "bcrypt-nodejs": "^0.0.3",
     "bcrypt-pbkdf": "^1.0.2",
     "bcryptjs": "^2.4.3",
     "better-assert": "^1.0.2",

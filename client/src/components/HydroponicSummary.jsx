@@ -25,7 +25,7 @@ class HydroponicSummary extends Component {
 
         this.socket.on('updates', (payload) => {
             this.setState({status: payload});
-            console.log(this.state);
+            //console.log(this.state);
         });
 
         this.socket.on('componentStatusUpdate', (data) => {

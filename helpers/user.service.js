@@ -1,4 +1,4 @@
-const secret = process.env.JWT_SECRET;;
+const secret = process.env.JWT_SECRET;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../models/Sequelize.js');
@@ -16,14 +16,18 @@ module.exports = {
 };
 
 async function authenticate({ username, password }) {
+
+    //console.log("authenticating password");
     const user = await db.User.scope('withHash').findOne({ where: { username } });
 
-    if (!user || !(await bcrypt.compare(password, user.hash)))
+    if (!user || !(await bcrypt.compare(password, user.hash))) {
         throw 'Username or password is incorrect';
+    }
 
     // authentication successful
     const token = jwt.sign({ sub: user.id }, secret, { expiresIn: '7d' });
-    return { ...omitHash(user.get()), token };
+    //return { ...omitHash(user.get()), token };
+    return { ...omitHash(user), token };
 }
 
 async function getAll() {
@@ -66,7 +70,7 @@ async function create1(database, params) {
         params.hash = await bcrypt.hash(params.password, 10);
     }
     console.log("hash:");
-    console.log (params.hash);
+    console.log(params.hash);
 
     // save user
     await database.User.create(params);
@@ -90,7 +94,8 @@ async function update(id, params) {
     Object.assign(user, params);
     await user.save();
 
-    return omitHash(user.get());
+    //return omitHash(user.get());
+    return omitHash(user);
 }
 
 async function _delete(id) {
@@ -107,6 +112,10 @@ async function getUser(id) {
 }
 
 function omitHash(user) {
+    //console.log("in omithash")
+    //console.log(user);
+    //const { hash, ...userWithoutHash } = user;
     const { hash, ...userWithoutHash } = user;
+    //console.log(userWithoutHash);
     return userWithoutHash;
 }

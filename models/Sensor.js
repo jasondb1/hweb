@@ -28,7 +28,6 @@ module.exports = (sequelize, type) => {
             type: type.STRING
         }
     })
-    
 
   return Sensor;  
 };

@@ -28,6 +28,10 @@ class OpenClose extends Component {
         });
     }
 
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
     handleClick() {
         if (this.state.isOpen) {
             this.socket.emit('componentClose', this.state.component);

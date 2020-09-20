@@ -40,6 +40,10 @@ class Footer extends Component {
         });
     };
 
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
     render() {
         return ( <div className = "footer col-12" >
             <ListItems values = { this.state.status }/> 

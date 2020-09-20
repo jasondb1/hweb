@@ -29,6 +29,10 @@ class OnOff extends Component {
             //api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
     }
 
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
     handleClick() {
         if (this.state.isOn) {
             //api.componentOff(this.state.component).then(json => this.setState({isOn: false}));

@@ -29,7 +29,7 @@ class Database {
 
     for (let row of data) {
 
-      this.db.sensor.create({
+      this.db.Sensor.create({
         Timestamp: datetime,
         //Description: row.description,
         Location: row.location,
@@ -48,11 +48,11 @@ class Database {
     if (sensor === 'all') {
 
       //reset all (be very careful) consider removing
-      this.db.sensor.destroy({
+      this.db.Sensor.destroy({
         truncate: true
       }).catch(this.errHandler);
     } else {
-      this.db.sensor.destroy({
+      this.db.Sensor.destroy({
         where: {
           Sensor: sensor
         }
@@ -63,11 +63,11 @@ class Database {
   clearLog(where) {
 
     if (where != null) {
-      this.db.sensor.destroy({
+      this.db.Sensor.destroy({
         truncate: true
       }).catch(this.errHandler);
     } else {
-      this.db.sensor.destroy({
+      this.db.Sensor.destroy({
         where: { where }
       }).catch(this.errHandler);
     }
@@ -84,7 +84,7 @@ class Database {
     //let time_threshold = Date.now() - time_prev;
     let values = null;
 
-    values = this.db.sensor.findAll({
+    values = this.db.Sensor.findAll({
       attributes: ['Timestamp', 'Value'],
       where: {
         Sensor: sensor,
@@ -119,7 +119,7 @@ class Database {
 
     let datetime = new Date();
 
-    const values = this.db.sensor.findAll()
+    const values = this.db.Sensor.findAll()
       .then(
         fs.appendFile(
           filename,

@@ -129,9 +129,6 @@ class Database {
             return callback(null,rows);
         });
 
-        //this.open();
-        //return rows;
-
     }
 
     //export the data to a csv file
@@ -166,8 +163,6 @@ class Database {
         //this.open();
 
     }
-
-
 }
 
 module.exports = Database;

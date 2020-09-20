@@ -1,5 +1,6 @@
 const ComponentsCtrl = require('../controllers/components');
-const verifyToken = require('../serverAuth.js').verifyToken;
+//const verifyToken = require('../serverAuth.js').verifyToken;
+//const authorize = require('middleware/authorize');
 const { JWT_SECRET } = process.env;
 //const io = require('socket.io')();
 const jwt = require('jsonwebtoken');

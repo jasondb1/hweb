@@ -28,6 +28,10 @@ class OffAutoButton extends Component {
             //api.getComponentState(this.state.component).then(json => this.setState({isOn: json.isOn}));
     }
 
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
     handleClick() {
             this.socket.emit(this.props.eventString, !this.state.isOn);
     };

@@ -1,32 +1,32 @@
 import React from 'react'
 import httpClient from '../services/httpClient'
+//import confirmService from '../services/confirmService'
 
-const UserList = () => {
-  return(<ul>
-          <li>User list (del) (chg password)</li>
-      </ul>
-
-   // <ul>
-            //     {
-            //         this.state.data.map((item, key) => {
-            //             return <li key={key}>{item.timeM} {item.description}</li>
-            //         })
-            //     }
-            // </ul>
-
-  );
-
-};
-
-//TODO: use httpClient.getAdmin or get list of users
-//TODO: confirm password
 
 // sign up form behaves almost identically to log in form. We could create a flexible Form component to use for both actions, but for now we'll separate the two:
 class SignUp extends React.Component {
-    state = {
-        isAdmin: httpClient.getAdmin(),
-        fields: {username: '', email: '', admin: false, password: '', password1: ''}
-    };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isAdmin: httpClient.getAdmin(),
+            fields: { username: '', email: '', admin: false, password: '', password1: '' },
+            data: []
+        };
+
+        this.removeItem = this.removeItem.bind(this);
+        this.editItem = this.editItem.bind(this);
+    }
+
+    componentDidMount() {
+
+        //get users table
+        httpClient.getAllUsers().then(payload => {
+            this.setState({ data: payload });
+        });
+
+    }
 
     onInputChange(evt) {
         //console.log("new value", evt.target.value);
@@ -65,14 +65,38 @@ class SignUp extends React.Component {
             // }
 
 
-            this.setState({message: response.message, success: response.success})
+            this.setState({ message: response.message, success: response.success })
             //this.setState({fields: {username: '', email: '', admin: false, password: '', password1: ''}});
-        
+
         })
     }
 
+    async removeItem({ target: { value } }) {
+        //console.log(target);
+        console.log(value);
+
+        //const result = await confirmService.show();
+        const answer = window.confirm("Delete item?")
+        if (answer) {
+            //delete items
+            console.log("delete item");
+            //const items = this.state.items.filter((item, index) => index !== parseInt(value));
+            //this.setState({ items });
+        }
+    }
+
+
+    editItem({ target: { value } }) {
+        //console.log(target);
+        console.log(value);
+        //TODO: add code to delete 
+        //populate form, and change add button to edit
+        //const items = this.state.items.filter((item, index) => index !== parseInt(value));
+        //this.setState({ items });
+    }
+
     render() {
-        const {username, email, admin, password, password1} = this.state.fields;
+        const { username, email, admin, password, password1 } = this.state.fields;
         return (
             <div className='SignUp'>
                 <div className='row'>
@@ -87,36 +111,36 @@ class SignUp extends React.Component {
                                         <span className="input-group-text" id="inputGroup-sizing-default">Username</span>
                                     </div>
                                     <input className='form-control' type="text" placeholder="username" name="username"
-                                           defaultValue={username}/>
+                                        defaultValue={username} />
                                 </div>
                                 <div className="input-group mb-3">
                                     <div className="input-group-prepend">
                                         <span className="input-group-text" id="inputGroup-sizing-default">Email</span>
                                     </div>
                                     <input className='form-control' type="text" placeholder="Email" name="email"
-                                           defaultValue={email}/>
+                                        defaultValue={email} />
                                 </div>
                                 <div className="input-group mb-3">
                                     <div className="input-group-prepend">
                                         <span className="input-group-text" id="inputGroup-sizing-default">Password</span>
                                     </div>
                                     <input className='form-control' type="password" placeholder="Password" name="password"
-                                           defaultValue={password}/>
+                                        defaultValue={password} />
                                 </div>
-                               <div className="input-group mb-3">
+                                <div className="input-group mb-3">
                                     <div className="input-group-prepend">
-                                        <span className="input-group-text" id="inputGroup-sizing-default">Re-Enter Password</span>
+                                        <span className="input-group-text" id="inputGroup-sizing-default">Password</span>
                                     </div>
                                     <input className='form-control' type="password" placeholder="Re-Enter Password" name="password1"
-                                           defaultValue={password1}/>
+                                        defaultValue={password1} />
                                 </div>
-                                
+
                                 <div className="input-group form-check">
-                                    <input type="checkbox" className="form-check-input" id="admin" name='admin' defaultChecked={admin}/>
-                                        <label className="form-check-label" htmlFor="admin">Administrator</label>
+                                    <input type="checkbox" className="form-check-input" id="admin" name='admin' defaultChecked={admin} />
+                                    <label className="form-check-label" htmlFor="admin">Administrator</label>
                                 </div>
-                                <br/>
-                                <button className='btn btn-primary'>Sign Up</button>   
+                                <br />
+                                <button className='btn btn-primary'>Add User</button>
                                 <div className="mt-3">
                                     {this.state.message}
                                 </div>
@@ -125,7 +149,46 @@ class SignUp extends React.Component {
                     </div>
                 </div>
                 <div className='row user-list'>
-                    <UserList />
+                    {/* <UserList data={this.state.data} /> */}
+                    <table className="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Admin</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.data.map(user =>
+                                <tr key={user.id}>
+                                    <td>{user.username}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.admin}</td>
+                                    <td>
+                                        <button
+                                            className="button is-danger"
+                                            value={user.id}
+                                            onClick={this.editItem}
+                                        >
+                                            Edit
+                                    </button>
+                                    </td>
+                                    <td>
+
+                                       <button
+                                        className="button is-danger"
+                                        value={user.id}
+                                        onClick={this.removeItem}
+                                    >
+                                        Delete
+                                    </button>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )

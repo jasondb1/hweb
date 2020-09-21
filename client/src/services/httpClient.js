@@ -49,7 +49,7 @@ httpClient.logIn = function (credentials) {
 httpClient.signUp = function (userInfo) {
     return this({method: 'post', url: '/api/users/register', data: userInfo})
         .then((serverResponse) => {
-            console.log(serverResponse.data)
+            //console.log(serverResponse.data)
 
             //Do the following for self-signup and return the token
             //const token = serverResponse.data.token;
@@ -65,7 +65,14 @@ httpClient.signUp = function (userInfo) {
 };
 
 //TODO: Add getting all users from database
+httpClient.getAllUsers = function () {
+    return this({method: 'get', url: '/api/users/'})
+        .then((serverResponse) => {
+            //get all users
+            return serverResponse.data;
 
+        })
+};
 
 httpClient.logOut = function () {
     localStorage.removeItem('token');

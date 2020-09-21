@@ -22,8 +22,8 @@ verifyToken = (req, res, next) => {
             });
         }
         req.userId = decoded.id;
-        console.log("decoded id");
-        console.log (decoded.id);
+        console.log("[Need to add additional check here - decoded id");
+        console.log (decoded);
         //TODO: check if user exists?
         next();
     });

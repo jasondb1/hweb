@@ -12,7 +12,7 @@ module.exports = {
     create,
     update,
     delete: _delete,
-    create1
+    //create1
 };
 
 async function authenticate({ username, password }) {
@@ -40,6 +40,11 @@ async function getById(id) {
 
 async function create(params) {
     // validate
+    //console.log("create user");
+    //console.log(params);
+    if (params.admin === 'on') 
+        params.admin = 1;
+
     if (await db.User.findOne({ where: { username: params.username } })) {
         throw 'Username "' + params.username + '" is already taken';
     }
@@ -53,28 +58,24 @@ async function create(params) {
     await db.User.create(params);
 }
 
-async function create1(database, params) {
-    // validate
-    console.log("in create 1");
-    console.log(database.User);
-    console.log(params);
+// async function create1(database, params) {
+//     // validate
+//     console.log("in create 1");
+//     console.log(database.User);
+//     console.log(params);
 
-    if (await database.User.findOne({ where: { username: params.username } })) {
-        throw 'Username "' + params.username + '" is already taken';
-    }
+//     if (await database.User.findOne({ where: { username: params.username } })) {
+//         throw 'Username "' + params.username + '" is already taken';
+//     }
 
-    console.log("username is good");
+//     // hash password
+//     if (params.password) {
+//         params.hash = await bcrypt.hash(params.password, 10);
+//     }
 
-    // hash password
-    if (params.password) {
-        params.hash = await bcrypt.hash(params.password, 10);
-    }
-    console.log("hash:");
-    console.log(params.hash);
-
-    // save user
-    await database.User.create(params);
-}
+//     // save user
+//     await database.User.create(params);
+// }
 
 async function update(id, params) {
     const user = await getUser(id);

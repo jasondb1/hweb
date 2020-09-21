@@ -2,6 +2,8 @@ import io from 'socket.io-client';
 require('dotenv').config();
 const SOCKET_SERVER = process.env.SOCKET_SERVER;
 
+
+//TODO: goto one socket connection
 // let authSocket = (function(){
 //     let socketInstance;
 

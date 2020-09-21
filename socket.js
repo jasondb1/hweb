@@ -1,4 +1,4 @@
-const verifyToken = require('../serverAuth.js').verifyToken;
+//const verifyToken = require('../serverAuth.js').verifyToken;
 const socketioJwt = require('socketio-jwt');
 const {JWT_SECRET} = process.env;
 console.log('socket.js');

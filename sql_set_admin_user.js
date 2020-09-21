@@ -8,7 +8,8 @@ const bcrypt = require('bcryptjs');
 newUser = { username: 'admin', password: 'Passw0rd', email: 'admin@test.com', admin: true };
 
 console.log("database in sql set admin");
-create1(database, newUser);
+//create1(database, newUser);
+create(database, newUser);
 
 async function create1(database, params) {
     // validate

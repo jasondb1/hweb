@@ -47,10 +47,14 @@ httpClient.logIn = function (credentials) {
 
 // logIn and signUp functions could be combined into one since the only difference is the url we're sending a request to..
 httpClient.signUp = function (userInfo) {
-    return this({method: 'post', url: '/api/users', data: userInfo})
+    return this({method: 'post', url: '/api/users/register', data: userInfo})
         .then((serverResponse) => {
-            const token = serverResponse.data.token;
-            if (token) {
+            console.log(serverResponse.data)
+
+            //Do the following for self-signup and return the token
+            //const token = serverResponse.data.token;
+            // if (token) {
+            if (serverResponse.data.success === true){
                 // sets token as an included header for all subsequent api requests
                 //this.defaults.headers.common.token = this.setToken(token);
                 return {message: 'New User Added', success: true};
@@ -59,6 +63,9 @@ httpClient.signUp = function (userInfo) {
             }
         })
 };
+
+//TODO: Add getting all users from database
+
 
 httpClient.logOut = function () {
     localStorage.removeItem('token');

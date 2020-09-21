@@ -15,7 +15,7 @@ counter = 0;
 
 module.exports = function(io, db) {
 
-    console.log("Initializing componentsio");
+    //console.log("Initializing componentsio");
     //console.log(db);
         //start updating components at regular intervals
     let componentsCtrl = new ComponentsCtrl(db);
@@ -49,11 +49,13 @@ module.exports = function(io, db) {
             client.emit('updates', componentsCtrl.currentStatus());
         }, UPDATEINTERVAL);
 
-        if (DEBUG) console.log("Connection:" + counter++);
+        if (DEBUG) console.log("Connection:" + counter++ + ':' + client.id);
 
         //user disconnects
         client.on('disconnect', () => {
-            if (DEBUG) console.log('client disconnected:' + counter);
+            
+            if (DEBUG) console.log('client disconnected:' + counter-- + ':' + client.id);
+            
         });
 
         //client.on('componentGetStatus', comp => {
@@ -62,30 +64,35 @@ module.exports = function(io, db) {
 
         //component off
         client.on('turnComponentOff', comp => {
+            if (DEBUG) console.log("component off");
             componentsCtrl.component[comp].obj.off();
             client.emit('componentStatusUpdate', { component: comp, isOn: false });
         });
 
         //component on
         client.on('turnComponentOn', comp => {
+            if (DEBUG) console.log("component on");
             componentsCtrl.component[comp].obj.on();
             client.emit('componentStatusUpdate', { component: comp, isOn: true });
         });
 
         //garage close
         client.on('componentOpen', comp => {
+            if (DEBUG) console.log("component open");
             componentsCtrl.component.garageRelay.obj.open();
             client.emit('componentStatusUpdate', { component: comp, isOpen: true });
         });
 
         //garage open
         client.on('componentClose', comp => {
+            if (DEBUG) console.log("component close");
             componentsCtrl.component.garageRelay.obj.open();
             client.emit('componentStatusUpdate', { component: comp, isOpen: false });
         });
 
         //temperature up
         client.on('temperatureUp', () => {
+            if (DEBUG) console.log("temp up");
             componentsCtrl.component.temperatureControl.obj.temperatureUp();
             client.emit('statusUpdate', {
                 heatingTemperature: componentsCtrl.component.heatingTemperature.value,
@@ -95,6 +102,7 @@ module.exports = function(io, db) {
 
         //temperature down
         client.on('temperatureDown', () => {
+            if (DEBUG) console.log("temp down");
             componentsCtrl.component.temperatureControl.obj.temperatureDown();
             client.emit('statusUpdate', {
                 heatingTemperature: componentsCtrl.component.heatingTemperature.value,
@@ -119,6 +127,7 @@ module.exports = function(io, db) {
         // });
 
         client.on('enableCooling', (value) => {
+            if (DEBUG) console.log("enable cooling");
             if (value) {
                 componentsCtrl.component.temperatureControl.enableCooling;
             } else {
@@ -129,11 +138,12 @@ module.exports = function(io, db) {
 
         //fan on
         client.on('fanOn', (value) => {
+            if (DEBUG) console.log("fan on");
             if (value) {
-                console.log('routes fan on');
+                if (DEBUG) console.log('routes fan on');
                 componentsCtrl.component.temperatureControl.obj.fanOn;
             } else {
-                console.log('routes fan off');
+                if (DEBUG) console.log('routes fan off');
                 componentsCtrl.component.temperatureControl.obj.setFanAuto;
             }
             client.emit('statusUpdate', { furnaceFanMode: componentsCtrl.component.furnaceFanMode.value, })
@@ -141,26 +151,28 @@ module.exports = function(io, db) {
 
         //temperature hold
         client.on('setHold', (value) => {
+            if (DEBUG) console.log("set hold" + counter + ':' + client.id);
             componentsCtrl.component.temperatureControl.setHold(value);
             client.emit('statusUpdate', { temperatureHold: componentsCtrl.component.temperatureHold.value, })
         });
 
         //export data to logfile
         client.on('exportData', () => {
-            console.log("export data");
+            if (DEBUG) console.log("export data" + counter + ':' + client.id);
             componentsCtrl.database.exportData();
             //client.emit('statusMessage', {"Success"})
         });
 
         //clear the logfile
         client.on('clearLog', () => {
-            console.log("clear log");
+            if (DEBUG) console.log("clear log" + counter + ':' + client.id);
             componentsCtrl.database.clearLog();
             //client.emit('statusMessage', {"Success"})
         });
 
         //Gets historic data from a sensor
         client.on('getData', (sensor, timeBack) => {
+            if (DEBUG) console.log("get data" + counter + ':' + client.id);
             let payload = componentsCtrl.database.getSensorData(sensor, timeBack);
             client.emit('sensorData', payload);
         });
@@ -169,14 +181,16 @@ module.exports = function(io, db) {
 
         //sets the hydroponic mode on the sensor
         client.on('hydroponicMode', (value) => {
-            console.log("socket received message: hydroponicMode: " + value);
+            if (DEBUG) console.log("hydroponic mode");
+            if (DEBUG) console.log("socket received message: hydroponicMode: " + value + '-' + counter + ':' + client.id);
             componentsCtrl.component.hydroponicMode.obj.setMode(value);
             client.emit('componentStatusUpdate', { hydroponicMode: value });
         });
 
         //sneds a command to the hydroponic bed
         client.on('hydroponicCommand', (value) => {
-            console.log("socket received message: hydroponicCommand: " + value);
+            if (DEBUG) console.log("hydroponic command" + counter + ':' + client.id);
+            if (DEBUG) console.log("socket received message: hydroponicCommand: " + value);
             
             //TODO: Maybe add a return for success/fail    
             componentsCtrl.component.hydroponicMode.obj.sendCommand(value);
@@ -186,7 +200,7 @@ module.exports = function(io, db) {
 
         //generic request for any sensor 24 hours back - timeback in ms
         client.on('requestData', (args) => {
-            //if (DEBUG) console.log("request data");
+            if (DEBUG) console.log("request data" + counter + ':' + client.id);
             //if (DEBUG)console.log(args);
             payload = componentsCtrl.database.getSensorData(args.sensor, (args.timeback * 60 * 1000), (err, payload) => {
                 //request data from database

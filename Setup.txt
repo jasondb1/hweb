@@ -61,12 +61,12 @@ node server.js
 
 
 client
-192.168.1.108:3000
+192.168.1.20:3000
 localhost:3000
 
 
-test@test.com
-test
+admin 
+Passw0rd
 
 
 --install latest node
@@ -75,11 +75,29 @@ npm rebuild
 
 ssh pi@homeweb.local
 
-sudo apt install mongodb
-sudo systemctl enable mongodb
+
+***** Starting server automatically
+
+place homeweb.service file into /lib/systemd/system/homeweb.service
+
+once this is done ensure this is running: sudo systemctl daemon-reload
+
+turn on: sudo systemctl enable homeweb.service
+sudo systemctl stop homeweb.service
+sudo systemctl start homeweb.service
+sudo systemctl disable homeweb.service - disable service on boot
+
+troubleshoot
+journalctl -u homewbe.service
+
+log to a file :ExecStart=/bin/bash -c '/usr/bin/node /home/pi/homeweb > /home/pi/homeweb.log 2>&1'
+
+
 
 
 https://nodesource.com/blog/running-your-node-js-app-with-systemd-part-1/
+
+move 
 
 Using systemctl To Control Our App
 
@@ -95,7 +113,7 @@ $ sudo systemctl start hello_env
 
 After you do this, you should be able to go to
 
-http://11.22.33.44:3001
+http://192.168.1.20:3001
 
 in your web browser and see the output. If it's there, congratulations, you've launched your app using systemd! If the output looks very different than it did when you launched the app manually don't worry, that's normal. When systemd kicks off an application, it does so from a much more minimal environment than the one you have when you ssh into a machine. In particular, the $HOME environment variable may not be set by default, so be sure to pay attention to this if your app makes use of any environment variables. You may need to set them yourself when using systemd.
 
@@ -119,3 +137,7 @@ and finally, if you previously enabled the app, but you change your mind and wan
 
 $ sudo systemctl disable hello_env
 
+
+
+Implementing Authentication :
+https://bezkoder.com/node-js-jwt-authentication-mysql/

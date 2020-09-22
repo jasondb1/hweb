@@ -42,7 +42,7 @@ async function create(params) {
     // validate
     //console.log("create user");
     //console.log(params);
-    if (params.admin === 'on') 
+    if (params.admin === 'on')
         params.admin = 1;
 
     if (await db.User.findOne({ where: { username: params.username } })) {
@@ -78,9 +78,10 @@ async function create(params) {
 // }
 
 async function update(id, params) {
-    const user = await getUser(id);
-
+    
     // validate
+    const user = await getUser(id);
+    console.log(user);
     const usernameChanged = params.username && user.username !== params.username;
     if (usernameChanged && await db.User.findOne({ where: { username: params.username } })) {
         throw 'Username "' + params.username + '" is already taken';
@@ -92,16 +93,28 @@ async function update(id, params) {
     }
 
     // copy params to user and save
-    Object.assign(user, params);
-    await user.save();
+    //Object.assign(user, params);
+    //await user.save();
+
+    // Change User
+    await db.User.update(params, {
+        where: {
+            id: id
+        }
+    });
 
     //return omitHash(user.get());
     return omitHash(user);
 }
 
 async function _delete(id) {
-    const user = await getUser(id);
-    await user.destroy();
+    //const user = await getUser(id);
+    //console.log(user);
+    await db.User.destroy({
+        where: {
+            id: id
+        }
+    });
 }
 
 // helper functions

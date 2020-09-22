@@ -14,7 +14,8 @@ router.post('/register', [authJwt.verifyToken, authJwt.isAdmin], register);
 router.get('/', [authJwt.verifyToken], getAll);
 router.get('/current', [authJwt.verifyToken], getCurrent);
 router.get('/:id', [authJwt.verifyToken], getById);
-router.put('/:id', [authJwt.verifyToken], updateSchema, update);
+//router.put('/:id', [authJwt.verifyToken], updateSchema, update);
+router.put('/:id', [authJwt.verifyToken], update);
 router.delete('/:id', [authJwt.verifyToken], _delete);
 
 module.exports = router;
@@ -85,13 +86,18 @@ function updateSchema(req, res, next) {
 }
 
 function update(req, res, next) {
+    //console.log("update user");
+    //console.log(req.params.id);
+    //console.log(req.body);
     userService.update(req.params.id, req.body)
-        .then(user => res.json(user))
+        .then(() => res.json({ message: 'User updated successfully' , success: true}))
         .catch(next);
 }
 
 function _delete(req, res, next) {
+    console.log ("delete user");
+    console.log(req.params);
     userService.delete(req.params.id)
-        .then(() => res.json({ message: 'User deleted successfully' }))
+        .then(() => res.json({ message: 'User deleted successfully', success: true }))
         .catch(next);
 }

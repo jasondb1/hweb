@@ -46,7 +46,7 @@ httpClient.logIn = function (credentials) {
 };
 
 // logIn and signUp functions could be combined into one since the only difference is the url we're sending a request to..
-httpClient.signUp = function (userInfo) {
+httpClient.newUser = function (userInfo) {
     return this({method: 'post', url: '/api/users/register', data: userInfo})
         .then((serverResponse) => {
             //console.log(serverResponse.data)
@@ -64,13 +64,26 @@ httpClient.signUp = function (userInfo) {
         })
 };
 
-//TODO: Add getting all users from database
 httpClient.getAllUsers = function () {
     return this({method: 'get', url: '/api/users/'})
         .then((serverResponse) => {
             //get all users
             return serverResponse.data;
 
+        })
+};
+
+httpClient.updateUser = function (userInfo) {
+    return this({method: 'put', url: ('/api/users/' + userInfo.id), data: userInfo})
+        .then((serverResponse) => {
+            return serverResponse.data;
+        })
+};
+
+httpClient.deleteUser = function (userId) {
+    return this({method: 'delete', url: ('/api/users/' + userId)})
+        .then((serverResponse) => {
+            return serverResponse.data;
         })
 };
 

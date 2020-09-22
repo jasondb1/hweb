@@ -57,7 +57,7 @@ httpClient.newUser = function (userInfo) {
             if (serverResponse.data.success === true){
                 // sets token as an included header for all subsequent api requests
                 //this.defaults.headers.common.token = this.setToken(token);
-                return {message: 'New User Added', success: true};
+                return serverResponse.data;
             } else {
                 return {message: 'User Not Added', success: false};
             }

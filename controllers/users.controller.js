@@ -54,7 +54,8 @@ function register(req, res, next) {
 
     //TODO: Add error message to catch to send back to client
     userService.create(req.body)
-        .then(() => res.json({ message: 'New User Added', success: true}))
+        .then((user) => 
+        {res.json({ user: user, message: 'New User Added', success: true}) })
         .catch(next);
 }
 
@@ -86,11 +87,8 @@ function updateSchema(req, res, next) {
 }
 
 function update(req, res, next) {
-    //console.log("update user");
-    //console.log(req.params.id);
-    //console.log(req.body);
     userService.update(req.params.id, req.body)
-        .then(() => res.json({ message: 'User updated successfully' , success: true}))
+        .then((user) => res.json({ user: user, message: 'User updated successfully' , success: true}))
         .catch(next);
 }
 

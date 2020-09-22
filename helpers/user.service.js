@@ -39,9 +39,8 @@ async function getById(id) {
 }
 
 async function create(params) {
-    // validate
-    //console.log("create user");
-    //console.log(params);
+    
+    // validate (Add more if needed)
     if (params.admin === 'on')
         params.admin = 1;
 
@@ -55,33 +54,19 @@ async function create(params) {
     }
 
     // save user
-    await db.User.create(params);
+    let newUserId;
+    await db.User.create(params).then(user => newUserId = user.id);
+    const user = await getUser(newUserId);
+    return omitHash(user);
 }
 
-// async function create1(database, params) {
-//     // validate
-//     console.log("in create 1");
-//     console.log(database.User);
-//     console.log(params);
-
-//     if (await database.User.findOne({ where: { username: params.username } })) {
-//         throw 'Username "' + params.username + '" is already taken';
-//     }
-
-//     // hash password
-//     if (params.password) {
-//         params.hash = await bcrypt.hash(params.password, 10);
-//     }
-
-//     // save user
-//     await database.User.create(params);
-// }
-
 async function update(id, params) {
-    
+
+    if (params.admin === 'on')
+        params.admin = 1;
+
     // validate
-    const user = await getUser(id);
-    console.log(user);
+    let user = await getUser(id);
     const usernameChanged = params.username && user.username !== params.username;
     if (usernameChanged && await db.User.findOne({ where: { username: params.username } })) {
         throw 'Username "' + params.username + '" is already taken';
@@ -92,10 +77,6 @@ async function update(id, params) {
         params.hash = await bcrypt.hash(params.password, 10);
     }
 
-    // copy params to user and save
-    //Object.assign(user, params);
-    //await user.save();
-
     // Change User
     await db.User.update(params, {
         where: {
@@ -103,13 +84,13 @@ async function update(id, params) {
         }
     });
 
-    //return omitHash(user.get());
+    //reload updateduser
+    user = await getUser(id);
+
     return omitHash(user);
 }
 
 async function _delete(id) {
-    //const user = await getUser(id);
-    //console.log(user);
     await db.User.destroy({
         where: {
             id: id
@@ -126,10 +107,6 @@ async function getUser(id) {
 }
 
 function omitHash(user) {
-    //console.log("in omithash")
-    //console.log(user);
-    //const { hash, ...userWithoutHash } = user;
     const { hash, ...userWithoutHash } = user;
-    //console.log(userWithoutHash);
     return userWithoutHash;
 }

@@ -51,23 +51,42 @@ db.sequelize = sequelize;
 db.Sensor = require("./Sensor.js")(sequelize, Sequelize);
 db.User = require("./User.js")(sequelize, Sequelize);
 db.Role = require("./Role.js")(sequelize, Sequelize);
-
+db.Bed = require("./Bed.js")(sequelize, Sequelize);
+db.BedHistory = require("./BedHistory.js")(sequelize, Sequelize);
+db.BedPlanning = require("./BedPlanning.js")(sequelize, Sequelize);
+db.Crops = require("./Crops.js")(sequelize, Sequelize);
+db.Customer = require("./Customer.js")(sequelize, Sequelize);
+db.Farm = require("./Farm.js")(sequelize, Sequelize);
+db.Greenhouse = require("./Greenhouse.js")(sequelize, Sequelize);
+db.Harvest = require("./Harvest.js")(sequelize, Sequelize);
+db.Nursery = require("./Nursery.js")(sequelize, Sequelize);
+db.OrderItems = require("./OrderItems.js")(sequelize, Sequelize);
+db.Orders = require("./Orders.js")(sequelize, Sequelize);
+db.PlantedCrops = require("./PlantedCrops.js")(sequelize, Sequelize);
+db.Sales = require("./Sales.js")(sequelize, Sequelize);
+db.SoldItems = require("./SoldItems.js")(sequelize, Sequelize);
+db.Storage = require("./Storage.js")(sequelize, Sequelize);
 
 //Relations
 //db.sensor.belongsTo(db.x, {as: "Something", foreignKey:"userID"})
-//db.x.hasmany(db.x)
-//db.x.hasOne(db.x)
+//db.x.hasmany(db.x, {as: 'employes'} ) 1:n
+//db.x.hasmany(db.x, ) 
+//db.x.hasOne(db.x, ) 1:1
+//User.belongsTo(models.Company, {foreignKey: 'companyId', as: 'company'})
+//Company.hasMany(models.User, {as: 'employes'})
 db.Role.belongsToMany(db.User, {
   through: "user_roles",
   foreignKey: "roleId",
-  otherKey: "userId"
+  //otherKey: "userId"
 });
 
 db.User.belongsToMany(db.Role, {
   through: "user_roles",
   foreignKey: "userId",
-  otherKey: "roleId"
+  //otherKey: "roleId"
 });
+
+
 
 //console.log(db);
 //console.log("before sync");

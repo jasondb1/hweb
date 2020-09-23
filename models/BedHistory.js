@@ -1,5 +1,5 @@
 module.exports = (sequelize, type) => {
-    const Sensor = sequelize.define('sensor', {
+    const BedHistory = sequelize.define('bedhistory', {
         id: {
             type: type.INTEGER,
             primaryKey: true,
@@ -8,23 +8,25 @@ module.exports = (sequelize, type) => {
         BedId: {
             type: type.INTEGER,
         },
-        Timestamp: {
+        ActionDate: {
             type: type.DATE
         },
-        Sensor: {
-            type: type.STRING,
-            allowNull: false
-        },
-        Location: {
+        Action: {
             type: type.STRING
         },
-        SensorId: {
+        Amount: {
+            type: type.FLOAT,
+        },
+        Units: {
+            type: type.STRING
+        },
+        DoneBy: {
             type: type.INTEGER
         },
-        Value: {
-            type: type.FLOAT,
-        }
+        Notes: {
+            type: type.STRING,
+        },
     })
 
-  return Sensor;  
+    return BedHistory;
 };

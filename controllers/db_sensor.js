@@ -2,7 +2,7 @@ const DEBUG = false;
 const fs = require('fs');
 const LOG_FILEPATH = 'current_log.csv'; //move this to a config file
 let table = 'sensor_data';
-const {OP} = require('sequelize');
+const { OP } = require('sequelize');
 
 class Database {
 
@@ -19,7 +19,7 @@ class Database {
 
   insert(data) {
 
-    if (DEBUG){
+    if (DEBUG) {
       console.log("insert data:");
       console.log(data);
     }
@@ -76,12 +76,6 @@ class Database {
   //retrieve sensor data
   //default time is 24 hours
   getSensorData(sensor, time_prev, callback) {
-
-    //console.log(new Date());
-    //console.log(new Date(new Date() - time_prev));
-    //let time_now = new Date().getTime;
-    //let time_now = datetime.getTime();
-    //let time_threshold = Date.now() - time_prev;
     let values = null;
 
     values = this.db.Sensor.findAll({
@@ -93,23 +87,23 @@ class Database {
         }
       }
     })
-    .then ( (values) => {
-          if ((values) === null) {
+      .then((values) => {
+        if ((values) === null) {
           // throw err;
-            return callback(new Error("Error Retrieving Data"));
-          }
+          return callback(new Error("Error Retrieving Data"));
+        }
 
         if (DEBUG) {
           console.log("[getSensorData]");
           console.log("database data:");
           console.log(values);
         }
-      
-      return callback(null, values);
 
-    })
-    .catch(this.errHandler)
-    
+        return callback(null, values);
+
+      })
+      .catch(this.errHandler)
+
   };
 
   //export the data to a csv file

@@ -26,7 +26,6 @@ async function authenticate({ username, password }) {
 
     // authentication successful
     const token = jwt.sign({ sub: user.id }, secret, { expiresIn: '7d' });
-    //return { ...omitHash(user.get()), token };
     return { ...omitHash(user), token };
 }
 
@@ -86,7 +85,6 @@ async function update(id, params) {
 
     //reload updateduser
     user = await getUser(id);
-
     return omitHash(user);
 }
 

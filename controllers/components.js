@@ -1,7 +1,7 @@
 "use strict";
 const DEBUG = true;
 
-const dbController = require('./db_sensor_new.js');
+const dbController = require('./db_sensor.js');
 
 const Led = require('./Led.js');
 const GarageRelay = require('./GarageRelay.js');

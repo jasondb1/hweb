@@ -1,31 +1,41 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt-nodejs');
+module.exports = (sequelize, type) => {
+    const User = sequelize.define('User', {
+        id: {
+            type: type.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        admin: type.BOOLEAN,
+        name: type.STRING,
+        first_name: type.STRING,
+        last_name: type.STRING,
+        email: {
+            type: type.STRING,
+            allowNull: false,
+            unique: true
+        },
+        username: {
+            type: type.STRING,
+            allowNull: false,
+            unique: true
+        },
+        hash: {
+            type: type.STRING,
+            allowNull: false
+        },
+    },
+        {//options
+            defaultScope: {
+                // exclude hash by default
+                attributes: { exclude: ['hash'] }
+            },
+            scopes: {
+                // include hash with this scope
+                withHash: { attributes: {}, }
+            }
+        }
+    )
 
-const userSchema = new mongoose.Schema({
-    name: {type: String},
-    email: {type: String, required: true, unique: true},
-    admin: {type: Boolean},
-    password: {type: String, required: true}
-});
+    return User;
 
-// adds a method to a user document object to create a hashed password
-userSchema.methods.generateHash = function (password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8))
 };
-
-// adds a method to a user document object to check if provided password is correct
-userSchema.methods.validPassword = function (password) {
-    return bcrypt.compareSync(password, this.password)
-};
-
-// middleware: before saving, check if password was changed,
-// and if so, encrypt new password before saving:
-userSchema.pre('save', function (next) {
-    if (this.isModified('password')) {
-        this.password = this.generateHash(this.password)
-    }
-    next()
-});
-
-const User = mongoose.model('User', userSchema);
-module.exports = User;

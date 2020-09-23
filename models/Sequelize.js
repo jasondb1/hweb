@@ -49,7 +49,7 @@ db.sequelize = sequelize;
 
 //models/tables here
 db.Sensor = require("./Sensor.js")(sequelize, Sequelize);
-db.User = require("./User_sql.js")(sequelize, Sequelize);
+db.User = require("./User.js")(sequelize, Sequelize);
 db.Role = require("./Role.js")(sequelize, Sequelize);
 
 

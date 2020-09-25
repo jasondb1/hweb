@@ -84,14 +84,22 @@ db.User.belongsToMany(db.Role, {
   //otherKey: "roleId"
 });
 
-
 db.TaskItem.belongsTo(db.TaskList);
 db.TaskList.hasMany(db.TaskItem);
 db.TaskList.belongsTo(db.Farm);
 db.Farm.hasMany(db.TaskList);
 
-db.SensorData.hasMany(db.Sensor);
-db.Sensor.belongsTo(db.SensorData);
+//db.SensorData.hasMany(db.Sensor);
+//db.Sensor.belongsTo(db.SensorData);
+
+db.Bed.hasMany(db.Sensor);
+db.Sensor.belongsTo(db.Bed);
+
+db.Greenhouse.hasMany(db.Sensor);
+db.Sensor.belongsTo(db.Greenhouse);
+
+db.Nursery.hasMany(db.Sensor);
+db.Sensor.belongsTo(db.Nursery);
 
 db.Farm.hasMany(db.Bed);
 db.Bed.belongsTo(db.Farm);
@@ -188,8 +196,6 @@ db.Crops.belongsToMany(db.Storage, {
   //otherKey: "roleId"
 });
 
-db.Bed.hasMany(db.SensorData);
-db.SensorData.belongsTo(db.Bed);
 
 db.SoldItems.hasMany(db.Crops);
 db.Crops.belongsTo(db.SoldItems);

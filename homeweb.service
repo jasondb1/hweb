@@ -7,8 +7,8 @@ After=network.target
 Environment=NODE_PORT=3001
 Type=simple
 User=pi
-ExecStart=/usr/bin/node /home/pi/homeweb
-WorkingDirectory=/home/pi/homeweb
+ExecStart=/usr/bin/node /home/pi/hweb
+WorkingDirectory=/home/pi/hweb
 Restart=on-failure
 
 [Install]

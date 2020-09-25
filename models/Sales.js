@@ -5,14 +5,8 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             autoIncrement: true
         },
-        CropId: {
-            type: type.INTEGER,
-        },
         Customer: {
             type: type.STRING
-        },
-        CustomerID: {
-            type: type.INTEGER,
         },
         SaleDate: {
             type: type.DATE

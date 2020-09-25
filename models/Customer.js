@@ -8,9 +8,6 @@ module.exports = (sequelize, type) => {
         Name: {
             type: type.STRING
         },
-        CustomerID: {
-            type: type.INTEGER,
-        },
         CreatedDate: {
             type: type.DATE
         },

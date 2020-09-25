@@ -5,9 +5,6 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             autoIncrement: true
         },
-        BedId: {
-            type: type.INTEGER,
-        },
         ActionDate: {
             type: type.DATE
         },

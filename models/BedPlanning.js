@@ -1,12 +1,9 @@
 module.exports = (sequelize, type) => {
-    const BedHistory = sequelize.define('bedplanning', {
+    const BedPlanning = sequelize.define('bedplanning', {
         id: {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
-        },
-        BedId: {
-            type: type.INTEGER,
         },
         PlannedDate: {
             type: type.DATE
@@ -31,5 +28,5 @@ module.exports = (sequelize, type) => {
         },
     })
 
-    return BedHistory;
+    return BedPlanning;
 };

@@ -5,14 +5,6 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             autoIncrement: true
         },
-        CropId: {
-            type: type.INTEGER,
-            allowNull: false
-        },
-        BedId: {
-            type: type.INTEGER,
-            allowNull: true
-        },
         PlantingDate: {
             type: type.DATE
         },

@@ -8,10 +8,9 @@ const bcrypt = require('bcryptjs');
 newUser = { username: 'admin', password: 'Passw0rd', email: 'admin@test.com', admin: true };
 
 console.log("database in sql set admin");
-//create1(database, newUser);
 create(database, newUser);
 
-async function create1(database, params) {
+async function create(database, params) {
     // validate
 
     if (await database.User.findOne({ where: { username: params.username } })) {
@@ -29,6 +28,10 @@ async function create1(database, params) {
 
     // save user
     await database.User.create(params);
+
+    console.log("Set Admin user and password")
+    console.log("user: admin")
+    console.log("password: passw0rd")
 
 };
 

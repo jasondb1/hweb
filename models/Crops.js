@@ -60,6 +60,21 @@ module.exports = (sequelize, type) => {
         MaxIdealPh: {
             type: type.INTEGER
         },
+        OptimalSunlight: {
+            type: type.INTEGER
+        },
+        OptimalStorageTemp: {
+            type: type.INTEGER
+        },
+        OptimalLightPerDay: {
+            type: type.INTEGER
+        },
+        EstimatedValuePerUnit: {
+            type: type.FLOAT
+        },
+        Notes: {
+            type: type.STRING
+        },
     })
 
     return Crop;

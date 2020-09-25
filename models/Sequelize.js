@@ -48,6 +48,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 //models/tables here
+db.SensorData = require("./SensorData.js")(sequelize, Sequelize);
 db.Sensor = require("./Sensor.js")(sequelize, Sequelize);
 db.User = require("./User.js")(sequelize, Sequelize);
 db.Role = require("./Role.js")(sequelize, Sequelize);
@@ -66,14 +67,11 @@ db.PlantedCrops = require("./PlantedCrops.js")(sequelize, Sequelize);
 db.Sales = require("./Sales.js")(sequelize, Sequelize);
 db.SoldItems = require("./SoldItems.js")(sequelize, Sequelize);
 db.Storage = require("./Storage.js")(sequelize, Sequelize);
+db.TaskList = require("./TaskList.js")(sequelize, Sequelize);
+db.TaskItem = require("./TaskItem.js")(sequelize, Sequelize);
 
 //Relations
-//db.sensor.belongsTo(db.x, {as: "Something", foreignKey:"userID"})
-//db.x.hasmany(db.x, {as: 'employes'} ) 1:n
-//db.x.hasmany(db.x, ) 
-//db.x.hasOne(db.x, ) 1:1
-//User.belongsTo(models.Company, {foreignKey: 'companyId', as: 'company'})
-//Company.hasMany(models.User, {as: 'employes'})
+
 db.Role.belongsToMany(db.User, {
   through: "user_roles",
   foreignKey: "roleId",
@@ -87,7 +85,151 @@ db.User.belongsToMany(db.Role, {
 });
 
 
+db.TaskItem.belongsTo(db.TaskList);
+db.TaskList.hasMany(db.TaskItem);
+db.TaskList.belongsTo(db.Farm);
+db.Farm.hasMany(db.TaskList);
 
+db.SensorData.hasMany(db.Sensor);
+db.Sensor.belongsTo(db.SensorData);
+
+db.Farm.hasMany(db.Bed);
+db.Bed.belongsTo(db.Farm);
+
+db.Bed.hasMany(db.BedHistory);
+db.BedHistory.belongsTo(db.Bed);
+
+db.PlantedCrops.hasMany(db.Bed);
+db.Bed.belongsTo(db.PlantedCrops);
+
+db.PlantedCrops.hasMany(db.Crops);
+db.Crops.belongsTo(db.PlantedCrops);
+
+// db.PlantedCrops.belongsToMany(db.Bed, {
+//   through: "planted_beds",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+// db.Bed.belongsToMany(db.PlantedCrops, {
+//   through: "planted_beds",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+
+// db.PlantedCrops.belongsToMany(db.Crops, {
+//   through: "planted_crops",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+// db.Crops.belongsToMany(db.PlantedCrops, {
+//   through: "planted_crops",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+
+db.Bed.belongsToMany(db.Harvest, {
+  through: "harv_beds",
+  //foreignKey: "userId",
+  //otherKey: "roleId"
+});
+db.Harvest.belongsToMany(db.Bed, {
+  through: "harv_beds",
+  //foreignKey: "userId",
+  //otherKey: "roleId"
+});
+
+db.Harvest.hasMany(db.Crops);
+db.Crops.belongsTo(db.Harvest);
+
+db.Farm.hasMany(db.Greenhouse);
+db.Greenhouse.belongsTo(db.Farm);
+
+db.Customer.hasMany(db.Sales);
+db.Sales.belongsTo(db.Customer);
+
+db.Customer.hasMany(db.Orders);
+db.Orders.belongsTo(db.Customer);
+
+db.Nursery.hasMany(db.Crops);
+db.Crops.belongsTo(db.Nursery);
+
+db.Farm.hasMany(db.User);
+db.User.belongsTo(db.Farm);
+
+db.BedPlanning.hasMany(db.Crops);
+db.Crops.belongsTo(db.BedPlanning);
+
+db.BedPlanning.hasMany(db.Bed);
+db.Bed.belongsTo(db.BedPlanning);
+
+db.Farm.hasMany(db.Nursery);
+db.Nursery.belongsTo(db.Farm);
+
+db.Nursery.hasMany(db.Bed);
+db.Bed.belongsTo(db.Nursery);
+
+db.Farm.hasMany(db.Customer);
+db.Customer.belongsTo(db.Farm);
+
+db.Farm.hasMany(db.Crops);
+db.Crops.belongsTo(db.Farm);
+
+db.Greenhouse.hasMany(db.Bed);
+db.Bed.belongsTo(db.Greenhouse);
+
+db.Storage.belongsToMany(db.Crops, {
+  through: "stored_crops",
+  //foreignKey: "userId",
+  //otherKey: "roleId"
+});
+db.Crops.belongsToMany(db.Storage, {
+  through: "stored_crops",
+  //foreignKey: "userId",
+  //otherKey: "roleId"
+});
+
+db.Bed.hasMany(db.SensorData);
+db.SensorData.belongsTo(db.Bed);
+
+db.SoldItems.hasMany(db.Crops);
+db.Crops.belongsTo(db.SoldItems);
+
+db.Orders.hasMany(db.OrderItems);
+db.OrderItems.belongsTo(db.Orders);
+
+db.Sales.hasMany(db.SoldItems);
+db.SoldItems.belongsTo(db.Sales);
+
+db.SoldItems.hasMany(db.Crops);
+db.Crops.belongsTo(db.SoldItems);
+
+db.OrderItems.hasMany(db.Crops);
+db.Crops.belongsTo(db.OrderItems);
+
+//good to here
+
+// db.Bed.belongsToMany(db.SensorData, {
+//   through: "bed_sensors",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+// db.SensorData.belongsToMany(db.Bed, {
+//   through: "bed_sensors",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+
+
+// db.Harvest.belongsToMany(db.Crops, {
+//   through: "harvested_crops",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
+// db.Crops.belongsToMany(db.Harvest, {
+//   through: "harvested_crops",
+//   //foreignKey: "userId",
+//   //otherKey: "roleId"
+// });
 //console.log(db);
 //console.log("before sync");
 
@@ -100,19 +242,15 @@ let test = sequelize.authenticate()
   });
 
 
-db.sequelize.sync({ alter: true })
+//db.sequelize.sync({ force: true })
+//db.sequelize.sync({ alter: true })
+db.sequelize.sync()
   .then(function () {
     console.log("MariaDB Synchronized! ");
   })
   .catch(() => {
     console.log("error during sync")
   })
-
-
-// .then(() => {
-//   console.log('tables created/altered');
-//   _db = db;
-// })
 
 //initialize(db);
 

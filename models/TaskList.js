@@ -1,17 +1,14 @@
 module.exports = (sequelize, type) => {
-    const SoldItems = sequelize.define('solditems', {
+    const TaskList = sequelize.define('tasklist', {
         id: {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        Status: {
+        ListName: {
             type: type.STRING
         },
-        Quantity: {
-            type: type.FLOAT,
-        },
-        Units: {
+        Description: {
             type: type.STRING,
         },
         Notes: {
@@ -19,5 +16,5 @@ module.exports = (sequelize, type) => {
         },
     })
 
-    return SoldItems;
+    return TaskList;
 };

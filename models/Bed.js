@@ -18,10 +18,6 @@ module.exports = (sequelize, type) => {
         Location: {
             type: type.STRING
         },
-        FarmId: {
-            type: type.INTEGER,
-            allowNull: false
-        },
         ActiveBed: {
             type: type.BOOLEAN
         },

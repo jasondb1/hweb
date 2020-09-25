@@ -1,15 +1,9 @@
 module.exports = (sequelize, type) => {
-    const BedHistory = sequelize.define('bedhistory', {
+    const Harvest = sequelize.define('harvest', {
         id: {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
-        },
-        BedId: {
-            type: type.INTEGER,
-        },
-        CropId: {
-            type: type.INTEGER,
         },
         HarvestDate: {
             type: type.DATE
@@ -23,16 +17,16 @@ module.exports = (sequelize, type) => {
         CropAge: {
             type: type.INTEGER
         },
-                HarvestedBy: {
-           type: type.INTEGER 
+        HarvestedBy: {
+            type: type.INTEGER
         },
         Quality: {
-           type: type.INTEGER 
+            type: type.INTEGER
         },
         Notes: {
             type: type.STRING,
         },
     })
 
-    return BedHistory;
+    return Harvest;
 };

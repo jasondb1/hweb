@@ -245,7 +245,7 @@ void readSensors() {
   valuePhotoResistor = analogRead(pinLightSensor);
   valueTemperature = dataSmooth(historyTemperature);
   valueHumidity = dataSmooth(historyHumidity);
-  valueReservoirDepth = RESERVOIR_BOTTOM - averageDistance(5);
+  valueReservoirDepth = RESERVOIR_BOTTOM - averageDistance(3);
 
   index = (index + 1) % SAMPLES;
 

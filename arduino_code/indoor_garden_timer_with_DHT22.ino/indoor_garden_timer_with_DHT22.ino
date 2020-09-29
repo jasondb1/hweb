@@ -34,7 +34,8 @@
 #define MAX_SENT_BYTES 3
 
 //Reservoir - distance from sensor to bottom of reservoir
-#define RESERVOIR_BOTTOM 45
+#define RESERVOIR_BOTTOM 450  //mm to bottom of reservoir
+#define RESERVOIR_TOP 20 //
 
 
 //convenience definitions

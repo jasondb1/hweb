@@ -17,8 +17,6 @@
 //hardware parameters
 #define PUMPPIN 6
 #define LIGHTPIN 7
-#define FANPIN 5      //currently not used
-#define RESERVEDPIN 4
 #define P_RESISTOR A2
 #define ECHOPIN 8
 #define TRIGPIN 9
@@ -26,7 +24,7 @@
 #define DHTTYPE DHT22
 
 //behaviour parameters
-#define DELAY 2500 // 2 seconds between updates - saves power so cpu is not always running
+#define DELAY 2000 // 2 seconds between updates - saves power so cpu is not always running
 #define SAMPLES  5//number of points to average to determine valid data points
 
 //Communication parameters
@@ -264,7 +262,14 @@ int averageDistance(int samples){
   
   for (int x = 0; x < samples; x++){
     sum += readDistance();
+    Serial.print(sum);
   }
+
+   #ifdef DEBUG
+    Serial.print("Avg Dist: ");
+    Serial.print(sum/samples);
+    Serial.println(" cm");
+  #endif
   
   return (sum / samples);  
   
@@ -283,7 +288,7 @@ int readDistance(){
 
   // Clears the TRIGPIN condition
   digitalWrite(TRIGPIN, LOW);
-  delayMicroseconds(2);
+  delayMicroseconds(4);
   // Sets the TRIGPIN HIGH for 10 microseconds
   digitalWrite(TRIGPIN, HIGH);
   delayMicroseconds(10);
@@ -291,13 +296,16 @@ int readDistance(){
   // Reads the ECHOPIN, returns the sound wave travel time in microseconds
   duration = pulseIn(ECHOPIN, HIGH);
   // Calculating the distance
-  distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (there and back)
+  //distance = duration * 0.0343 / 2; // Speed of sound wave divided by 2 (there and back)
+  distance = duration * 0.343 / 2; // Speed of sound wave divided by 2 (there and back) in mm
 
   #ifdef DEBUG
     Serial.print("Distance: ");
     Serial.print(distance);
-    Serial.println(" cm");
+    Serial.println(" mm");
   #endif
+
+  return distance;
 
 }
 
@@ -369,7 +377,7 @@ void receiveEvent(int bytesReceived) {
 
   #ifdef DEBUG
     Serial.print("data received: ");
-    Serial.println(number);
+    Serial.println(bytesReceived);
   #endif
     
   }
@@ -451,8 +459,8 @@ void requestEvent() {
     Serial.print("\n---Sending");
     Serial.println(valuePhotoResistor);
     Serial.println(valueTemperature/100);
-    Serial.println(valueTemperature%100);
-    Serial.println(valueTemperature);
+    //Serial.println(valueTemperature%100);
+    Serial.println(valueReservoirDepth);
     Serial.println(sysmode);
     delay(250);
   #endif
@@ -460,8 +468,9 @@ void requestEvent() {
   //do this to send integers and split float into integers
   int valTemp = valueTemperature * 100;
   int valHum = valueHumidity * 10;
-  //unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
+
   if (outputText){
+     unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
     //buffer
     sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysmode, statusLightOn, statusPumpOn, secondsToLightOff);
   
@@ -473,7 +482,7 @@ void requestEvent() {
     if (statusLightOn){
       unsigned int minutesToLightOff = (lightOffAt - millis()) / 60000;
       //longToCharBuffer(buffer_out, 6, (lightOffAt - millis()) );
-      intToCharBuffer(buffer_out, 6, (minutesToLightOff);
+      intToCharBuffer(buffer_out, 6, minutesToLightOff);
     } else {
       unsigned int minutesToLightOn = (lightOnAt - millis()) / 60000;
       intToCharBuffer(buffer_out, 6, minutesToLightOn );

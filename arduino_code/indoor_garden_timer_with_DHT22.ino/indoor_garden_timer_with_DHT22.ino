@@ -491,10 +491,10 @@ void requestEvent() {
     longToCharBuffer(buffer_out, 8, lightDurMillis /60000);
     longToCharBuffer(buffer_out, 10, floodIntMillis / 60000);
     longToCharBuffer(buffer_out, 12, floodDurMillis / 60000);
-    buffer_out[13] = sysmode;
-    buffer_out[14] = statusLightOn;
-    buffer_out[15] = statusPumpOn;
-    intToCharBuffer(buffer_out, 16, valueReservoirDepth);
+    buffer_out[14] = sysmode;
+    buffer_out[15] = statusLightOn;
+    buffer_out[16] = statusPumpOn;
+    intToCharBuffer(buffer_out, 17, valueReservoirDepth);
     //reserve byte for fan status
 
   }

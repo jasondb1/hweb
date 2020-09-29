@@ -17,6 +17,8 @@
 //hardware parameters
 #define PUMPPIN 6
 #define LIGHTPIN 7
+#define FANPIN 5      //currently not used
+#define RESERVEDPIN 4
 #define P_RESISTOR A2
 #define ECHOPIN 8
 #define TRIGPIN 9
@@ -24,7 +26,7 @@
 #define DHTTYPE DHT22
 
 //behaviour parameters
-#define DELAY 2000 // 2 seconds between updates - saves power so cpu is not always running
+#define DELAY 2500 // 2 seconds between updates - saves power so cpu is not always running
 #define SAMPLES  5//number of points to average to determine valid data points
 
 //Communication parameters

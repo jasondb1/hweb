@@ -22,6 +22,7 @@ const Navmenu = (props) => {
                 <Link className='nav-link' to="/main/garage" onClick={props.toggleNavMenu}><img alt="" className="icon" src={garageicon} height='32' />Garage</Link>
                 <Link className='nav-link' to="/main/climate" onClick={props.toggleNavMenu}><img alt="" className="icon" src={climateicon} height='32' />Climate</Link>
                 <Link className='nav-link' to="/main/hydroponics" onClick={props.toggleNavMenu}><img alt="" className="icon" src={hydroponicicon} height='32' />Hydroponics</Link>
+                <Link className='nav-link' to="/main/weathers" onClick={props.toggleNavMenu}><img alt="" className="icon" src={climateicon} height='32' />Hydroponics</Link>
                 <Link className='nav-link' to="/main/test" onClick={props.toggleNavMenu}><img alt="" className="icon" src={othericon} height='32' />Other Controls</Link>
                         {props.isAdmin ?
                             <Link className='nav-link' to="/main/admin" onClick={props.toggleNavMenu}><img alt=""

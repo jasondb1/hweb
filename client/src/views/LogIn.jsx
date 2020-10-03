@@ -1,8 +1,6 @@
 import React from 'react'
 import httpClient from '../services/httpClient'
 
-//import { authenticate } from '../services/socket';
-
 class LogIn extends React.Component {
     state = {
         fields: {username: '', email: '', password: ''}
@@ -41,14 +39,6 @@ class LogIn extends React.Component {
                             <div className='form-group'>
                                 <div className="input-group mb-3">
                                     <div className="input-group-prepend">
-                                        <span className="input-group-text" id="inputGroup-sizing-default">Email</span>
-                                    </div>
-                                    <input className='form-control' type="text" placeholder="Email" name="email"
-                                           defaultValue={email}/>
-                                </div>
-
-                                <div className="input-group mb-3">
-                                    <div className="input-group-prepend">
                                         <span className="input-group-text" id="inputGroup-sizing-default">Username</span>
                                     </div>
                                     <input className='form-control' type="text" placeholder="username" name="username"
@@ -62,7 +52,6 @@ class LogIn extends React.Component {
                                     <input className='form-control' type="password" placeholder="Password" name="password"
                                            defaultValue={password}/>
                                 </div>
-
                                 <button className='btn btn-primary'>Log In</button>
                             </div>
 

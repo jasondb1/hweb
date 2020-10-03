@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './SensorChart.css';
-import { authSocket } from "../services/socket";
+//import { authSocket } from "../services/socket";
 import * as d3 from 'd3';
 
 //let CHART_WIDTH = 600;
@@ -28,8 +28,7 @@ let valueline = d3.line()
     .y(function(d) { return y(d.Value); });
 
 //remove old chart
-    //d3.select("#" + chartId + ' svg').remove()
-    d3.select("#" + chartId + ' svg > * ').remove()
+    d3.select("#" + chartId + ' svg').remove()
 
 // append the svg obgect to the body of the page
 // appends a 'group' element to 'svg'
@@ -80,7 +79,7 @@ class Chart extends Component {
         this.state = {
             label: 'Chart',
             component: 'unknown',
-            data: {},
+            //data: props.data,
             chartWidth: 600,
             chartHeight: 400,
             chartId: "chart",
@@ -91,40 +90,51 @@ class Chart extends Component {
     componentDidMount() {
 
         //this.socket = getAuthSocket();
-        this.socket = authSocket();
+        //this.socket = authSocket();
         //console.log (authSocket.getInstance());
 
-        this.socket.emit('requestData', {sensor:this.props.sensor, timeBack:1440} );
+        //this.socket.emit('requestData', {sensor:this.props.sensor, timeback:1440} );
         
         //retrieve data
-        this.socket.on('incomingData', (payload) => {
-            //console.log(payload);
-            this.setState({ data: payload });
-            drawLineChart(this.state.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);
-        });
+        // this.socket.on('incomingData', (payload) => {
+        //     //console.log(payload);
+        //     this.setState({ data: payload });
+        //     drawLineChart(this.state.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);
+        // });
+        //if (this.props.data)
+            //drawLineChart(this.props.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);
     }
 
     componentWillUnmount() {
-        this.socket.close();
+        //this.socket.close();
     }
 
-    setSensor (sensor) {
-        this.setState({sensor: sensor});
-    }
+    // setSensor (sensor) {
+    //     this.setState({sensor: sensor});
+    // }
 
-    handleClickButton(value){
-        this.socket.emit('requestData', {sensor:this.props.sensor, timeBack:value} );
+    // handleClickButton(value){
+    //     this.socket.emit('requestData', {sensor:this.props.sensor, timeback:value} );
+    // }
+
+    componentDidUpdate() {
+
+        console.log("update chart");
+
+        if (this.props.data)
+            drawLineChart(this.props.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);
     }
 
     render() {
         return ( <div id={this.props.sensor}>
+
             {/* <svg id = "visualisationi"
             width = "600"
             height = "400"> 
             </svg>  */}
                 {/*</div>
             <div>*/}
-                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                {/* <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
                         onClick={this.handleClickButton.bind(this, 10080)}
                 >1 week
                 </button>
@@ -143,7 +153,7 @@ class Chart extends Component {
                 <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
                     onClick={this.handleClickButton.bind(this, 60)}
                 >1 hour</button>
-                <br/>
+                <br/> */}
             </div>
         );
     }

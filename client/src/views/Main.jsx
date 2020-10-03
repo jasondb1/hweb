@@ -11,7 +11,9 @@ import Hydroponics from "../components/Hydroponic";
 import SignUp from "../components/SignUp";
 import Test from "../components/Test";
 import Footer from "../components/Footer";
-import httpClient from '../services/httpClient'
+import httpClient from '../services/httpClient';
+
+import Database from '../components/Database';
 
 class Main extends Component {
 
@@ -66,6 +68,7 @@ class Main extends Component {
                         <Route path={`${match.path}/garage`} {...this.props} component={Garage}/>
                         <Route path={`${match.path}/climate`} {...this.props} component={Climate}/>
                         <Route path={`${match.path}/hydroponics`} {...this.props} component={Hydroponics}/>
+                        <Route path={`${match.path}/database`} {...this.props} component={Database}/>
                         <Route path={`${match.path}/admin`} {...this.props} isAdmin={this.state.isAdmin} component={SignUp}/>
                         <Route path={`${match.path}/test`} {...this.props} component={Test}/>
                     </div>

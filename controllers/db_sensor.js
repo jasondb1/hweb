@@ -104,6 +104,46 @@ class Database {
 
   };
 
+  //retrieve multiple sensor data
+  //default time is 24 hours
+  //get multiple sensor data from latestTime and 
+  getMultipleSensorData(sensors, timeBack, callback) {
+    let values = null;
+
+    //TODO: only get values that are newer than latestTime for better caching
+    //console.log("getMultipleSensorData:");
+    //console.log(timeBack);
+
+    values = this.db.SensorData.findAll({
+      attributes: ['Timestamp', 'Value', 'Sensor'],
+      where: {
+        Sensor: {
+          [this.db.Sequelize.Op.or]: sensors
+        },
+        Timestamp: {
+          [this.db.Sequelize.Op.gt]: new Date(new Date() - timeBack)
+        }
+      }
+    })
+      .then((values) => {
+        if ((values) === null) {
+          // throw err;
+          return callback(new Error("Error Retrieving Data"));
+        }
+
+        if (DEBUG) {
+          console.log("[getSensorData]");
+          console.log("database data:");
+          console.log(values);
+        }
+
+        return callback(null, values);
+
+      })
+      .catch(this.errHandler)
+
+  };
+
   //export the data to a csv file
   exportData(filter = '1', filename = LOG_FILEPATH) {
 

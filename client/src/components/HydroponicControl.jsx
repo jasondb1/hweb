@@ -1,7 +1,9 @@
+//import { Timestamp } from 'bson';
 import React, { Component } from 'react';
 import { authSocket } from "../services/socket";
 import './HydroponicControl.css';
-import Chart from './SensorChart';
+//import Chart from './SensorChart';
+import Chart from './SensorChartAlt';
 const climateIcon = require('../icons/icons8-temperature-50.png');
 const humidityIcon = require('../icons/icons8-humidity-80.png');
 const reservoirIcon = require('../icons/icons8-hygrometer-50.png');
@@ -22,21 +24,8 @@ function timeLightOnOff(value) {
     now += value * 1000;
     now = new Date(now);
 
-    return now;
+    return (now.getHours() + ':' + pad(now.getMinutes()));
 }
-
-// function timeLightOn(secondsToLightOff, lightDuration) {
-
-//         let now = Date.now();
-
-//         now += secondsToLightOff * 1000; //calculate when light goes on
-//         now -= lightDuration;
-//         now += 86400000; //add one day
-
-//         now = new Date(now);
-
-//         return now;
-// }
 
 class HydroponicControl extends Component {
 
@@ -46,8 +35,13 @@ class HydroponicControl extends Component {
         this.state = {
             label: 'Hydroponic Control',
             component: 'hydroponicControl',
-            status: { hydroponicControl: {} }
+            status: { hydroponicControl: {} },
+            //data: {},
+            chartData:{},
+            lightStatus: null,
         };
+
+        this.dataArray = {};
 
         this.handleClickOff = this.handleClickOff.bind(this);
         this.handleClickAuto = this.handleClickAuto.bind(this);
@@ -56,9 +50,37 @@ class HydroponicControl extends Component {
     }
 
     componentDidMount() {
-
-        //this.socket = getAuthSocket();
         this.socket = authSocket();
+
+        //get cached data
+        //this.dataArray = JSON.parse(localStorage.getItem('sensorData'));
+        //get sensor data from at last timestamp to current
+        // if (this.dataArray){
+        // let newestDate = JSON.stringify(this.dataArray.reduce(function(prev, current) { 
+        //             return (prev.Timestamp > current.Timestamp) ? prev : current 
+        //         }));
+        // this.socket.emit('requestMultipleSensorData', {sensors:['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], time: newestDate.Timestamp} );
+        // } else {
+        //this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: 1440 });
+        this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: 60 });
+
+
+        this.socket.on('incomingMultipleSensorData', (payload) => {
+            //console.log(payload);
+
+            this.dataArray = [];
+
+            for (let element of payload) {
+                if(this.dataArray[element.Sensor]){
+                    this.dataArray[element.Sensor].push(element);
+                } else {
+                    this.dataArray[element.Sensor] = [element];
+                }
+            }
+
+            this.setState({chartData: this.dataArray});
+
+        });
 
         this.socket.on('componentStatusUpdate', (data) => {
             this.setState(data);
@@ -66,15 +88,34 @@ class HydroponicControl extends Component {
         });
 
         this.socket.on('updates', (payload) => {
-            this.setState({ status: payload });
-            //console.log(payload);
-            //console.log(this.state);
+            //this.setState({ status: payload });
+            //console.log("update:")
+
+            let sensorKeys = ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'];
+            let incomingData;
+
+            for (let key of sensorKeys) {
+                incomingData = {
+                    Timestamp: payload.ts,
+                    Sensor: key,
+                    Value: payload[key],
+                };
+
+                if (this.dataArray[key] && this.dataArray[key].length > 0) {
+                    this.dataArray[key].push(incomingData);
+                }
+            }
+
+            this.setState({status: payload, chartData: this.dataArray});
 
         });
     }
 
     componentWillUnmount() {
         this.socket.close();
+
+        //set cache storage
+        localStorage.setItem('sensorData', JSON.stringify(this.dataArray));
     }
 
     handleClickOff() {
@@ -99,6 +140,10 @@ class HydroponicControl extends Component {
         this.socket.emit('hydroponicCommand', value);
     }
 
+    handleClickButtonTime(value){
+         this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: value });
+    }
+
     render() {
         return (
             <div className='row align-items-center justify-content-center'>
@@ -115,9 +160,9 @@ class HydroponicControl extends Component {
                                 height="40" />
                             {this.state.status.hydroponicLightLevel}
                         </li>
-                        <li><img  className="mr-3" src={reservoirIcon} alt="" width="40"
-                            height="40" /> 
-                            {this.state.status.hydroponicReservoirDepth} cm
+                        <li><img className="mr-3" src={reservoirIcon} alt="" width="40"
+                            height="40" />
+                            {this.state.status.hydroponicReservoirDepth} mm
                         </li>
                         <li>
                             <img className="mr-3" src={floodIcon} alt="" width="40"
@@ -129,9 +174,9 @@ class HydroponicControl extends Component {
                                 height="40" />
                             {this.state.status.hydroponicLightStatus === 0 ? <span className="badge badge-danger">OFF</span> : <span className="badge badge-success">ON</span>}
                         </li>
-                       <li>
-                            Light {this.state.status.hydroponicControl.lightStatus === 0 ? "On" : "Off"}: {Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff / 3660)}:{pad(Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff % 3600 / 60))} Hours
-                            <br /> ({timeLightOnOff(this.state.status.hydroponicControl.secondsToLightOnOff).toLocaleString()})
+                        <li>
+                            Light {this.state.status.hydroponicControl.lightStatus === 0 ? "On" : "Off"} in: {Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff / 3660)}:{pad(Math.floor(this.state.status.hydroponicControl.secondsToLightOnOff % 3600 / 60))} Hours
+                             ({timeLightOnOff(this.state.status.hydroponicControl.secondsToLightOnOff)})
                     </li>
                     </ul>
                 </div>
@@ -171,15 +216,13 @@ class HydroponicControl extends Component {
                         onClick={this.handleClickButton.bind(this, 12)}
                     >
                         <span>-15</span>
-                        <img src={downIcon} alt="" width="20"
-                            height="20" />
+
                     </button>
                     <span className="buttonLabel">Light Cycle Start</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 11)}
                     >
-                        <img src={upIcon} alt="" width="20"
-                            height="20" />
+
                         <span>+15</span>
                     </button>
 
@@ -188,15 +231,11 @@ class HydroponicControl extends Component {
                         onClick={this.handleClickButton.bind(this, 6)}
                     >
                         <span>-15</span>
-                        <img src={downIcon} alt="" width="20"
-                            height="20" />
                     </button>
                     <span className="buttonLabel">{this.state.status.hydroponicControl.lightDuration / 60} hrs Light On Duration</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 5)}
                     >
-                        <img src={upIcon} alt="" width="20"
-                            height="20" />
                         <span>+15</span>
                     </button>
                     <br />
@@ -205,15 +244,11 @@ class HydroponicControl extends Component {
                         onClick={this.handleClickButton.bind(this, 8)}
                     >
                         <span>-5</span>
-                        <img src={downIcon} alt="" width="20"
-                            height="20" />
                     </button>
                     <span className="buttonLabel">{this.state.status.hydroponicControl.floodInterval} min Pump Cycle</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 7)}
                     >
-                        <img src={upIcon} alt="" width="20"
-                            height="20" />
                         <span>+5</span>
                     </button>
 
@@ -222,28 +257,45 @@ class HydroponicControl extends Component {
                         onClick={this.handleClickButton.bind(this, 10)}
                     >
                         <span>-1</span>
-                        <img src={downIcon} alt="" width="20"
-                            height="20" />
                     </button>
                     <span className="buttonLabel">{this.state.status.hydroponicControl.floodDuration} min Pump Duration</span>
                     <button className="smallButton"
                         onClick={this.handleClickButton.bind(this, 9)}
                     >
-                        <img src={upIcon} alt="" width="20"
-                            height="20" />
                         <span>+1</span>
                     </button>
 
                     <br />
+                    <hr/>
+                                    <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        onClick={this.handleClickButtonTime.bind(this, 10080)}
+                >1 week
+                </button>
+                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        onClick={this.handleClickButtonTime.bind(this, 1440)}
+                >24 hours
+                </button>
+                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                    onClick={this.handleClickButtonTime.bind(this, 720)}
+                >12 hour
+                </button>
+                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                    onClick={this.handleClickButtonTime.bind(this, 360)}
+                >6 hour
+                </button>
+                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                    onClick={this.handleClickButtonTime.bind(this, 60)}
+                >1 hour</button>
+                <br/>
                     <hr />
+                    <div></div>
                     <h3>Temperature</h3>
-                    <Chart sensor="hydroponicTemperature" />
-                    <hr />
+                    <Chart sensor="hydroponicTemperature" data={this.state.chartData.hydroponicTemperature} timeback={1440} />
                     <h3>Humidity</h3>
-                    <Chart sensor="hydroponicHumidity" />
+                    <Chart sensor="hydroponicHumidity" data={this.state.chartData.hydroponicHumidity} timeback={1440} />
                     <hr />
                     <h3>Reservoir Depth</h3>
-                    <Chart sensor="hydroponicReservoirDepth" />
+                    <Chart sensor="hydroponicReservoirDepth" data={this.state.chartData.hydroponicReservoirDepth} timeback={1440} />
                 </div>
             </div>
         );

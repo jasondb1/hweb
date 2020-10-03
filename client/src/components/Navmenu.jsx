@@ -7,6 +7,7 @@ const dashboardicon = require('../icons/icons8-dashboard-50.png');
 const garageicon = require('../icons/icons8-garage-50-7.png');
 const climateicon = require('../icons/icons8-temperature-50.png');
 const hydroponicicon = require('../icons/icons8-temperature-50.png');
+const databaseicon = require('../icons/icons8-dashboard-50.png');
 const othericon = require('../icons/icons8-content-50.png');
 const adminicon = require('../icons/icons8-user-group-50.png');
 const logouticon = require('../icons/icons8-exit-50.png');
@@ -22,6 +23,7 @@ const Navmenu = (props) => {
                 <Link className='nav-link' to="/main/garage" onClick={props.toggleNavMenu}><img alt="" className="icon" src={garageicon} height='32' />Garage</Link>
                 <Link className='nav-link' to="/main/climate" onClick={props.toggleNavMenu}><img alt="" className="icon" src={climateicon} height='32' />Climate</Link>
                 <Link className='nav-link' to="/main/hydroponics" onClick={props.toggleNavMenu}><img alt="" className="icon" src={hydroponicicon} height='32' />Hydroponics</Link>
+                <Link className='nav-link' to="/main/database" onClick={props.toggleNavMenu}><img alt="" className="icon" src={databaseicon} height='32' />Database</Link>
                 <Link className='nav-link' to="/main/test" onClick={props.toggleNavMenu}><img alt="" className="icon" src={othericon} height='32' />Other Controls</Link>
                         {props.isAdmin ?
                             <Link className='nav-link' to="/main/admin" onClick={props.toggleNavMenu}><img alt=""

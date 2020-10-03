@@ -34,7 +34,8 @@
 #define MAX_SENT_BYTES 3
 
 //Reservoir - distance from sensor to bottom of reservoir
-#define RESERVOIR_BOTTOM 45
+#define RESERVOIR_BOTTOM 450  //mm to bottom of reservoir
+#define RESERVOIR_TOP 20 //
 
 
 //convenience definitions
@@ -244,7 +245,7 @@ void readSensors() {
   valuePhotoResistor = analogRead(pinLightSensor);
   valueTemperature = dataSmooth(historyTemperature);
   valueHumidity = dataSmooth(historyHumidity);
-  valueReservoirDepth = RESERVOIR_BOTTOM - averageDistance(5);
+  valueReservoirDepth = RESERVOIR_BOTTOM - averageDistance(3);
 
   index = (index + 1) % SAMPLES;
 
@@ -262,7 +263,14 @@ int averageDistance(int samples){
   
   for (int x = 0; x < samples; x++){
     sum += readDistance();
+    Serial.print(sum);
   }
+
+   #ifdef DEBUG
+    Serial.print("Avg Dist: ");
+    Serial.print(sum/samples);
+    Serial.println(" cm");
+  #endif
   
   return (sum / samples);  
   
@@ -281,7 +289,7 @@ int readDistance(){
 
   // Clears the TRIGPIN condition
   digitalWrite(TRIGPIN, LOW);
-  delayMicroseconds(2);
+  delayMicroseconds(4);
   // Sets the TRIGPIN HIGH for 10 microseconds
   digitalWrite(TRIGPIN, HIGH);
   delayMicroseconds(10);
@@ -289,13 +297,16 @@ int readDistance(){
   // Reads the ECHOPIN, returns the sound wave travel time in microseconds
   duration = pulseIn(ECHOPIN, HIGH);
   // Calculating the distance
-  distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (there and back)
+  //distance = duration * 0.0343 / 2; // Speed of sound wave divided by 2 (there and back)
+  distance = duration * 0.343 / 2; // Speed of sound wave divided by 2 (there and back) in mm
 
   #ifdef DEBUG
     Serial.print("Distance: ");
     Serial.print(distance);
-    Serial.println(" cm");
+    Serial.println(" mm");
   #endif
+
+  return distance;
 
 }
 
@@ -367,7 +378,7 @@ void receiveEvent(int bytesReceived) {
 
   #ifdef DEBUG
     Serial.print("data received: ");
-    Serial.println(number);
+    Serial.println(bytesReceived);
   #endif
     
   }
@@ -449,8 +460,8 @@ void requestEvent() {
     Serial.print("\n---Sending");
     Serial.println(valuePhotoResistor);
     Serial.println(valueTemperature/100);
-    Serial.println(valueTemperature%100);
-    Serial.println(valueTemperature);
+    //Serial.println(valueTemperature%100);
+    Serial.println(valueReservoirDepth);
     Serial.println(sysmode);
     delay(250);
   #endif
@@ -458,8 +469,9 @@ void requestEvent() {
   //do this to send integers and split float into integers
   int valTemp = valueTemperature * 100;
   int valHum = valueHumidity * 10;
-  //unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
+
   if (outputText){
+     unsigned long secondsToLightOff = (lightOffAt - millis()) / 1000;
     //buffer
     sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysmode, statusLightOn, statusPumpOn, secondsToLightOff);
   
@@ -471,18 +483,18 @@ void requestEvent() {
     if (statusLightOn){
       unsigned int minutesToLightOff = (lightOffAt - millis()) / 60000;
       //longToCharBuffer(buffer_out, 6, (lightOffAt - millis()) );
-      intToCharBuffer(buffer_out, 6, (minutesToLightOff);
+      intToCharBuffer(buffer_out, 6, minutesToLightOff);
     } else {
       unsigned int minutesToLightOn = (lightOnAt - millis()) / 60000;
       intToCharBuffer(buffer_out, 6, minutesToLightOn );
     }
-    longToCharBuffer(buffer_out, 8, lightDurMillis /60000);
-    longToCharBuffer(buffer_out, 10, floodIntMillis / 60000);
-    longToCharBuffer(buffer_out, 12, floodDurMillis / 60000);
-    buffer_out[13] = sysmode;
-    buffer_out[14] = statusLightOn;
-    buffer_out[15] = statusPumpOn;
-    intToCharBuffer(buffer_out, 16, valueReservoirDepth);
+    intToCharBuffer(buffer_out, 8, lightDurMillis /60000);
+    intToCharBuffer(buffer_out, 10, floodIntMillis / 60000);
+    intToCharBuffer(buffer_out, 12, floodDurMillis / 60000);
+    buffer_out[14] = sysmode;
+    buffer_out[15] = statusLightOn;
+    buffer_out[16] = statusPumpOn;
+    intToCharBuffer(buffer_out, 17, valueReservoirDepth);
     //reserve byte for fan status
 
   }

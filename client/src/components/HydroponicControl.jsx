@@ -160,13 +160,8 @@ class HydroponicControl extends Component {
                                 height="40" />
                             {this.state.status.hydroponicLightLevel}
                         </li>
-<<<<<<< HEAD
                         <li><img className="mr-3" src={reservoirIcon} alt="" width="40"
                             height="40" />
-=======
-                        <li><img  className="mr-3" src={reservoirIcon} alt="" width="40"
-                            height="40" /> 
->>>>>>> 184b09d840f012aca7d1c1eaad6dfae6850cf153
                             {this.state.status.hydroponicReservoirDepth} mm
                         </li>
                         <li>

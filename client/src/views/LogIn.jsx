@@ -28,7 +28,7 @@ class LogIn extends React.Component {
     };
 
     render() {
-        const {username, email, password} = this.state.fields;
+        const {username, password} = this.state.fields;
         return (
             <div className='LogIn'>
                 <div className='row'>

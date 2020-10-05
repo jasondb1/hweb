@@ -16,6 +16,7 @@ const db = require("./models/Sequelize.js");
 const componentsio = require('./routes/componentsio.js')(io, db);
 const components = require('./routes/components');
 const usersRoutes = require('./routes/users.controller.js');
+const databaseRoutes = require('./routes/databaseRoutes.js');
 const errorHandler = require('./middleware/error-handler.js');
 
 const https = require('https');
@@ -51,6 +52,7 @@ app.get('/api', (req, res) => {
 
 // api routes
 app.use('/api/users', usersRoutes);
+app.use('/api/database', databaseRoutes);
 app.use('/api', components);
 
 app.use('*', (req, res) => {

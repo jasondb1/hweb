@@ -18,6 +18,7 @@ const sequelize = new Sequelize(
   dialectOptions: {
     encrypt: true
   },
+  //timezone: "Canada/Mountain",
   query: { raw: true }
 }
 );

@@ -119,7 +119,7 @@ class Chart extends Component {
 
     componentDidUpdate() {
 
-        console.log("update chart");
+        //console.log("update chart");
 
         if (this.props.data)
             drawLineChart(this.props.data, this.state.chartWidth, this.state.chartHeight, this.props.sensor);

@@ -69,6 +69,7 @@ class Main extends Component {
                         <Route path={`${match.path}/garage`} {...this.props} component={Garage}/>
                         <Route path={`${match.path}/climate`} {...this.props} component={Climate}/>
                         <Route path={`${match.path}/hydroponics`} {...this.props} component={Hydroponics}/>
+                        <Route path={`${match.path}/weather`} {...this.props} component={Weather}/>
                         <Route path={`${match.path}/database`} {...this.props} component={Database}/>
                         <Route path={`${match.path}/admin`} {...this.props} isAdmin={this.state.isAdmin} component={SignUp}/>
                         <Route path={`${match.path}/test`} {...this.props} component={Test}/>

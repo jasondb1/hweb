@@ -10,8 +10,8 @@ const reservoirIcon = require('../icons/icons8-hygrometer-50.png');
 const lightIcon = require('../icons/icons8-light-on-80.png');
 const floodIcon = require('../icons/icons8-irrigation-50.png');
 const lightOffIcon = require('../icons/icons8-light-off-80.png');
-const upIcon = require('../icons/icons8-sort-up-50.png');
-const downIcon = require('../icons/icons8-sort-down-50.png');
+//const upIcon = require('../icons/icons8-sort-up-50.png');
+//const downIcon = require('../icons/icons8-sort-down-50.png');
 
 function pad(n) {
     return (n < 10) ? ("0" + n) : n;

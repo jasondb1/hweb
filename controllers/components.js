@@ -108,19 +108,19 @@ class ComponentsCtrl {
             hydroponicLightStatus: {
                 obj: arduino,
                 value: arduino.getLightStatus(),
-                logValue: true
+                logValue: false
             },
             //
             hydroponicPumpStatus: {
                 obj: arduino,
                 value: arduino.getPumpStatus(),
-                logValue: true
+                logValue: false
             },
 
             hydroponicMode: {
                 obj: arduino,
                 value: arduino.getMode(),
-                logValue: true
+                logValue: false
             },
 
             hydroponicCycleOn: {

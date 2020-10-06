@@ -162,7 +162,7 @@ class HydroponicControl extends Component {
                         </li>
                         <li><img className="mr-3" src={reservoirIcon} alt="" width="40"
                             height="40" />
-                            {this.state.status.hydroponicReservoirDepth} mm
+                            {this.state.status.hydroponicReservoirDepth} cm
                         </li>
                         <li>
                             <img className="mr-3" src={floodIcon} alt="" width="40"

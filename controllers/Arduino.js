@@ -71,13 +71,14 @@ class Arduino extends ComponentInput {
 
                     //check if temperatures are valid
                     //TODO: this may be able to be removed if filtering is done on arduino
-                    let val = (buffer_arduino.readInt16BE(2)) / 100;
+                    let val = (buffer_arduino.readInt16BE(2)) / 10; 
                     if ((val > -50 && val < 150) && val != 0 ) {
                         this.value.temperature = val;
                     }
 
                     //TODO: this may be able to be removed if filtering is done on arduino                                            
-                    val = (buffer_arduino.readInt16BE(4)) / 10;
+                    //val = (buffer_arduino.readInt16BE(4)) / 10;
+                    val = (buffer_arduino.readInt16BE(4));
                     if (val > 0 && val < 150) {
                         this.value.humidity = val;
                     }

@@ -43,7 +43,6 @@ const Navmenu = (props) => {
             }
         </div>
     )
-
 };
 
 export default Navmenu;

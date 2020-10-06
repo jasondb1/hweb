@@ -14,8 +14,8 @@ const io = require('socket.io')(server);
 const db = require("./models/Sequelize.js");
 
 const componentsio = require('./routes/componentsio.js')(io, db);
-const components = require('./routes/components');
-const usersRoutes = require('./routes/users.controller.js');
+const components = require('./routes/componentRoutes');
+const usersRoutes = require('./routes/userRoutes.js');
 const databaseRoutes = require('./routes/databaseRoutes.js');
 const errorHandler = require('./middleware/error-handler.js');
 

@@ -250,8 +250,8 @@ let test = sequelize.authenticate()
 
 
 //db.sequelize.sync({ force: true })
-//db.sequelize.sync({ alter: true })
-db.sequelize.sync()
+db.sequelize.sync({ alter: true })
+//db.sequelize.sync()
   .then(function () {
     console.log("MariaDB Synchronized! ");
   })

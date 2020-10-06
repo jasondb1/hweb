@@ -9,7 +9,7 @@ module.exports = (sequelize, type) => {
             type: type.STRING,
             allowNull: true
         },
-        NickName: {
+        Tags: {
             type: type.STRING
         },
         Type: {
@@ -30,7 +30,7 @@ module.exports = (sequelize, type) => {
         ReservoirVolume: {
             type: type.INTEGER
         },
-        LightDescription: {
+        LightType: {
             type: type.STRING
         },
 

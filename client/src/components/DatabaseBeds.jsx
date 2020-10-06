@@ -19,7 +19,7 @@ let formFields = [
     { name: 'Width', value: '', fieldName: 'Width (m)', type: 'text' },
     { name: 'Type', value: '', fieldName: 'Type', type: 'select' },
     { name: 'ReservoirVolume', value: '', fieldName: 'Reservoir Vol(L)', type: 'select' },
-    { name: 'Light Type', value: '', fieldName: 'Light Type', type: 'text' },
+    { name: 'LightType', value: '', fieldName: 'Light Type', type: 'text' },
     { name: 'farmId', value: '', fieldName: 'Farm', type: 'select' },
     { name: 'plantedcropId', value: '', fieldName: 'Planted Crop', type: 'select' },
     { name: 'nurseryId', value: '', fieldName: 'Nursery', type: 'select' },
@@ -29,8 +29,17 @@ let formFields = [
 
 let tableColumns = [
     //{ name: 'id', columnName: '', isDisplayed: false, type: 'hidden' },
-    { name: 'FarmName', columnName: 'Farm Name', isDisplayed: true, type: 'text' },
-    { name: 'Location', columnName: 'Location', isDisplayed: true, type: 'text' }
+    { name: 'Description', columnName: 'Description', isDisplayed: true, type: 'text' },
+    { name: 'Location', columnName: 'Location', isDisplayed: true, type: 'text' },
+    { name: 'Tags', columnName: 'Tags', isDisplayed: true, type: 'text' },
+    { name: 'Length', columnName: 'Length', isDisplayed: true, type: 'text' },
+    { name: 'Width', columnName: 'Width', isDisplayed: true, type: 'text' },
+    { name: 'Type', columnName: 'Type', isDisplayed: true, type: 'text' },
+    { name: 'ReservoirVolume', columnName: 'Res. Volume', displayIf: "Tags === Hydroponic", isDisplayed: true, type: 'text' },
+    { name: 'farmID', columnName: 'Farm', isDisplayed: true, type: 'text' },
+    { name: 'greenhouseId', columnName: 'Greenhouse', isDisplayed: true, type: 'text' },
+    { name: 'nurseryId', columnName: 'Nursery', isDisplayed: true, type: 'text' },
+    { name: 'Green House', columnName: 'greenhouseId', isDisplayed: true, type: 'text' },
 ];
 
 //TODO: get username maybe

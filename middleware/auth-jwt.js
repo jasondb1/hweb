@@ -24,6 +24,19 @@ verifyToken = (req, res, next) => {
         req.userId = decoded.id;
         console.log("[Need to add additional check here - decoded id");
         console.log (decoded);
+
+        User.findByPk(decoded.id, (err, user) => {
+            // if no user, deny access
+            if (!user) return res.json({success: false, message: "Invalid token."});
+            console.log("User");
+            console.log(user);
+            // otherwise, add user to req object
+            req.user = user;
+            // go on to process the route:
+            next();
+        })
+
+
         //TODO: check if user exists?
         next();
     });

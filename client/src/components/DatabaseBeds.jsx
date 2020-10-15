@@ -1,31 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import "./Form.css";
 
-import httpClient from '../services/databaseService';
+
+import farmDbService from '../services/farmDbService';
+import httpDbService from '../services/bedDbService';
 import Form from './Form';
 import List from './List';
 const homeicon = require('../icons/icons8-home-50.png');
 //import confirmService from '../services/confirmService'
 //const deleteIcon = require('../icons/icons8-minus-50.png');
 //const editIcon = require('../icons/icons8-minus-50.png');
-
-let formFields = [
-    { name: 'id', value: null, fieldName: '', type: 'hidden' },
-    { name: 'Active', value: null, fieldName: 'Active', type: 'toggle' },
-    { name: 'Description', value: '', fieldName: 'Description', type: 'text' },
-    { name: 'Tags', value: '', fieldName: 'Tags', type: 'text' },
-    { name: 'Location', value: '', fieldName: 'Location', type: 'text' },
-    { name: 'Length', value: '', fieldName: 'Length (m)', type: 'text' },
-    { name: 'Width', value: '', fieldName: 'Width (m)', type: 'text' },
-    { name: 'Type', value: '', fieldName: 'Type', type: 'select' },
-    { name: 'ReservoirVolume', value: '', fieldName: 'Reservoir Vol(L)', type: 'select' },
-    { name: 'LightType', value: '', fieldName: 'Light Type', type: 'text' },
-    { name: 'farmId', value: '', fieldName: 'Farm', type: 'select' },
-    { name: 'plantedcropId', value: '', fieldName: 'Planted Crop', type: 'select' },
-    { name: 'nurseryId', value: '', fieldName: 'Nursery', type: 'select' },
-    { name: 'greenhouseId', value: '', fieldName: 'Greenhouse', type: 'select' },
-
-];
+const BEDTYPES = [{id: "Soil", name: "Soil"}, {id: "Raised", name:"Raised"}, {id: "Nursery", name: "Nursery"}, {id:"Container", name: "Container"}, {id: "Kratky", name: "Kratky"}, 
+{id: "NFT", name: "NFT"}, {id: "DWC", name: "DWC"}, {id: "Flood & Drain", name: "Flood & Drain"} ];
+const LIGHTTYPES = [{id: "Sun/Natural", name:"Sun/Natural"}, {id: "Greenhouse Natural", name: "Greenhouse Natural"}, {id: "Fluorescent", name: "Fluorescent"}, {id: "LED", name: "LED"} ];
 
 let tableColumns = [
     //{ name: 'id', columnName: '', isDisplayed: false, type: 'hidden' },
@@ -39,24 +27,37 @@ let tableColumns = [
     { name: 'farmID', columnName: 'Farm', isDisplayed: true, type: 'text' },
     { name: 'greenhouseId', columnName: 'Greenhouse', isDisplayed: true, type: 'text' },
     { name: 'nurseryId', columnName: 'Nursery', isDisplayed: true, type: 'text' },
-    { name: 'Green House', columnName: 'greenhouseId', isDisplayed: true, type: 'text' },
+    { name: 'plantedcropId', columnName: 'greenhouseId', isDisplayed: true, type: 'text' },
 ];
 
 //TODO: get username maybe
 
-class Farm extends React.Component {
+class Beds extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            fields: formFields,
+            fields: [
+                { name: 'id', value: null, fieldName: '', type: 'hidden' },
+                { name: 'Active', value: null, fieldName: 'Active', type: 'toggle' },
+                { name: 'Description', value: '', fieldName: 'Description', type: 'text' },
+                { name: 'Tags', value: '', fieldName: 'Tags', type: 'text' },
+                { name: 'Location', value: '', fieldName: 'Location', type: 'text' },
+                { name: 'Length', value: '', fieldName: 'Length (m)', type: 'text' },
+                { name: 'Width', value: '', fieldName: 'Width (m)', type: 'text' },
+                { name: 'Type', value: '', fieldName: 'Type', type: 'select' , options: BEDTYPES},
+                { name: 'ReservoirVolume', value: '', fieldName: 'Reservoir Vol(L)', type: 'text' },
+                { name: 'LightType', value: '', fieldName: 'Light Type', type: 'select', options: LIGHTTYPES },
+                { name: 'farmId', value: '', fieldName: 'Farm', type: 'select', options: []},
+                // { name: 'plantedcropId', value: '', fieldName: 'Planted Crop', type: 'select', options: null },
+                // { name: 'nurseryId', value: '', fieldName: 'Nursery', type: 'select', options: null },
+                // { name: 'greenhouseId', value: '', fieldName: 'Greenhouse', type: 'select', options: null },
+            ],
             tableData: [{}],
             editMode: false,
             success: false,
         };
-
-        this.formFields = formFields;
 
         this.removeItem = this.removeItem.bind(this);
         this.editItem = this.editItem.bind(this);
@@ -65,16 +66,24 @@ class Farm extends React.Component {
 
     componentDidMount() {
         //get table data
-        httpClient.getAllFarms().then(payload => {
-            this.setState({ tableData: payload });
+        farmDbService.getAllFarmNames().then(payload => {
+            let field = this.state.fields.find(item => item.name === "farmId");
+            field.options = payload.map(obj => { obj.name = obj.FarmName; delete(obj.FarmName); return obj} );
+            this.setState({ ...this.state.fields, field});
+        });
+
+        httpDbService.getAllFarms().then(payload => {
+            this.setState({ farmOptions: payload });
         });
     }
 
     onInputChange(evt) {
+
         const value = evt.target.type === "checkbox" ? evt.target.checked : evt.target.value;
-        this.formFields[evt.target.id].value = value;
         this.setState({
-            fields: this.formFields
+            //fields: formFields
+                ...this.state.fields,
+                [evt.target.name]: value
         })
     }
 
@@ -83,7 +92,7 @@ class Farm extends React.Component {
 
         if (this.state.editMode) {
             //console.log("submitted in edit mode")
-            httpClient.updateFarm(this.state.fields).then(response => {
+            httpDbService.updateFarm(this.state.fields).then(response => {
                 //console.log(response);
                 if (response.success === true) {
                     this.resetForm();
@@ -97,7 +106,7 @@ class Farm extends React.Component {
             })
         } else {
             //console.log("submitted in non edit mode")
-            httpClient.newFarm(this.state.fields).then(response => {
+            httpDbService.newFarm(this.state.fields).then(response => {
                 if (response.success === true) {
                     this.resetForm();
                     const items = [...this.state.tableData, response.payload];
@@ -116,7 +125,7 @@ class Farm extends React.Component {
             //delete items
             let id = this.state.tableData[value].id;
 
-            httpClient.deleteFarm(id).then(response => {
+            httpDbService.deleteFarm(id).then(response => {
                 this.setState({ message: response.message, success: response.success });
                 const items = this.state.tableData.filter((data, index) => index !== parseInt(value));
                 this.setState({ tableData: items });
@@ -184,4 +193,4 @@ class Farm extends React.Component {
     }
 }
 
-export default Farm
+export default Beds

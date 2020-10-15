@@ -15,7 +15,7 @@ module.exports = (sequelize, type) => {
         Type: {
             type: type.STRING
         },
-        Location: {
+        BedLocation: {
             type: type.STRING
         },
         ActiveBed: {

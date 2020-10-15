@@ -70,6 +70,7 @@ db.SoldItems = require("./SoldItems.js")(sequelize, Sequelize);
 db.Storage = require("./Storage.js")(sequelize, Sequelize);
 db.TaskList = require("./TaskList.js")(sequelize, Sequelize);
 db.TaskItem = require("./TaskItem.js")(sequelize, Sequelize);
+db.Alarm = require("./Alarm.js")(sequelize, Sequelize);
 
 //Relations
 
@@ -93,6 +94,9 @@ db.Farm.hasMany(db.TaskList);
 //db.SensorData.hasMany(db.Sensor);
 //db.Sensor.belongsTo(db.SensorData);
 
+db.Farm.hasMany(db.Alarm);
+db.Alarm.belongsTo(db.Farm);
+
 db.Bed.hasMany(db.Sensor);
 db.Sensor.belongsTo(db.Bed);
 
@@ -114,16 +118,22 @@ db.Bed.belongsTo(db.PlantedCrops);
 db.PlantedCrops.hasMany(db.Crops);
 db.Crops.belongsTo(db.PlantedCrops);
 
-// db.PlantedCrops.belongsToMany(db.Bed, {
-//   through: "planted_beds",
-//   //foreignKey: "userId",
-//   //otherKey: "roleId"
-// });
-// db.Bed.belongsToMany(db.PlantedCrops, {
-//   through: "planted_beds",
-//   //foreignKey: "userId",
-//   //otherKey: "roleId"
-// });
+db.BedPlanning.belongsToMany(db.Crops, {
+  through: "planned_beds",
+  //foreignKey: "userId",
+  //otherKey: "roleId"
+});
+db.Crops.belongsToMany(db.BedPlanning, {
+  through: "planned_beds",
+  //foreignKey: "userId",
+  //otherKey: "roleId"
+});
+
+// db.BedPlanning.hasMany(db.Crops);
+// db.Crops.belongsTo(db.BedPlanning);
+
+// db.BedPlanning.hasMany(db.Bed);
+// db.Bed.belongsTo(db.BedPlanning);
 
 // db.PlantedCrops.belongsToMany(db.Crops, {
 //   through: "planted_crops",
@@ -165,12 +175,6 @@ db.Crops.belongsTo(db.Nursery);
 db.Farm.hasMany(db.User);
 db.User.belongsTo(db.Farm);
 
-db.BedPlanning.hasMany(db.Crops);
-db.Crops.belongsTo(db.BedPlanning);
-
-db.BedPlanning.hasMany(db.Bed);
-db.Bed.belongsTo(db.BedPlanning);
-
 db.Farm.hasMany(db.Nursery);
 db.Nursery.belongsTo(db.Farm);
 
@@ -196,7 +200,6 @@ db.Crops.belongsToMany(db.Storage, {
   //foreignKey: "userId",
   //otherKey: "roleId"
 });
-
 
 db.SoldItems.hasMany(db.Crops);
 db.Crops.belongsTo(db.SoldItems);

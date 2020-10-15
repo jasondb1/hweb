@@ -1,6 +1,8 @@
 import React from 'react';
+//import Select from 'react-select';
 
 const Form = (props) => {
+    //console.log(props);
 
     return (
         <form id="user-form" className='m-4 border rounded-lg shadow border-primary p-4' onSubmit={props.submitFunction} >
@@ -14,8 +16,19 @@ const Form = (props) => {
                                 <span className="input-group-text" id="inputGroup-sizing-default">{element.fieldName}</span>
                             </div>
                         }
-                        <input id={index} className='form-control' type={element.type} placeholder={element.fieldName} name={element.name}
+                        {element.type === 'select' && <select id={index} name={element.name} onChange={props.changeFunction} value={element.value} >
+                            {element.options.map((item, index) => <option key={index} value={item.id}>{item.name}</option>)}
+                        </select>}
+                        {element.type === 'text' && <input id={index} className='form-control' type="text" placeholder={element.fieldName} name={element.name}
                             onChange={props.changeFunction} value={element.value || ''} />
+                        }
+                        {element.type === 'toggle' &&
+                            <label className="ml-3 switch">
+                                <input id={index} name={element.name} onChange={props.changeFunction} value={element.value || ''} type="checkbox" checked={element.value} />
+                                <span className="slider round"></span>
+                            </label>
+                        }
+
                     </div>
                 )}
 

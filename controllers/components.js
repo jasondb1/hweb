@@ -20,7 +20,8 @@ const RELAY2PIN = 23;
 let ARDUINO_I2C_ADDR = 0x08;
 const DHT22PIN = 17;
 
-const SAMPLEINTERVAL = 10000; //interval in seconds to sample temperature and humidity
+const SAMPLEINTERVAL = 10000; //interval in milliseconds to sample temperature and humidity
+const LOGGINGINTERVAL = 30000;
 
 //output components
 let indicator = new Led(LEDPIN);
@@ -44,6 +45,7 @@ class ComponentsCtrl {
         this.loggingEnabled = false;
         this.status = {};
         this.database = new dbController(db);
+        this.lastLogged = new Date();
     }
 
     init() {
@@ -106,19 +108,19 @@ class ComponentsCtrl {
             hydroponicLightStatus: {
                 obj: arduino,
                 value: arduino.getLightStatus(),
-                logValue: true
+                logValue: false
             },
             //
             hydroponicPumpStatus: {
                 obj: arduino,
                 value: arduino.getPumpStatus(),
-                logValue: true
+                logValue: false
             },
 
             hydroponicMode: {
                 obj: arduino,
                 value: arduino.getMode(),
-                logValue: true
+                logValue: false
             },
 
             hydroponicCycleOn: {
@@ -225,30 +227,37 @@ class ComponentsCtrl {
         //console.log(this.status);
 
         if (this.loggingEnabled) {
-            let keys = Object.keys(this.component);
-            let data = [];
 
-            //console.log(keys);
+            let currentTime = new Date();
 
-            for (let key of keys) {
-                if (this.status[key] != undefined) {
-                    if (this.component[key].logValue) {
-                        data.push({
-                            description: this.component[key].obj.name,
-                            sensor: key,
-                            value: this.status[key],
-                            //value: this.component.obj.value, //alternate way to read value
-                            location: this.component[key].obj.location
-                        });
+            if ((currentTime.getTime() - this.lastLogged.getTime()) > LOGGINGINTERVAL) {
+                this.lastLogged = currentTime;
+
+                let keys = Object.keys(this.component);
+                let data = [];
+
+                //console.log(keys);
+
+                for (let key of keys) {
+                    if (this.status[key] != undefined) {
+                        if (this.component[key].logValue) {
+                            data.push({
+                                description: this.component[key].obj.name,
+                                sensor: key,
+                                value: this.status[key],
+                                //value: this.component.obj.value, //alternate way to read value
+                                location: this.component[key].obj.location
+                            });
+                        }
                     }
                 }
-            }
-            //console.log(this.database);
-            //this.database.sensor.insert(data);
-            //console.log('data-');
-            //console.log(data);
+                //console.log(this.database);
+                //this.database.sensor.insert(data);
+                //console.log('data-');
+                //console.log(data);
 
-            this.database.insert(data);
+                this.database.insert(data);
+            }
         }
     }
 

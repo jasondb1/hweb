@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import FurnaceControl from './FurnaceControl';
-import Chart from './SensorChart';
 
 class Weather extends Component {
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Switch, Route, Redirect} from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import httpClient from './services/httpClient'
 
 //import NavBar from './NavBar'
@@ -9,14 +9,16 @@ import SignUp from './components/SignUp'
 //import Home from './views/Home'
 //import Dashboard from './views/Dashboard';
 import Main from './views/Main';
+import Database from './views/Database';
 
 class App extends React.Component {
-    state = {currentUser: httpClient.getCurrentUser(),
+    state = {
+        currentUser: httpClient.getCurrentUser(),
         isAdmin: httpClient.getAdmin(),
     };
 
     onLoginSuccess(user) {
-        this.setState({currentUser: httpClient.getCurrentUser(), isAdmin: httpClient.getAdmin()});
+        this.setState({ currentUser: httpClient.getCurrentUser(), isAdmin: httpClient.getAdmin() });
     }
 
     onSignUpSuccess(user) {
@@ -25,12 +27,12 @@ class App extends React.Component {
 
     logOut() {
         httpClient.logOut();
-        this.setState({currentUser: null, isAdmin: null});
+        this.setState({ currentUser: null, isAdmin: null });
     }
 
     render() {
-        const {currentUser} = this.state;
-        const {isAdmin} = this.state;
+        const { currentUser } = this.state;
+        const { isAdmin } = this.state;
         return (
             <div className='App container-fluid'>
 
@@ -39,17 +41,17 @@ class App extends React.Component {
                 <Switch>
 
                     <Route path="/login" render={(props) => {
-                        return <LogIn {...props} onLoginSuccess={this.onLoginSuccess.bind(this)}/>
-                    }}/>
+                        return <LogIn {...props} onLoginSuccess={this.onLoginSuccess.bind(this)} />
+                    }} />
 
                     <Route path="/logout" render={(props) => {
-                        return <LogOut onLogOut={this.logOut.bind(this)}/>
-                    }}/>
+                        return <LogOut onLogOut={this.logOut.bind(this)} />
+                    }} />
 
-        {/* TODO: only allow for time when no admin is present; the sign up component takes an 'onSignUpSuccess' prop which will perform the same thing as onLoginSuccess: set the state to contain the currentUser */}
+                    {/* TODO: only allow for time when no admin is present; the sign up component takes an 'onSignUpSuccess' prop which will perform the same thing as onLoginSuccess: set the state to contain the currentUser */}
                     <Route path="/signup" render={(props) => {
-                        return <SignUp {...props} onSignUpSuccess={this.onLoginSuccess.bind(this)}/>
-                    }}/>
+                        return <SignUp {...props} onSignUpSuccess={this.onLoginSuccess.bind(this)} />
+                    }} />
 
                     {/* } <Route path="/dashboard" render={() => {
                         return currentUser
@@ -61,14 +63,20 @@ class App extends React.Component {
                     <Route path="/main" render={(props) => {
                         return currentUser
                             ? <Main {...props} currentUser={currentUser} isAdmin={isAdmin} />
-                            : <Redirect to="/login"/>
-                    }}/>
+                            : <Redirect to="/login" />
+                    }} />
+
+                    <Route path="/database" render={(props) => {
+                        return currentUser
+                            ? <Database {...props} currentUser={currentUser} isAdmin={isAdmin} />
+                            : <Redirect to="/login" />
+                    }} />
 
                     <Route path="/" render={(props) => {
                         return currentUser
-                            ? <Main {...props} currentUser={currentUser} isAdmin={isAdmin}/>
-                            : <Redirect to="/login"/>
-                    }}/>
+                            ? <Main {...props} currentUser={currentUser} isAdmin={isAdmin} />
+                            : <Redirect to="/login" />
+                    }} />
 
                 </Switch>
             </div>

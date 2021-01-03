@@ -13,20 +13,20 @@ let UPDATEINTERVAL = 10000;
 
 counter = 0;
 
-module.exports = function(io, db) {
+module.exports = function (io, db) {
 
     //console.log("Initializing componentsio");
     //console.log(db);
-        //start updating components at regular intervals
+    //start updating components at regular intervals
     let componentsCtrl = new ComponentsCtrl(db);
     componentsCtrl.init();
     componentsCtrl.enableLogging(db);
     componentsCtrl.start();
 
 
-    io.use(function(socket, next) {
+    io.use(function (socket, next) {
         if (socket.handshake.query && socket.handshake.query.token) {
-            jwt.verify(socket.handshake.query.token, JWT_SECRET, function(err, decoded) {
+            jwt.verify(socket.handshake.query.token, JWT_SECRET, function (err, decoded) {
                 if (err) return next(new Error('Authentication error'));
                 socket.decoded = decoded;
                 next();
@@ -40,36 +40,32 @@ module.exports = function(io, db) {
 
     io.on('connection', client => {
 
+        if (DEBUG) console.log("Connection:" + counter++ + ':' + client.id);
         //send data as soon as connection is made
         client.emit('updates', componentsCtrl.currentStatus());
 
         //updates the client automatically on the interval
         //Could move this to a .on 
-        autoUpdate = setInterval(() => {
+        let autoUpdate = setInterval(() => {
             client.emit('updates', componentsCtrl.currentStatus());
         }, UPDATEINTERVAL);
 
-        if (DEBUG) console.log("Connection:" + counter++ + ':' + client.id);
-
         //user disconnects
         client.on('disconnect', () => {
-            
+
             if (DEBUG) console.log('client disconnected:' + counter-- + ':' + client.id);
-            
+            clearInterval(autoUpdate);
+            //clearInterval(subscribeData);
         });
 
-        //client.on('componentGetStatus', comp => {
-        //    client.emit('componentStatusUpdate', {component: comp, isOpen: false});
-        //});
-
-        //component off
+        //turn component off
         client.on('turnComponentOff', comp => {
             if (DEBUG) console.log("component off");
             componentsCtrl.component[comp].obj.off();
             client.emit('componentStatusUpdate', { component: comp, isOn: false });
         });
 
-        //component on
+        //turn component on
         client.on('turnComponentOn', comp => {
             if (DEBUG) console.log("component on");
             componentsCtrl.component[comp].obj.on();
@@ -191,7 +187,7 @@ module.exports = function(io, db) {
         client.on('hydroponicCommand', (value) => {
             if (DEBUG) console.log("hydroponic command" + counter + ':' + client.id);
             if (DEBUG) console.log("socket received message: hydroponicCommand: " + value);
-            
+
             //TODO: Maybe add a return for success/fail    
             componentsCtrl.component.hydroponicMode.obj.sendCommand(value);
             //client.emit('componentStatusUpdate', { hydropoincMode: value });
@@ -202,17 +198,36 @@ module.exports = function(io, db) {
         client.on('requestData', (args) => {
             if (DEBUG) console.log("request data" + counter + ':' + client.id);
             //if (DEBUG)console.log(args);
-            payload = componentsCtrl.database.getSensorData(args.sensor, (args.timeback * 60 * 1000), (err, payload) => {
+            payload = componentsCtrl.database.getSensorData(args.sensor, (args.timeBack * 60 * 1000), (err, payload) => {
                 //request data from database
                 //let payload = [{date: "2020-05-01", close:12.2}];
-            if (err){
-                console.log(err);
-            }
-                //if (DEBUG) console.log("\n\npayload:");
-                //if (DEBUG) console.log(payload);
-                //if (DEBUG)console.log("-----");
+                if (err) {
+                    console.log(err);
+                }
+                if (DEBUG) console.log("\n\npayload:");
+                if (DEBUG) console.log(payload);
+                if (DEBUG) console.log("-----");
                 client.emit('incomingData', payload);
             })
         });
+
+        //         //generic request for any sensor 24 hours back - timeback in ms
+        client.on('requestMultipleSensorData', (args) => {
+            if (DEBUG) console.log("request data" + counter + ':' + client.id);
+            if (DEBUG)console.log(args);
+
+            payload = componentsCtrl.database.getMultipleSensorData(args.sensors, (args.timeBack * 60 * 1000), (err, payload) => {
+                //request data from database
+                //let payload = [{date: "2020-05-01", close:12.2}];
+                if (err) {
+                    console.log(err);
+                }
+                if (DEBUG) console.log("\n\npayload:");
+                if (DEBUG) console.log(payload);
+                if (DEBUG) console.log("-----");
+                client.emit('incomingMultipleSensorData', payload);
+            })
+        });
+
     });
 };

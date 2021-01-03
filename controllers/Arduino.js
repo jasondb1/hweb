@@ -71,14 +71,15 @@ class Arduino extends ComponentInput {
 
                     //check if temperatures are valid
                     //TODO: this may be able to be removed if filtering is done on arduino
-                    let val = (buffer_arduino.readInt16BE(2)) / 100;
-                    if (val > -99 && val < 150) {
+                    let val = (buffer_arduino.readInt16BE(2)) / 10; 
+                    if ((val > -50 && val < 150) && val != 0 ) {
                         this.value.temperature = val;
                     }
 
                     //TODO: this may be able to be removed if filtering is done on arduino                                            
-                    val = (buffer_arduino.readInt16BE(4)) / 10;
-                    if (val > -1 && val < 150) {
+                    //val = (buffer_arduino.readInt16BE(4)) / 10;
+                    val = (buffer_arduino.readInt16BE(4));
+                    if (val > 0 && val < 150) {
                         this.value.humidity = val;
                     }
 
@@ -89,7 +90,11 @@ class Arduino extends ComponentInput {
                     this.value.mode = buffer_arduino.readUInt8(14);
                     this.value.lightStatus = buffer_arduino.readUInt8(15);
                     this.value.pumpStatus = buffer_arduino.readUInt8(16);
-                    this.value.reservoirDepth = buffer_arduino.readUInt16BE(17);
+
+                  val = buffer_arduino.readUInt16BE(17);
+                    if (val < 4500) {
+                        this.value.reservoirDepth = val;
+                    }
 
                     if (DEBUG) console.log("received from arduino:");
                     if (DEBUG) console.log(this.value);
@@ -100,14 +105,14 @@ class Arduino extends ComponentInput {
                     //this.value.p_resistor = -99;
                     //this.value.temperature = -99;
                     //this.value.humidity = -99;
-                    this.value.mode = -99;
-                    this.value.pumpStatus = -99;
-                    this.value.lightStatus = -99;
+                    //this.value.mode = -99;
+                    //this.value.pumpStatus = -99;
+                    //this.value.lightStatus = -99;
                 }
             });
 
             this.lastRead = Date.now();
-            
+
             //console.log("this.value:")
             //console.log(this.value);
             //console.log("end data request");   

@@ -1,14 +1,12 @@
 const DEBUG = false;
 const fs = require('fs');
 const LOG_FILEPATH = 'current_log.csv'; //move this to a config file
-let table = 'sensor_data';
-const { OP } = require('sequelize');
+//const { OP } = require('sequelize');
 
 class Database {
 
   constructor(db) {
     this.db = db;
-    this.table = table;
   }
 
   //Generic Error Handler 
@@ -29,7 +27,7 @@ class Database {
 
     for (let row of data) {
 
-      this.db.Sensor.create({
+      this.db.SensorData.create({
         Timestamp: datetime,
         //Description: row.description,
         Location: row.location,
@@ -48,11 +46,11 @@ class Database {
     if (sensor === 'all') {
 
       //reset all (be very careful) consider removing
-      this.db.Sensor.destroy({
+      this.db.SensorData.destroy({
         truncate: true
       }).catch(this.errHandler);
     } else {
-      this.db.Sensor.destroy({
+      this.db.SensorData.destroy({
         where: {
           Sensor: sensor
         }
@@ -78,12 +76,52 @@ class Database {
   getSensorData(sensor, time_prev, callback) {
     let values = null;
 
-    values = this.db.Sensor.findAll({
+    values = this.db.SensorData.findAll({
       attributes: ['Timestamp', 'Value'],
       where: {
         Sensor: sensor,
         Timestamp: {
           [this.db.Sequelize.Op.gt]: new Date(new Date() - time_prev)
+        }
+      }
+    })
+      .then((values) => {
+        if ((values) === null) {
+          // throw err;
+          return callback(new Error("Error Retrieving Data"));
+        }
+
+        if (DEBUG) {
+          console.log("[getSensorData]");
+          console.log("database data:");
+          console.log(values);
+        }
+
+        return callback(null, values);
+
+      })
+      .catch(this.errHandler)
+
+  };
+
+  //retrieve multiple sensor data
+  //default time is 24 hours
+  //get multiple sensor data from latestTime and 
+  getMultipleSensorData(sensors, timeBack, callback) {
+    let values = null;
+
+    //TODO: only get values that are newer than latestTime for better caching
+    //console.log("getMultipleSensorData:");
+    //console.log(timeBack);
+
+    values = this.db.SensorData.findAll({
+      attributes: ['Timestamp', 'Value', 'Sensor'],
+      where: {
+        Sensor: {
+          [this.db.Sequelize.Op.or]: sensors
+        },
+        Timestamp: {
+          [this.db.Sequelize.Op.gt]: new Date(new Date() - timeBack)
         }
       }
     })
@@ -113,7 +151,7 @@ class Database {
 
     let datetime = new Date();
 
-    const values = this.db.Sensor.findAll()
+    const values = this.db.SensorData.findAll()
       .then(
         fs.appendFile(
           filename,

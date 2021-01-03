@@ -28,7 +28,8 @@ let valueline = d3.line()
     .y(function(d) { return y(d.Value); });
 
 //remove old chart
-    d3.select("#" + chartId + ' svg').remove()
+    //d3.select("#" + chartId + ' svg').remove()
+    d3.select("#" + chartId + ' svg > * ').remove()
 
 // append the svg obgect to the body of the page
 // appends a 'group' element to 'svg'
@@ -93,7 +94,7 @@ class Chart extends Component {
         this.socket = authSocket();
         //console.log (authSocket.getInstance());
 
-        this.socket.emit('requestData', {sensor:this.props.sensor, timeback:1440} );
+        this.socket.emit('requestData', {sensor:this.props.sensor, timeBack:1440} );
         
         //retrieve data
         this.socket.on('incomingData', (payload) => {
@@ -112,7 +113,7 @@ class Chart extends Component {
     }
 
     handleClickButton(value){
-        this.socket.emit('requestData', {sensor:this.props.sensor, timeback:value} );
+        this.socket.emit('requestData', {sensor:this.props.sensor, timeBack:value} );
     }
 
     render() {

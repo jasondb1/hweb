@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import httpClient from '../services/httpClient';
 import Farm from "../components/DatabaseFarm";
 import Beds from "../components/DatabaseBeds";
+import Crops from "../components/DatabaseCrops";
 import Harvest from "../components/DatabaseHarvest";
 
 class Main extends Component {
@@ -62,6 +63,7 @@ class Main extends Component {
                         <Route path={`${match.path}/`} {...this.props} component={Database} exact/>
                         <Route path={`${match.path}/farm`} {...this.props} component={Farm}/>
                         <Route path={`${match.path}/beds`} {...this.props} component={Beds}/>
+                        <Route path={`${match.path}/crops`} {...this.props} component={Crops}/>
                         <Route path={`${match.path}/harvest`} {...this.props} component={Harvest}/>
 
                     </div>

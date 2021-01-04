@@ -28,6 +28,9 @@ const Form = (props) => {
                                 <span className="slider round"></span>
                             </label>
                         }
+                        {element.type === 'multiline' &&
+                            <textarea class="form-control" id={index} rows="3">{element.value || ''}</textarea>
+                        }
 
                     </div>
                 )}

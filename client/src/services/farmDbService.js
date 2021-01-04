@@ -33,10 +33,10 @@ farmDbService.getAllFarms = function () {
 };
 
 farmDbService.getAllFarmNames = function () {
-        console.log("getting farm names");
+        //console.log("getting farm names");
     return this({ method: 'get', url: '/api/database/farmnames/' })
         .then((serverResponse) => {
-            console.log(serverResponse.data);
+            //console.log(serverResponse.data);
             //get all users
             return serverResponse.data;
 

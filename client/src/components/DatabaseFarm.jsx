@@ -42,7 +42,7 @@ class Farm extends React.Component {
 
     componentDidMount() {
         //get table data
-        httpClient.getAllFarms().then(payload => {
+        httpClient.getAllRecords('/api/database/farm/').then(payload => {
             this.setState({ tableData: payload });
         });
     }
@@ -60,7 +60,7 @@ class Farm extends React.Component {
 
         if (this.state.editMode) {
             //console.log("submitted in edit mode")
-            httpClient.updateFarm(this.state.fields).then(response => {
+            httpClient.updateRecord('/api/database/farm/', this.state.fields).then(response => {
                 //console.log(response);
                 if (response.success === true) {
                     this.resetForm();
@@ -74,7 +74,7 @@ class Farm extends React.Component {
             })
         } else {
             //console.log("submitted in non edit mode")
-            httpClient.newFarm(this.state.fields).then(response => {
+            httpClient.newRecord('/api/database/farm/', this.state.fields).then(response => {
                 if (response.success === true) {
                     this.resetForm();
                     const items = [...this.state.tableData, response.payload];
@@ -93,7 +93,7 @@ class Farm extends React.Component {
             //delete items
             let id = this.state.tableData[value].id;
 
-            httpClient.deleteFarm(id).then(response => {
+            httpClient.deleteRecord('/api/database/farm/', id).then(response => {
                 this.setState({ message: response.message, success: response.success });
                 const items = this.state.tableData.filter((data, index) => index !== parseInt(value));
                 this.setState({ tableData: items });
@@ -133,7 +133,7 @@ class Farm extends React.Component {
             <div className='Form'>
                 <div className='row'>
                     <div className='column column-33 column-offset-33'>
-                        <h1>Bed Setup</h1>
+                        <h1>Farm Setup</h1>
                         <Form fields={this.state.fields}
                             changeFunction={this.onInputChange.bind(this)}
                             submitFunction={this.onFormSubmit.bind(this)}

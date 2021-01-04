@@ -9,7 +9,7 @@ const bedDbService = axios.create();
 // as a default header for all api requests.
 bedDbService.defaults.headers.common.token = httpClient.getToken();
 
-bedDbService.newFarm = function (fieldData) {
+bedDbService.newBed = function (fieldData) {
     return this({ method: 'post', url: '/api/database/farm/', data: trimFields(fieldData) })
         .then((serverResponse) => {
             //console.log(serverResponse);
@@ -23,7 +23,7 @@ bedDbService.newFarm = function (fieldData) {
         .catch(err => {if (err) console.log("error entering new farm")})
 };
 
-bedDbService.getAllFarms = function () {
+bedDbService.getAllBeds = function () {
     return this({ method: 'get', url: '/api/database/farm/' })
         .then((serverResponse) => {
             //get all users
@@ -32,7 +32,7 @@ bedDbService.getAllFarms = function () {
         })
 };
 
-bedDbService.updateFarm = function (fieldData) {
+bedDbService.updateBed = function (fieldData) {
     let fields = trimFields(fieldData);
     return this({ method: 'put', url: ('/api/database/farm/' + fields.id), data: fields })
         .then((serverResponse) => {

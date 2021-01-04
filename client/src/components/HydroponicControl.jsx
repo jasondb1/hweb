@@ -35,7 +35,7 @@ class HydroponicControl extends Component {
         this.state = {
             label: 'Hydroponic Control',
             component: 'hydroponicControl',
-            status: { hydroponicControl: {} },
+            status: { hydroponicControl: {lightStatus: false, } },
             //data: {},
             chartData: {},
             lightStatus: null,

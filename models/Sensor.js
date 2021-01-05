@@ -15,9 +15,18 @@ module.exports = (sequelize, type) => {
         Location: {
             type: type.STRING
         },
+        Tag: {
+            type: type.STRING
+        },
         Type: {
             type: type.INTEGER
-        }
+        },
+        Status: {
+            type: type.STRING
+        },
+        PollingRate: {
+            type: type.STRING
+        },
     })
 
     return Sensor;

@@ -33,6 +33,12 @@ module.exports = (sequelize, type) => {
         LightType: {
             type: type.STRING
         },
+        Status: {
+            type: type.STRING
+        },
+        Planted: {
+            type: type.BOOLEAN
+        },
 
     })
 

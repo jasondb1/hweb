@@ -22,7 +22,7 @@ const solditemsDbService = require('../helpers/solditemsDbService.js');
 const storageDbService = require('../helpers/storageDbService.js');
 const taskitemDbService = require('../helpers/taskitemDbService.js');
 const tasklistDbService = require('../helpers/tasklistDbService.js');
-
+const alarmDbService = require('../helpers/alarmDbService.js');
 
 // routes
 
@@ -177,5 +177,13 @@ router.get('/farmnames', [authJwt.verifyToken], farmDbService.getNames);
 router.get('/farm/:id', [authJwt.verifyToken], farmDbService.getById);
 router.put('/farm/:id', [authJwt.verifyToken], farmDbService.update);
 router.delete('/farm/:id', [authJwt.verifyToken], farmDbService._delete);
+
+//farms
+router.post('/alarm', [authJwt.verifyToken, authJwt.isAdmin], alarmDbService.create);
+router.get('/alarm', [authJwt.verifyToken], alarmDbService.getAll);
+router.get('/alarmnames', [authJwt.verifyToken], alarmDbService.getNames);
+router.get('/alarm/:id', [authJwt.verifyToken], alarmDbService.getById);
+router.put('/alarm/:id', [authJwt.verifyToken], alarmDbService.update);
+router.delete('/alarm/:id', [authJwt.verifyToken], alarmDbService._delete);
 
 module.exports = router;

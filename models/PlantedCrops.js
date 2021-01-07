@@ -14,11 +14,11 @@ module.exports = (sequelize, type) => {
         Transplanted: {
             type: type.BOOLEAN
         },
+        Perennial: {
+            type: type.BOOLEAN
+        },
         Notes: {
             type: type.STRING
-        },
-        PlantedDate: {
-            type: type.DATE
         },
         EarliestHarvestDate: {
             type: type.DATE
@@ -30,7 +30,7 @@ module.exports = (sequelize, type) => {
             type: type.DATE
         },
         PlantedBy: {
-           type: type.INTEGER 
+            type: type.INTEGER
         },
     })
 

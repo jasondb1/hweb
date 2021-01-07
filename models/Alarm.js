@@ -1,33 +1,32 @@
 module.exports = (sequelize, type) => {
-    const Sensor = sequelize.define('sensor', {
+    const Alarm = sequelize.define('alarm', {
         id: {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        Sensor: {
-            type: type.STRING,
-            allowNull: false
-        },
         Description: {
             type: type.STRING
         },
-        Location: {
-            type: type.STRING
-        },
-        Tag: {
+        Email: {
             type: type.STRING
         },
         Type: {
+            type: type.STRING
+        },
+        // Sensor: {
+        //     type: type.String
+        // },
+        Threshold: {
+            type: type.FLOAT
+        },
+        AlarmDate: {
+            type: type.DATE
+        },
+        Recurrence: {
             type: type.INTEGER
-        },
-        Status: {
-            type: type.STRING
-        },
-        PollingRate: {
-            type: type.STRING
         },
     })
 
-    return Sensor;
+    return Alarm;
 };

@@ -5,7 +5,7 @@ import httpDbService from '../services/databaseService';
 import Form from './Form';
 import List from './List';
 
-const restUrl = '/api/database/harvest/';
+const restUrl = '/api/database/plantedcrop/';
 
 const homeicon = require('../icons/icons8-home-50.png');
 //import confirmService from '../services/confirmService'
@@ -19,32 +19,34 @@ let tableColumns = [
     //{ name: 'id', columnName: '', isDisplayed: false, type: 'hidden' },
     { name: 'plantedcropId', columnName: 'Crop', isDisplayed: true, type: 'text' },
     { name: 'bedId', columnName: 'Bed', isDisplayed: true, type: 'text' },
-    { name: 'HarvestDate', columnName: 'Harvest Date', isDisplayed: true, type: 'text' },
-    { name: 'Quantity', columnName: 'Quantity', isDisplayed: true, type: 'text' },
-    { name: 'Units', columnName: 'Units', isDisplayed: true, type: 'text' },
-    { name: 'Crop Age', columnName: 'CropAge', isDisplayed: true, type: 'text' },
-    { name: 'Quality', columnName: 'Notes', isDisplayed: true, type: 'text' },
+    { name: 'PlantingDate', columnName: 'Planting Date', isDisplayed: true, type: 'text' },
+    { name: 'Earliest Harvest', columnName: 'Earliest Harvest Date', isDisplayed: true, type: 'text' },
+    { name: 'LatestHarvestDate', columnName: 'Latest Harvest Date', isDisplayed: true, type: 'text' },
+    { name: 'DateGerminated', columnName: 'Date Germinated', isDisplayed: true, type: 'text' },
+    { name: 'PlantedBy', columnName: 'PlantedBy', isDisplayed: true, type: 'text' },
     { name: 'Notes', columnName: 'Notes', isDisplayed: true, type: 'text' },
-    { name: 'Harvested By', columnName: 'HarvestedBy', isDisplayed: true, type: 'text' },
+
 ];
 
 let formFields = [
     { name: 'id', value: null, fieldName: '', type: 'hidden' },
     { name: 'plantedcropId', value: '', fieldName: 'Crop', type: 'select', options: [] },
     { name: 'bedId', value: '', fieldName: 'Bed', type: 'select', options: [] },
-    { name: 'HarvestDate', value: '', fieldName: 'Harvest Date', type: 'text' },
-    { name: 'Quantity', value: '', fieldName: 'Quantity', type: 'text' },
-    { name: 'Unit', value: '', fieldName: 'Unit', type: 'text' },
-    { name: 'Quality', value: null, fieldName: 'Quality', type: 'text' },
-    { name: 'CropAge', value: null, fieldName: 'Crop Age', type: 'text' },
+    { name: 'Planting Date', value: '', fieldName: 'PlantingDate', type: 'text' },
+    { name: 'Earliest Harvest', value: '', fieldName: 'EarliestHarvestDate', type: 'text' },
+    { name: 'LatestHarvest', value: '', fieldName: 'LatestHarvestDate', type: 'text' },
+    { name: 'Direct Seed', value: null, fieldName: 'DirectSeed', type: 'toggle' },
+    { name: 'Transplanted', value: null, fieldName: 'Transplanted', type: 'toggle' },
+    { name: 'Perennial', value: null, fieldName: 'Perennial', type: 'toggle' },
     { name: 'Notes', value: '', fieldName: 'Notes', type: 'text' },
-    { name: 'HarvestedBy', value: '', fieldName: 'Harvested By', type: 'text' },
+    { name: 'DateGerminated', value: '', fieldName: 'DateGerminated', type: 'text' },
+    { name: 'PlantedBy', value: '', fieldName: 'Planted By', type: 'text' },
 
     //{ name: 'nurseryId', value: '', fieldName: 'Nursery', type: 'select', options: [] },
 
 ];
 
-class Harvest extends React.Component {
+class PlantedCrop extends React.Component {
 
     constructor(props) {
         super(props);
@@ -169,7 +171,7 @@ class Harvest extends React.Component {
                 <div className='Form'>
                     <div className='row'>
                         <div className='column column-33 column-offset-33'>
-                            <h1>Harvest</h1>
+                            <h1>Bed Setup</h1>
                             <Form fields={this.state.fields}
                                 changeFunction={this.onInputChange.bind(this)}
                                 submitFunction={this.onFormSubmit.bind(this)}
@@ -194,4 +196,4 @@ class Harvest extends React.Component {
     }
 }
 
-export default Harvest
+export default PlantedCrop

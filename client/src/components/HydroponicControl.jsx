@@ -35,10 +35,11 @@ class HydroponicControl extends Component {
         this.state = {
             label: 'Hydroponic Control',
             component: 'hydroponicControl',
-            status: { hydroponicControl: {} },
+            status: { hydroponicControl: {lightStatus: false, } },
             //data: {},
-            chartData:{},
+            chartData: {},
             lightStatus: null,
+            chartTime: 60
         };
 
         this.dataArray = {};
@@ -62,8 +63,7 @@ class HydroponicControl extends Component {
         // this.socket.emit('requestMultipleSensorData', {sensors:['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], time: newestDate.Timestamp} );
         // } else {
         //this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: 1440 });
-        this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: 60 });
-
+        this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: this.state.chartTime });
 
         this.socket.on('incomingMultipleSensorData', (payload) => {
             //console.log(payload);
@@ -71,14 +71,14 @@ class HydroponicControl extends Component {
             this.dataArray = [];
 
             for (let element of payload) {
-                if(this.dataArray[element.Sensor]){
+                if (this.dataArray[element.Sensor]) {
                     this.dataArray[element.Sensor].push(element);
                 } else {
                     this.dataArray[element.Sensor] = [element];
                 }
             }
 
-            this.setState({chartData: this.dataArray});
+            this.setState({ chartData: this.dataArray });
 
         });
 
@@ -106,7 +106,7 @@ class HydroponicControl extends Component {
                 }
             }
 
-            this.setState({status: payload, chartData: this.dataArray});
+            this.setState({ status: payload, chartData: this.dataArray });
 
         });
     }
@@ -119,7 +119,6 @@ class HydroponicControl extends Component {
     }
 
     handleClickOff() {
-        //console.log(this.socket);
         this.socket.emit('hydroponicMode', 1);
     };
 
@@ -136,12 +135,12 @@ class HydroponicControl extends Component {
     };
 
     handleClickButton(value) {
-        //console.log(value);
         this.socket.emit('hydroponicCommand', value);
     }
 
-    handleClickButtonTime(value){
-         this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: value });
+    handleClickButtonTime(value) {
+        this.setState({chartTime: value});
+        this.socket.emit('requestMultipleSensorData', { sensors: ['hydroponicHumidity', 'hydroponicTemperature', 'hydroponicReservoirDepth'], timeBack: value });
     }
 
     render() {
@@ -266,27 +265,32 @@ class HydroponicControl extends Component {
                     </button>
 
                     <br />
-                    <hr/>
-                                    <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                    <hr />
+                    <button style={{ padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        className={this.state.chartTime === 10080 ? "selected" : "notSelected"}
                         onClick={this.handleClickButtonTime.bind(this, 10080)}
-                >1 week
+                    >1 week
                 </button>
-                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                    <button style={{ padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        className={this.state.chartTime === 1440 ? "selected" : "notSelected"}
                         onClick={this.handleClickButtonTime.bind(this, 1440)}
-                >24 hours
+                    >24 hours
                 </button>
-                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
-                    onClick={this.handleClickButtonTime.bind(this, 720)}
-                >12 hour
+                    <button style={{ padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        className={this.state.chartTime === 720 ? "selected" : "notSelected"}
+                        onClick={this.handleClickButtonTime.bind(this, 720)}
+                    >12 hour
                 </button>
-                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
-                    onClick={this.handleClickButtonTime.bind(this, 360)}
-                >6 hour
+                    <button style={{ padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        className={this.state.chartTime === 360 ? "selected" : "notSelected"}
+                        onClick={this.handleClickButtonTime.bind(this, 360)}
+                    >6 hour
                 </button>
-                <button style={{padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
-                    onClick={this.handleClickButtonTime.bind(this, 60)}
-                >1 hour</button>
-                <br/>
+                    <button style={{ padding: "0.3em", marginLeft: "0.7em", width: "6em" }}
+                        className={this.state.chartTime === 60 ? "selected" : "notSelected"}
+                        onClick={this.handleClickButtonTime.bind(this, 60)}
+                    >1 hour</button>
+                    <br />
                     <hr />
                     <div></div>
                     <h3>Temperature</h3>

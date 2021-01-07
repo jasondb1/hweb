@@ -2,6 +2,7 @@ const db = require('../models/Sequelize.js');
 
 module.exports = {
     getAll,
+    getNames,
     getById,
     create,
     update,
@@ -10,6 +11,15 @@ module.exports = {
 
 async function getAll() {
     return await db.Farm.findAll();
+}
+
+async function getNames() {
+    return await db.Farm.findAll(
+        {attributes: 
+            [farmId, Description]
+
+        }
+    );
 }
 
 async function getById(id) {

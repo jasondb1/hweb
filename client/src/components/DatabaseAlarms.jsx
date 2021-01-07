@@ -5,46 +5,34 @@ import httpDbService from '../services/databaseService';
 import Form from './Form';
 import List from './List';
 
-const restUrl = '/api/database/harvest/';
+const restUrl = '/api/database/alarm/';
 
 const homeicon = require('../icons/icons8-home-50.png');
 //import confirmService from '../services/confirmService'
 //const deleteIcon = require('../icons/icons8-minus-50.png');
 //const editIcon = require('../icons/icons8-minus-50.png');
-//const BEDTYPES = [{ id: "Soil", name: "Soil" }, { id: "Raised", name: "Raised" }, { id: "Nursery", name: "Nursery" }, { id: "Container", name: "Container" }, { id: "Kratky", name: "Kratky" },
-//{ id: "NFT", name: "NFT" }, { id: "DWC", name: "DWC" }, { id: "Flood & Drain", name: "Flood & Drain" }];
-//const LIGHTTYPES = [{ id: "Sun/Natural", name: "Sun/Natural" }, { id: "Greenhouse Natural", name: "Greenhouse Natural" }, { id: "Fluorescent", name: "Fluorescent" }, { id: "LED", name: "LED" }];
 
 let tableColumns = [
     //{ name: 'id', columnName: '', isDisplayed: false, type: 'hidden' },
-    { name: 'plantedcropId', columnName: 'Crop', isDisplayed: true, type: 'text' },
-    { name: 'bedId', columnName: 'Bed', isDisplayed: true, type: 'text' },
-    { name: 'HarvestDate', columnName: 'Harvest Date', isDisplayed: true, type: 'text' },
-    { name: 'Quantity', columnName: 'Quantity', isDisplayed: true, type: 'text' },
-    { name: 'Units', columnName: 'Units', isDisplayed: true, type: 'text' },
-    { name: 'Crop Age', columnName: 'CropAge', isDisplayed: true, type: 'text' },
-    { name: 'Quality', columnName: 'Notes', isDisplayed: true, type: 'text' },
-    { name: 'Notes', columnName: 'Notes', isDisplayed: true, type: 'text' },
-    { name: 'Harvested By', columnName: 'HarvestedBy', isDisplayed: true, type: 'text' },
+    { name: 'Description', columnName: 'Description', isDisplayed: true, type: 'text' },
+    { name: 'Email', columnName: 'Email', isDisplayed: true, type: 'text' },
+    { name: 'Type', columnName: 'Type', isDisplayed: true, type: 'text' },
+    { name: 'Threshold', columnName: 'Threshold', isDisplayed: true, type: 'text' },
+    { name: 'AlarmDate', columnName: 'Alarm Date', isDisplayed: true, type: 'text' },
+    { name: 'Recurrence', columnName: 'Recurrence (Days)', isDisplayed: true, type: 'text' },
 ];
 
 let formFields = [
     { name: 'id', value: null, fieldName: '', type: 'hidden' },
-    { name: 'plantedcropId', value: '', fieldName: 'Crop', type: 'select', options: [] },
-    { name: 'bedId', value: '', fieldName: 'Bed', type: 'select', options: [] },
-    { name: 'HarvestDate', value: '', fieldName: 'Harvest Date', type: 'text' },
-    { name: 'Quantity', value: '', fieldName: 'Quantity', type: 'text' },
-    { name: 'Unit', value: '', fieldName: 'Unit', type: 'text' },
-    { name: 'Quality', value: null, fieldName: 'Quality', type: 'text' },
-    { name: 'CropAge', value: null, fieldName: 'Crop Age', type: 'text' },
-    { name: 'Notes', value: '', fieldName: 'Notes', type: 'text' },
-    { name: 'HarvestedBy', value: '', fieldName: 'Harvested By', type: 'text' },
-
-    //{ name: 'nurseryId', value: '', fieldName: 'Nursery', type: 'select', options: [] },
-
+    { name: 'Type', value: '', fieldName: 'Type', type: 'text' },
+    { name: 'Description', value: null, fieldName: 'Description', type: 'text' },
+    { name: 'Email', value: '', fieldName: 'Email', type: 'text' },
+    { name: 'Threshold', value: '', fieldName: 'Threshold', type: 'text' },
+    { name: 'AlarmDate', value: '', fieldName: 'AlarmDate', type: 'text' },
+    { name: 'Recurrence', value: '', fieldName: 'Recurrence (Days)', type: 'text' },
 ];
 
-class Harvest extends React.Component {
+class Alarm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -63,18 +51,11 @@ class Harvest extends React.Component {
 
     componentDidMount() {
         //get table data
-        httpDbService.getAllRecords('/api/database/bed/').then(payload => {
-            let index = formFields.findIndex(element => element.name === 'bedId');
-            formFields[index].options = payload.map(obj => { obj.name = obj.Description; delete (obj.Description); return obj });
-            this.setState({ fields: formFields });
-        });
-
-        // //get crops
-        httpDbService.getAllRecords(restUrl).then(payload => {
-            let index = formFields.findIndex(element => element.name === 'plantedcropId');
-            formFields[index].options = payload.map(obj => { obj.name = obj.CropName; delete (obj.CropName); return obj });
-            this.setState({ fields: formFields });
-        });
+        // httpDbService.getAllRecords('/api/database/bed/').then(payload => {
+        //     let index = formFields.findIndex(element => element.name === 'BedId');
+        //     formFields[index].options = payload.map(obj => { obj.name = obj.BedDescription; delete (obj.BedDescription); return obj });
+        //     this.setState({ fields: formFields });
+        // });
 
         httpDbService.getAllRecords(restUrl).then(payload => {
             this.setState({ tableData: payload });
@@ -83,7 +64,6 @@ class Harvest extends React.Component {
 
     onInputChange(evt) {
         const value = evt.target.type === "checkbox" ? evt.target.checked : evt.target.value;
-
         formFields[evt.target.id].value = value;
         this.setState({ fields: formFields });
     }
@@ -169,7 +149,7 @@ class Harvest extends React.Component {
                 <div className='Form'>
                     <div className='row'>
                         <div className='column column-33 column-offset-33'>
-                            <h1>Harvest</h1>
+                            <h1>Bed Activity</h1>
                             <Form fields={this.state.fields}
                                 changeFunction={this.onInputChange.bind(this)}
                                 submitFunction={this.onFormSubmit.bind(this)}
@@ -194,4 +174,4 @@ class Harvest extends React.Component {
     }
 }
 
-export default Harvest
+export default Alarm

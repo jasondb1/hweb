@@ -5,10 +5,6 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             autoIncrement: true
         },
-        FarmName: {
-            type: type.STRING,
-            allowNull: false
-        },
         Location: {
             type: type.STRING
         },

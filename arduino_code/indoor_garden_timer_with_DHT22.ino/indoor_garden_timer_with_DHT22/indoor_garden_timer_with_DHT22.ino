@@ -12,6 +12,7 @@
 #include <Wire.h>
 #include <DHT.h>
 #include <NewPing.h>
+#include "PinChangeInterrupt.h"
 #include "TimeLib.h"
 struct timelib_tm tinfo;
 timelib_t time_now, initialt;
@@ -20,7 +21,7 @@ timelib_t time_now, initialt;
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-//#define DEBUG true
+//#define DEBUG
 
 //hardware parameters
 #define PUMPPIN 6
@@ -59,7 +60,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 //convenience definitions
 #define ONEDAY 86400000
 #define ONEHOUR 3600000
-#define ONEMINUTEs 60000
+#define ONEMINUTE 60000
 #define FIVEMINUTES 300000
 #define FIFTEENMINUTES 900000
 
@@ -173,12 +174,18 @@ void setup() {
   pinMode(buttonMenu, INPUT_PULLUP);
   pinMode(buttonUp, INPUT_PULLUP);
   pinMode(buttonDown, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(buttonMenu), menu_ISR, RISING);
-  attachInterrupt(digitalPinToInterrupt(buttonUp), up_ISR, RISING);
-  attachInterrupt(digitalPinToInterrupt(buttonDown), down_ISR, RISING);
+  //attachInterrupt(digitalPinToInterrupt(buttonMenu), menu_ISR, RISING);
+  //attachInterrupt(digitalPinToInterrupt(buttonUp), up_ISR, RISING);
+  //attachInterrupt(digitalPinToInterrupt(buttonDown), down_ISR, RISING);
+  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu), menu_ISR, RISING);
+  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp), up_ISR, RISING);
+  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown), down_ISR, RISING);
+
 
   digitalWrite(pumpPin, HIGH); //pump off
   digitalWrite(lightPin, HIGH); //pump off
+
+  setMode(2); //set to auto
 
   //setup sensors
   pinMode(pinLightSensor, INPUT);// Set pResistor - A0 pin as an input (optional)
@@ -219,6 +226,9 @@ void setup() {
   Serial.begin(9600);
 #endif
 
+lcd.clear();
+displayChanged = true;
+
 }
 
 
@@ -235,10 +245,10 @@ void loop() {
   unsigned long now = millis();
   readSensors();
 
-   time_now = timelib_get();
-    // Convert to human readable format
-    //timelib_break(now, &tinfo);
-    // Send to serial port
+  time_now = timelib_get();
+  // Convert to human readable format
+  //timelib_break(now, &tinfo);
+  // Send to serial port
 
 #ifdef DEBUG
   Serial.println("---Values");
@@ -252,7 +262,7 @@ void loop() {
   //calculate light on
   //if (now - lightLastOn > lightIntMillis || now < lightLastOn) { //checking when the light was last on. also when system first starts up
   if ( now > lightOnAt) {  //check if overflowing long
-    if (lightOnAt < ONEDAY && now < ONEDAY || lightOnAt > ONEDAY) { //code for light on at rollover
+    if ( (lightOnAt < ONEDAY && now < ONEDAY) || (lightOnAt > ONEDAY) ) { //code for light on at rollover
       lightLastOn = now;
       lightOnAt = lightIntMillis + now;
       lightOffAt = lightDurMillis + now;
@@ -308,8 +318,8 @@ void loop() {
   //days to change water calculation
 
   if (menuItem == STATUS) {
-    if(displayChanged){
-    displayInfo();
+    if (displayChanged) {
+      displayInfo();
     }
     delay(DELAY); //this is to save power
   } else {
@@ -353,15 +363,21 @@ void readSensors() {
 
 void displayInfo() {
 
-  lcd.clear();
+  char str2[16];
+
+  //lcd.clear();
   //print temperature
   lcd.setCursor(0, 0);
-  lcd.print(valueTemperature);
-  lcd.print((char)233);
+  dtostrf( valueTemperature, 5, 1, str2 );
+  lcd.print(str2);
+  //lcd.print(valueTemperature);
+  lcd.print((char)223);
 
   //print humidity
   lcd.setCursor(8, 0);
-  lcd.print(valueHumidity);
+  dtostrf( valueHumidity, 5, 1, str2 );
+  lcd.print(str2);
+  //lcd.print(valueHumidity);
   lcd.print("%");
 
   //print reservoir depth
@@ -389,28 +405,35 @@ void displayMenu() {
   switch (menuItem) {
     case SETMODE:
       str1 = "Set Mode";
-      sprintf(str2, "%s", setMode(sysMode) );
+      sprintf(str2, "%s", setMode(sysMode).c_str() );
+      //str2 = setMode(sysMode);
       break;
     case SETLIGHTTIME:
       str1 = "Set Light On";
-      sprintf(str2, "%0.2f hrs", (lightOnAt / 3600000) );
+      dtostrf( (lightOnAt / 3600000UL), 5, 2, str2 );
+      strcat(str2, " Hrs");
       break;
     case SETLIGHTDURATION:
       str1 = "Set Light Dur.";
-      sprintf(str2, "%0.2f Hrs", lightDurMillis / 3600000);
+      dtostrf( (lightDurMillis / 3600000UL), 5, 2, str2 );
+      strcat(str2, " Hrs");
       break;
     case SETPUMPINTERVAL:
-      str1 = "Set Pump Interval";
-      sprintf(str2, "%d mins", floodIntMillis / 60000);
+      str1 = "Set Pump Interval";     
+      sprintf(str2, "%ld Mins", floodIntMillis / 60000UL);
       break;
     case SETPUMPDURATION:
       str1 = "Set Pump Dur.";
-      sprintf(str2, "%d mins", floodDurMillis / 60000);
+      sprintf(str2, "%lu Mins", (floodDurMillis / 60000UL) );
       break;
     case SETNUTRIENTTIMER:
       str1 = "Set Nutrient Timer";
-      sprintf(str2, "%0.2f hrs", lightOnAt / 3600000);
+      dtostrf( (lightDurMillis / 3600000UL), 5, 2, str2 );
+      strcat(str2, " Hrs");
       break;
+//TODO: add change water timer
+
+      
   }
 
   lcd.clear();
@@ -418,6 +441,7 @@ void displayMenu() {
   lcd.print(str1);
   lcd.setCursor(2, 1);
   lcd.print(str2);
+  //lcd.print(lightDurMillis / 1000UL);
 
   lcd.setCursor(0, 1);
   lcd.print("-");
@@ -436,6 +460,10 @@ void displayMenu() {
 
 void menuButtonPressed() {
 
+#ifdef DEBUG
+  Serial.println("<MENU> PRESSED");
+#endif
+
   displayChanged = true;
 
   switch (menuItem) {
@@ -443,7 +471,7 @@ void menuButtonPressed() {
       menuItem = SETMODE;
       break;
     case SETMODE:
-      menuItem = SETLIGHTDURATION;
+      menuItem = SETLIGHTTIME;
       break;
     case SETLIGHTTIME:
       menuItem = SETLIGHTDURATION;
@@ -474,6 +502,10 @@ void menuButtonPressed() {
 //  process menu button pressed
 
 void upButtonPressed() {
+
+#ifdef DEBUG
+  Serial.println("<UP> PRESSED");
+#endif
 
   displayChanged = true;
 
@@ -509,6 +541,10 @@ void upButtonPressed() {
 
 void downButtonPressed() {
 
+#ifdef DEBUG
+  Serial.println("<DOWN> PRESSED");
+#endif
+
   displayChanged = true;
 
   switch (menuItem) {
@@ -541,6 +577,7 @@ void downButtonPressed() {
 //  process menu button pressed
 
 void menu_ISR() {
+
   buttonStatus = MENU;
 }
 

@@ -63,14 +63,16 @@ uint32_t auxDuration = 900;
 
 #else
 uint32_t longestDelayBetweenFlooding = 240;
-uint32_t floodInterval = 30;
-uint32_t floodDuration = 5;
-uint32_t lightInterval = 120;
-uint32_t lightDuration = 60; //light off for 60 seconds
+uint32_t floodInterval = 120;
+uint32_t floodDuration = 60;
+uint32_t lightInterval = 240;
+uint32_t lightDuration = 120; //light off for 60 seconds
 uint32_t fanInterval = 120;
 uint32_t fanDuration = 60;
 uint32_t auxInterval = 120;
 uint32_t auxDuration = 60;
+uint8_t lightOnHour = 3;
+uint8_t lightOnMin = 0;
 #endif
 
 //light sensor thresholds - currently not being used
@@ -174,14 +176,18 @@ void setup() {
   // Set system time counter
   timelib_set(initialt);
   // Configure the library to update / sync every day (for hardware RTC)
-  timelib_set_provider(time_provider, TIMELIB_SECS_PER_DAY);
+  //timelib_set_provider(time_provider, TIMELIB_SECS_PER_DAY);
 
+#ifndef DEBUG
   readSettings();//Read EEPROM
+#endif
 
   //Set timers for water and nutrient timer
   time_now = timelib_get();
   time_water_expires = time_now + (daysToReplaceWater * 24 * 60 * 60L);
   time_nutrient_expires = time_now + (daysToReplaceNutrient * 24 * 60 * 60L);
+
+  resetTimers();
 
 #ifdef DEBUG
   Serial.begin(57600);
@@ -207,6 +213,7 @@ void loop() {
 
   readSensors();
 
+  timelib_t menuDelay;
   time_now = timelib_get();
 
 #ifdef DEBUG
@@ -219,49 +226,49 @@ void loop() {
 
   //Calculate when light goes on
   if ( time_now > lightOnAt) {
-    //lightOnAt = (lightInterval) + time_now;
-    //lightOffAt = (lightDuration) + time_now;
+    lightOffAt = lightDuration + lightOnAt;
+    lightOnAt = lightInterval + lightOnAt;
 
-    timelib_break(time_now, &tinfo);
-    tinfo.tm_hour = lightOnHour;
-    tinfo.tm_min = lightOnMin;
-    tinfo.tm_sec = 00;
-    // Convert time structure to timestamp
-    lightOnAt = timelib_make(&tinfo);
-    lightOffAt = lightOnAt + lightDuration;
-    if (lightOnAt < time_now) {
-      lightOnAt += (24 * 60 * 60UL);
-    }
-
+    //        timelib_break(lightOnAt, &tinfo);
+    //        tinfo.tm_hour = lightOnHour;
+    //        tinfo.tm_min = lightOnMin;
+    //        tinfo.tm_sec = 00;
+    //        // Convert time structure to timestamp
+    //        lightOnAt = timelib_make(&tinfo);
   }
 
   //if light is on calculate when to run pump
   if (statusLightOn || pumpWhenLightOff) {
-    if (time_now - pumpLastOn > floodInterval || time_now < pumpLastOn) { //checking when the pump was last on.
+    //    if ( (time_now - pumpLastOn) > floodInterval || time_now < pumpLastOn) { //checking when the pump was last on.
+    //      pumpLastOn = time_now;
+    //      pumpOffAt = pumpOnAt + floodDuration; //pumpOffAt has been added so that the pump doesn't switch off during a cycle if the lights go our or sun goes down
+    //      pumpOnAt = pumpOnAt + floodInterval;
+    //    }
+    //calculate when to turn fan on
+    if ( time_now > pumpOnAt) {
       pumpLastOn = time_now;
-      pumpOnAt = time_now + floodInterval;
-      pumpOffAt = time_now + floodDuration; //pumpOffAt has been added so that the pump doesn't switch off during a cycle if the lights go our or sun goes down
+      pumpOffAt = pumpOnAt + floodDuration; //pumpOffAt has been added so that the pump doesn't switch off during a cycle if the lights go our or sun goes down
+      pumpOnAt = pumpOnAt + floodInterval;
     }
   }
 
-  //TODO: need to adjust longest delay between flooding with unix timestamps
-  //  //turn pump on at least once every x hours even without light
-  //  if (time_now - pumpLastOn > longestDelayBetweenFlooding && time_now > longestDelayBetweenFlooding) {
-  //    pumpLastOn = time_now;
-  //    pumpOnAt = time_now + floodInterval;
-  //    pumpOffAt = time_now + floodDuration;
-  //  }
+  //turn pump on at least once every x hours even without light
+  if ( (time_now - pumpLastOn) > longestDelayBetweenFlooding) {
+    pumpLastOn = time_now;
+    pumpOnAt = time_now + floodInterval;
+    pumpOffAt = time_now + floodDuration;
+  }
 
   //calculate when to turn fan on
-  if ( time_now > fanOnAt) {  //check if overflowing long
-    fanOnAt = fanInterval + time_now;
-    fanOffAt = fanDuration  + time_now;
+  if ( time_now > fanOnAt) {
+    fanOffAt = fanDuration  + fanOnAt;
+    fanOnAt = fanInterval + fanOnAt;
   }
 
   //calculate when to turn aux on
-  if ( time_now > auxOnAt) {  //check if overflowing long
-    auxOnAt = auxInterval + time_now;
-    auxOffAt = auxDuration + time_now;
+  if ( time_now > auxOnAt) {
+    auxOffAt = auxDuration + auxOnAt;
+    auxOnAt = auxInterval + auxOnAt;
   }
 
   //light on and off default to on
@@ -324,6 +331,7 @@ void loop() {
         downButtonPressed();
         break;
     }
+    //menuDelay = time_now + 15; //15 second delay
   }
 
   if (menuItem == STATUS) {
@@ -334,11 +342,16 @@ void loop() {
     }
     delay(DELAY); //this is to save power
   } else {
-
+    
+    //if (time_now > menuDelay) {
+    //menuItem = STATUS;
+    //displayChanged = true;
+    //}
+    
     if (displayChanged) {
       displayMenu();
     }
-    delay(250);
+    delay(180);
   }
 }
 
@@ -377,9 +390,17 @@ void displayInfo(int screen) {
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
-      printTime(lightOnAt);
-      lcd.print("-");
-      printTime(lightOffAt);
+
+      if (statusLightOn) {
+        printTime(lightOnAt);
+        lcd.print("-");
+        printTime(lightOffAt);
+      } else {
+        printTime(lightOffAt);
+        lcd.print("-");
+        printTime(lightOnAt);
+      }
+      
       break;
     case 2:
       lcd.setCursor(0, 0);
@@ -388,6 +409,7 @@ void displayInfo(int screen) {
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
+      
       if (statusPumpOn) {
         lcd.print("Off ");
         printTime(pumpOffAt);
@@ -399,6 +421,7 @@ void displayInfo(int screen) {
         lcd.setCursor(11, 1);
         lcd.print( (pumpOnAt - time_now) / 60UL);
       }
+      
       break;
     case 3:
       lcd.setCursor(0, 0);
@@ -407,6 +430,7 @@ void displayInfo(int screen) {
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
+      
       if (statusFanOn) {
         lcd.print("Off ");
         printTime(auxOffAt);
@@ -418,6 +442,7 @@ void displayInfo(int screen) {
         lcd.setCursor(11, 1);
         lcd.print( (fanOnAt - time_now) / 60UL);
       }
+      
       break;
     case 4:
       lcd.setCursor(0, 0);
@@ -426,6 +451,7 @@ void displayInfo(int screen) {
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
+      
       if (statusAuxOn) {
         lcd.print("Off ");
         printTime(auxOffAt);
@@ -437,6 +463,7 @@ void displayInfo(int screen) {
         lcd.setCursor(11, 1);
         lcd.print( (auxOnAt - time_now) / 60UL);
       }
+      
       break;
     case 5:
       lcd.print("Max/Min");
@@ -489,11 +516,11 @@ void displayInfo(int screen) {
 #endif
 
       //  //Days to Water Change
-      //  sprintf(str, "% ld", (time_water_expires - time_now) / (24 * 60 * 60L) );
+      sprintf(str, "W% ld", (int32_t)((time_water_expires - time_now) / (24 * 60 * 60L)) );
       //  lcd.setCursor(13, 0);
       //  lcd.print(str);
       //Hours to Water Change temp
-      sprintf(str, "W%ld", (time_water_expires - time_now) / (60 * 60L) );
+      //sprintf(str, "W%ld", (time_water_expires - time_now) / (60 * 60L) );
       lcd.setCursor(12, 0);
       lcd.print(str);
       //print temperature
@@ -507,11 +534,11 @@ void displayInfo(int screen) {
       lcd.print(str2);
       lcd.print("%");
       //  //Days to Nutrient Change
-      //  sprintf(str, "N% ld", (time_nutrient_expires - time_now) / (24 * 60 * 60L) );
+      sprintf(str, "N% ld", (int32_t)((time_nutrient_expires - time_now) / (24 * 60 * 60L)) );
       //  lcd.setCursor(13, 1);
       //  lcd.print(str);
       //Days to Nutrient Change
-      sprintf(str, "N%ld", (time_nutrient_expires - time_now) / (60 * 60L) );
+      //sprintf(str, "N%ld", (time_nutrient_expires - time_now) / (60 * 60L) );
       lcd.setCursor(12, 1);
       lcd.print(str);
       break;
@@ -540,6 +567,41 @@ void printTime(timelib_t timestamp)
   //    lcd.print('0');
   //  lcd.print(tinfo.tm_sec);
 
+
+}
+
+/////////////////////////
+// resetLightTimer()
+//
+// Reset Timers for Light
+
+void resetLightTimer() {
+  time_now = timelib_get();
+  timelib_break(time_now, &tinfo);
+  tinfo.tm_hour = lightOnHour;
+  tinfo.tm_min = lightOnMin;
+  tinfo.tm_sec = 00;
+  // Convert time structure to timestamp
+  lightOnAt = timelib_make(&tinfo);
+  lightOffAt = lightOnAt + lightDuration;
+
+  if (lightOnAt < time_now) {
+    lightOnAt += (24 * 60 * 60UL); //set to next day
+  }
+
+}
+
+/////////////////////////
+// resetTimers()
+//
+// Reset Timers for Light, pump, fan and aux
+
+void resetTimers() {
+  resetLightTimer();
+  pumpOnAt = time_now;
+  pumpLastOn = time_now;
+  fanOnAt = time_now;
+  auxOnAt = time_now;
 
 }
 
@@ -755,7 +817,7 @@ void menuButtonPressed() {
       menuItem = STATUS;
       lcd.clear();
   }
-  delay(250);
+  delay(180);
   buttonStatus = NONE;
 
 }
@@ -779,25 +841,21 @@ void upButtonPressed() {
       break;
     case SETHOUR:
       timelib_break(time_now, &tinfo);
-
       if (tinfo.tm_hour >= 23) {
         tinfo.tm_hour = 0;
       } else {
         tinfo.tm_hour += 1;
       }
-
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
       break;
     case SETMINUTE:
       timelib_break(time_now, &tinfo);
-
       if (tinfo.tm_min >= 59) {
         tinfo.tm_min = 0;
       } else {
         tinfo.tm_min += 1;
       }
-
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
       break;
@@ -810,40 +868,51 @@ void upButtonPressed() {
     case SETLIGHTTIMEHOURS:
       lightOffAt += (60UL * 60); //add 15 minutes for light off at - used to start cycle later in the day
       lightOnAt += (60UL * 60);
+      resetLightTimer();
       break;
     case SETLIGHTTIMEMINUTES:
       lightOffAt += (1UL * 60); //add 15 minutes for light off at - used to start cycle later in the day
       lightOnAt += (1UL * 60);
+      resetLightTimer();
       break;
     case SETLIGHTDURATION:
       lightDuration += (15UL * 60); //add 15 minutes for light duration
+      resetLightTimer();
       break;
     case SETCONTINUOUSPUMP:
       continuousPump = !continuousPump;
       break;
     case SETPUMPINTERVAL:
       floodInterval += (1UL * 60); //add 1 minute for pump cycle
+      pumpOnAt = time_now;
+      pumpLastOn = time_now;
       break;
     case SETPUMPDURATION:
       floodDuration += (1UL * 60); //add 1 minutes for pump duration
+      pumpOnAt = time_now;
+      pumpLastOn = time_now;
       break;
     case SETCONTINUOUSFAN:
       continuousFan = !continuousFan;
       break;
     case SETFANINTERVAL:
       fanInterval += (FANINCREMENT * 60UL); //add 1 minute for pump cycle
+      fanOnAt = time_now;
       break;
     case SETFANDURATION:
       fanDuration += (FANINCREMENT * 60UL); //add 1 minutes for pump duration
+      fanOnAt = time_now;
       break;
     case SETCONTINUOUSAUX:
       continuousAux = !continuousAux;
       break;
     case SETAUXINTERVAL:
       auxInterval += (AUXINCREMENT * 60UL); //add 1 minute for pump cycle
+      auxOnAt = time_now;
       break;
     case SETAUXDURATION:
       auxDuration += (AUXINCREMENT * 60UL); //add 1 minutes for pump duration
+      auxOnAt = time_now;
       break;
     case SETWATERTIMER:
 
@@ -878,12 +947,16 @@ void upButtonPressed() {
       lcd.clear();
       break;
     default:
-      displayScreen++;
+      if (++displayScreen > 8){
+        displayScreen = 0;
+      }
+      
+      displayScreen = (displayScreen++ % 10);
       displayChanged = true;
       lcd.clear();
   }
 
-  delay(250);
+  delay(180);
   buttonStatus = NONE;
 }
 
@@ -912,10 +985,9 @@ void downButtonPressed() {
       } else {
         tinfo.tm_hour -= 1;
       }
-
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
-
+      resetTimers();
       break;
     case SETMINUTE:
       timelib_break(time_now, &tinfo);
@@ -925,9 +997,9 @@ void downButtonPressed() {
       } else {
         tinfo.tm_min -= 1;
       }
-
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
+      resetTimers();
       break;
     case RESETWATERTIMER:
       time_water_expires = timelib_get() + (daysToReplaceWater * 24 * 60 * 60UL);
@@ -939,44 +1011,54 @@ void downButtonPressed() {
       //decrease light on time by 15 minutes
       lightOffAt -= (60UL * 60); //Sub 1 hours for light off at - used to start cycle later in the day
       lightOnAt -= (60UL * 60);
+      resetLightTimer();
       break;
     case SETLIGHTTIMEMINUTES:
       //decrease light on time by 15 minutes
       lightOffAt -= (1UL * 60); //Sub 1 minutes for light off at - used to start cycle later in the day
       lightOnAt -= (1UL * 60);
+      resetLightTimer();
       break;
     case SETLIGHTDURATION:
       lightDuration -= (15UL * 60); //sub 15 minutes for light duration
+      resetLightTimer();
       break;
     case SETCONTINUOUSPUMP:
       continuousPump = !continuousPump;
       break;
     case SETPUMPINTERVAL:
       floodInterval -= (1UL * 60); //sub 1 minutes for pump cycle
+       pumpOnAt = time_now;
+      pumpLastOn = time_now;
       break;
     case SETPUMPDURATION:
       floodDuration -= (1UL * 60); //sub 1 minutes for pump duration
+       pumpOnAt = time_now;
+      pumpLastOn = time_now;
       break;
     case SETCONTINUOUSFAN:
       continuousFan = !continuousFan;
       break;
     case SETFANINTERVAL:
       fanInterval -= (FANINCREMENT * 60UL); //sub 1 minute for pump cycle
+      fanOnAt = time_now;
       break;
     case SETFANDURATION:
       fanDuration -= (FANINCREMENT * 60UL); //sub 1 minutes for pump duration
+      fanOnAt = time_now;
       break;
     case SETCONTINUOUSAUX:
       continuousAux = !continuousAux;
       break;
     case SETAUXINTERVAL:
       auxInterval -= (AUXINCREMENT * 60UL); //sub 1 minute for pump cycle
+      auxOnAt = time_now;
       break;
     case SETAUXDURATION:
       auxDuration -= (AUXINCREMENT * 60UL); //sub 1 minutes for pump duration
+      auxOnAt = time_now;
       break;
     case SETWATERTIMER:
-
       if (daysToReplaceWater < 1) {
         daysToReplaceWater = 1;
       } else {
@@ -1007,12 +1089,12 @@ void downButtonPressed() {
       lcd.clear();
       break;
     default:
-      displayScreen--;
+      displayScreen = displayScreen--;
       displayChanged = true;
       lcd.clear();
   }
 
-  delay(250);
+  delay(180);
   buttonStatus = NONE;
 }
 
@@ -1250,11 +1332,11 @@ void requestEvent() {
 
 }
 
-timelib_t time_provider()
-{
-  // Prototype if the function providing time information
-  return initialt;
-}
+//timelib_t time_provider()
+//{
+//  // Prototype if the function providing time information
+//  return initialt;
+//}
 
 
 /////////////////////////
@@ -1365,17 +1447,6 @@ void readSettings() {
   EEPROM.get(EEAddr, pumpWhenLightOff); EEAddr += sizeof(pumpWhenLightOff);
   EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
 
-  time_now = timelib_get();
-  timelib_break(time_now, &tinfo);
-  tinfo.tm_hour = lightOnHour;
-  tinfo.tm_min = lightOnMin;
-  tinfo.tm_sec = 00;
-  // Convert time structure to timestamp
-  lightOnAt = timelib_make(&tinfo);
-  lightOffAt = lightOnAt + lightDuration;
-  if (lightOnAt < time_now) {
-    lightOnAt += (24 * 60 * 60UL);
-  }
 }
 
 /////////////////////////

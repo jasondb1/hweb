@@ -15,6 +15,7 @@
 #define DISPLAYRESERVOIR
 #define AUXINCREMENT 15 //minute increments
 #define FANINCREMENT 15 //minute increments
+#define MENUDELAY 10UL
 
 #define swName = "Hydroponics Controller"
 #define swVer = "1.2"

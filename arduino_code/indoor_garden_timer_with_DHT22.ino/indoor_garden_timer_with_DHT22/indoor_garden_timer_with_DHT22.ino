@@ -8,6 +8,7 @@
 //Timelibrary
 struct timelib_tm tinfo;
 timelib_t time_now, initialt, time_water_expires, time_nutrient_expires, time_next_update;
+uint8_t previousDay;
 
 //communications
 char buffer_out[BUFSIZE]; //max buffer size is 32 bytes
@@ -105,7 +106,7 @@ boolean manualMode = false;
 boolean continuousPump = true;
 boolean continuousFan = false;
 boolean continuousAux = false;
-boolean pumpWhenLightOff = false;
+boolean pumpWhenLightOff = true;
 
 int16_t valuePhotoResistor = -99;
 float valueHumidity = -99;
@@ -117,10 +118,16 @@ int16_t valueReservoirDepth = -99;
 uint8_t index = 0;
 uint16_t reservoirTop = RESERVOIR_TOP;
 uint16_t reservoirBottom = RESERVOIR_BOTTOM;
+int8_t maxTemp = -127;
+int8_t minTemp = 127;
 
 sMode systemMode = AUTO;
 uint8_t sysMode = 0;
 uint8_t displayScreen = 0;
+
+
+
+
 
 
 /////////////////////////
@@ -187,6 +194,7 @@ void setup() {
   time_water_expires = time_now + (daysToReplaceWater * 24 * 60 * 60L);
   time_nutrient_expires = time_now + (daysToReplaceNutrient * 24 * 60 * 60L);
 
+  //resetLightTimer();
   resetTimers();
 
 #ifdef DEBUG
@@ -204,6 +212,10 @@ void setup() {
 }
 
 
+
+
+
+
 /////////////////////////
 // loop()
 //
@@ -211,40 +223,27 @@ void setup() {
 
 void loop() {
 
-  readSensors();
-
   timelib_t menuDelay;
   time_now = timelib_get();
 
-#ifdef DEBUG
-  Serial.println("---Values");
-  Serial.println(valuePhotoResistor);
-  Serial.println(valueHumidity);
-  Serial.println(valueTemperature);
-  Serial.println(valueReservoirDepth);
-#endif
+  readSensors();
+
+  timelib_break(time_now, &tinfo);
+  if (tinfo.tm_mday > previousDay) {
+    previousDay = tinfo.tm_mday;
+    maxTemp = -127;
+    minTemp = 127;
+    //TODO: days planted write days planted
+  }
 
   //Calculate when light goes on
   if ( time_now > lightOnAt) {
     lightOffAt = lightDuration + lightOnAt;
     lightOnAt = lightInterval + lightOnAt;
-
-    //        timelib_break(lightOnAt, &tinfo);
-    //        tinfo.tm_hour = lightOnHour;
-    //        tinfo.tm_min = lightOnMin;
-    //        tinfo.tm_sec = 00;
-    //        // Convert time structure to timestamp
-    //        lightOnAt = timelib_make(&tinfo);
   }
 
-  //if light is on calculate when to run pump
+  //Calculate when to run pump
   if (statusLightOn || pumpWhenLightOff) {
-    //    if ( (time_now - pumpLastOn) > floodInterval || time_now < pumpLastOn) { //checking when the pump was last on.
-    //      pumpLastOn = time_now;
-    //      pumpOffAt = pumpOnAt + floodDuration; //pumpOffAt has been added so that the pump doesn't switch off during a cycle if the lights go our or sun goes down
-    //      pumpOnAt = pumpOnAt + floodInterval;
-    //    }
-    //calculate when to turn fan on
     if ( time_now > pumpOnAt) {
       pumpLastOn = time_now;
       pumpOffAt = pumpOnAt + floodDuration; //pumpOffAt has been added so that the pump doesn't switch off during a cycle if the lights go our or sun goes down
@@ -252,12 +251,12 @@ void loop() {
     }
   }
 
-  //turn pump on at least once every x hours even without light
-  if ( (time_now - pumpLastOn) > longestDelayBetweenFlooding) {
-    pumpLastOn = time_now;
-    pumpOnAt = time_now + floodInterval;
-    pumpOffAt = time_now + floodDuration;
-  }
+  //  //turn pump on at least once every x hours even without light
+  //  if ( (time_now - pumpLastOn) > longestDelayBetweenFlooding) {
+  //    pumpLastOn = time_now;
+  //    pumpOnAt = time_now + floodInterval;
+  //    pumpOffAt = time_now + floodDuration;
+  //  }
 
   //calculate when to turn fan on
   if ( time_now > fanOnAt) {
@@ -331,7 +330,7 @@ void loop() {
         downButtonPressed();
         break;
     }
-    //menuDelay = time_now + 15; //15 second delay
+    menuDelay = time_now + MENUDELAY; //15 second delay
   }
 
   if (menuItem == STATUS) {
@@ -342,18 +341,25 @@ void loop() {
     }
     delay(DELAY); //this is to save power
   } else {
-    
-    //if (time_now > menuDelay) {
-    //menuItem = STATUS;
-    //displayChanged = true;
-    //}
-    
+
+
     if (displayChanged) {
       displayMenu();
     }
+
+    if (time_now > menuDelay) {
+      menuItem = STATUS;
+      lcd.clear();
+      displayChanged = true;
+      displayInfo(displayScreen);
+    }
+
     delay(180);
   }
 }
+
+
+
 
 
 /////////////////////////
@@ -369,7 +375,27 @@ void readSensors() {
   uint16_t distance = sonar.convert_cm(sonar.ping_median(5));
   valueReservoirDepth = reservoirBottom - distance;
 
+  if (valueTemperature > maxTemp)
+    maxTemp = valueTemperature;
+
+  if (valueTemperature < minTemp)
+    minTemp = valueTemperature;
+
+
+
+#ifdef DEBUG
+  Serial.println("---Values");
+  Serial.println(valuePhotoResistor);
+  Serial.println(valueHumidity);
+  Serial.println(valueTemperature);
+  Serial.println(valueReservoirDepth);
+#endif
+
 }
+
+
+
+
 
 /////////////////////////
 // displayInfo()
@@ -400,7 +426,7 @@ void displayInfo(int screen) {
         lcd.print("-");
         printTime(lightOnAt);
       }
-      
+
       break;
     case 2:
       lcd.setCursor(0, 0);
@@ -409,7 +435,7 @@ void displayInfo(int screen) {
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
-      
+
       if (statusPumpOn) {
         lcd.print("Off ");
         printTime(pumpOffAt);
@@ -421,16 +447,16 @@ void displayInfo(int screen) {
         lcd.setCursor(11, 1);
         lcd.print( (pumpOnAt - time_now) / 60UL);
       }
-      
+
       break;
     case 3:
       lcd.setCursor(0, 0);
-      lcd.print("Fan:");
+      lcd.print("Aux1:");
       lcd.print( statusFanOn ? "On" : "Off");
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
-      
+
       if (statusFanOn) {
         lcd.print("Off ");
         printTime(auxOffAt);
@@ -442,16 +468,16 @@ void displayInfo(int screen) {
         lcd.setCursor(11, 1);
         lcd.print( (fanOnAt - time_now) / 60UL);
       }
-      
+
       break;
     case 4:
       lcd.setCursor(0, 0);
-      lcd.print("Aux:");
+      lcd.print("Aux2:");
       lcd.print( statusAuxOn ? "On" : "Off");
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
-      
+
       if (statusAuxOn) {
         lcd.print("Off ");
         printTime(auxOffAt);
@@ -463,41 +489,48 @@ void displayInfo(int screen) {
         lcd.setCursor(11, 1);
         lcd.print( (auxOnAt - time_now) / 60UL);
       }
-      
+
       break;
     case 5:
-      lcd.print("Max/Min");
+      lcd.setCursor(0, 0);
+      lcd.print("Max Temp: ");
+      lcd.print(maxTemp);
+      lcd.setCursor(0, 1);
+      lcd.print("Min Temp: ");
+      lcd.print(minTemp);
+      //sprintf(str, "%3d %3d", maxTemp, minTemp, maxHumidity, minHumidity );
+      //lcd.print(str);
       //temp max
       break;
+    //    case 6:
+    //      lcd.setCursor(0 , 0);
+    //      lcd.print(time_now);
+    //      lcd.setCursor(0 , 1);
+    //      lcd.print(lightOffAt);
+    //      lcd.print(" ");
+    //      lcd.print( (lightOffAt - time_now) / 60UL );
+    //      break;
+    //    case 7:
+    //      lcd.setCursor(0 , 0);
+    //      lcd.print(time_now);
+    //      lcd.setCursor(0 , 1);
+    //      lcd.print(lightOnAt);
+    //      lcd.print(" ");
+    //      lcd.print( (lightOnAt - time_now) / 60UL);
+    //      break;
     case 6:
-      lcd.setCursor(0 , 0);
-      lcd.print(time_now);
-      lcd.setCursor(0 , 1);
-      lcd.print(lightOffAt);
-      lcd.print(" ");
-      lcd.print( (lightOffAt - time_now) / 60UL );
-      break;
-    case 7:
-      lcd.setCursor(0 , 0);
-      lcd.print(time_now);
-      lcd.setCursor(0 , 1);
-      lcd.print(lightOnAt);
-      lcd.print(" ");
-      lcd.print( (lightOnAt - time_now) / 60UL);
-      break;
-    case 8:
       lcd.setCursor(0, 0);
       //printTime(pumpOnAt);
-      sprintf(str, "L% ld P% ld", ( (lightOnAt - time_now) / (1 * 60UL) ) , ( pumpOnAt - time_now ) / (1 * 60L) );
+      sprintf(str, "ON L% ld P% ld", ( (lightOnAt - time_now) / (1 * 60UL) ) , ( pumpOnAt - time_now ) / (1 * 60L) );
       lcd.print(str);
       lcd.setCursor(0, 1);
       sprintf(str, "F% ld A% ld", ( (fanOnAt - time_now) / (1 * 60UL) ), ( (auxOnAt - time_now) / (1 * 60UL) ) );
       lcd.print(str);
       break;
-    case 9:
+    case 7:
       lcd.setCursor(0, 0);
       //printTime(pumpOnAt);
-      sprintf(str, "L% ld P% ld", ( (lightOffAt - time_now) / (1 * 60UL) ) , (pumpOffAt - time_now) / (1 * 60UL) );
+      sprintf(str, "OFF L% ld P% ld", ( (lightOffAt - time_now) / (1 * 60UL) ) , (pumpOffAt - time_now) / (1 * 60UL) );
       lcd.print(str);
       lcd.setCursor(0, 1);
       sprintf(str, "F% ld A% ld", ( (fanOffAt - time_now) / (1 * 60UL) ), ( (auxOffAt - time_now) / (1 * 60UL) ) );
@@ -546,6 +579,10 @@ void displayInfo(int screen) {
 
 }
 
+
+
+
+
 /////////////////////////
 // printTime(timelib_t)
 //
@@ -570,6 +607,10 @@ void printTime(timelib_t timestamp)
 
 }
 
+
+
+
+
 /////////////////////////
 // resetLightTimer()
 //
@@ -591,6 +632,10 @@ void resetLightTimer() {
 
 }
 
+
+
+
+
 /////////////////////////
 // resetTimers()
 //
@@ -598,12 +643,46 @@ void resetLightTimer() {
 
 void resetTimers() {
   resetLightTimer();
-  pumpOnAt = time_now;
+  pumpOnAt = time_now + floodInterval;
   pumpLastOn = time_now;
-  fanOnAt = time_now;
-  auxOnAt = time_now;
+  pumpOffAt = time_now + floodDuration;
+  fanOnAt = lightOnAt - lightInterval;
+  auxOnAt = lightOnAt - lightInterval;
+
+  while (fanOnAt < time_now) {
+    fanOnAt += fanInterval;
+  }
+
+  while (auxOnAt < time_now) {
+    auxOnAt += auxInterval;
+  }
+
+  fanOffAt = fanOnAt + fanDuration - fanInterval;
+  auxOffAt = auxOnAt + auxDuration - auxInterval;
 
 }
+
+
+
+
+
+///////////////////////////
+//// resetTimers()
+////
+//// Reset Timers for Light, pump, fan and aux
+//
+//void resetTimers() {
+//  resetLightTimer();
+//  pumpOnAt = time_now;
+//  pumpLastOn = time_now;
+//  fanOnAt = time_now;
+//  auxOnAt = time_now;
+//
+//}
+
+
+
+
 
 /////////////////////////
 // displayMenu()
@@ -679,7 +758,7 @@ void displayMenu() {
       sprintf(str2, "%lu Mins", (floodDuration / 60UL) );
       break;
     case SETCONTINUOUSFAN:
-      str1 = "Continuous Fan";
+      str1 = "Continuous Aux1";
       if (continuousFan) {
         strcpy(str2, "Continuous");
       } else {
@@ -687,15 +766,15 @@ void displayMenu() {
       }
       break;
     case SETFANINTERVAL:
-      str1 = "Set Fan Interval";
+      str1 = "Set Aux1 Interval";
       sprintf(str2, "%lu Mins", fanInterval / 60UL);
       break;
     case SETFANDURATION:
-      str1 = "Set Fan Dur.";
+      str1 = "Set Aux1 Dur.";
       sprintf(str2, "%lu Mins", (fanDuration / 60UL) );
       break;
     case SETCONTINUOUSAUX:
-      str1 = "Continuous Aux";
+      str1 = "Continuous Aux2";
       if (continuousAux) {
         strcpy(str2, "Continuous");
       } else {
@@ -703,11 +782,11 @@ void displayMenu() {
       }
       break;
     case SETAUXINTERVAL:
-      str1 = "Set Aux Interval";
+      str1 = "Set Aux2 Interval";
       sprintf(str2, "%lu Mins", auxInterval / 60UL);
       break;
     case SETAUXDURATION:
-      str1 = "Set Aux Dur.";
+      str1 = "Set Aux2 Dur.";
       sprintf(str2, "%lu Mins", (auxDuration / 60UL) );
       break;
     case SETRESERVOIRBOTTOM:
@@ -848,6 +927,7 @@ void upButtonPressed() {
       }
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
+      resetTimers();
       break;
     case SETMINUTE:
       timelib_break(time_now, &tinfo);
@@ -858,6 +938,7 @@ void upButtonPressed() {
       }
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
+      resetTimers();
       break;
     case RESETWATERTIMER:
       time_water_expires = timelib_get() + (daysToReplaceWater * 24 * 60 * 60UL);
@@ -866,53 +947,51 @@ void upButtonPressed() {
       time_nutrient_expires = timelib_get() + (daysToReplaceNutrient * 24 * 60 * 60UL);
       break;
     case SETLIGHTTIMEHOURS:
-      lightOffAt += (60UL * 60); //add 15 minutes for light off at - used to start cycle later in the day
-      lightOnAt += (60UL * 60);
-      resetLightTimer();
+      lightOnHour++;
+      //lightOnAt += (60UL * 60);
+      resetTimers();
       break;
     case SETLIGHTTIMEMINUTES:
-      lightOffAt += (1UL * 60); //add 15 minutes for light off at - used to start cycle later in the day
-      lightOnAt += (1UL * 60);
-      resetLightTimer();
+      lightOnMin++;
+      //lightOnAt += (1UL * 60);
+      resetTimers();
       break;
     case SETLIGHTDURATION:
       lightDuration += (15UL * 60); //add 15 minutes for light duration
-      resetLightTimer();
+      resetTimers();
       break;
     case SETCONTINUOUSPUMP:
       continuousPump = !continuousPump;
       break;
     case SETPUMPINTERVAL:
       floodInterval += (1UL * 60); //add 1 minute for pump cycle
-      pumpOnAt = time_now;
-      pumpLastOn = time_now;
+      resetTimers();
       break;
     case SETPUMPDURATION:
       floodDuration += (1UL * 60); //add 1 minutes for pump duration
-      pumpOnAt = time_now;
-      pumpLastOn = time_now;
+      resetTimers();
       break;
     case SETCONTINUOUSFAN:
       continuousFan = !continuousFan;
       break;
     case SETFANINTERVAL:
       fanInterval += (FANINCREMENT * 60UL); //add 1 minute for pump cycle
-      fanOnAt = time_now;
+      resetTimers();
       break;
     case SETFANDURATION:
       fanDuration += (FANINCREMENT * 60UL); //add 1 minutes for pump duration
-      fanOnAt = time_now;
+      resetTimers();
       break;
     case SETCONTINUOUSAUX:
       continuousAux = !continuousAux;
       break;
     case SETAUXINTERVAL:
       auxInterval += (AUXINCREMENT * 60UL); //add 1 minute for pump cycle
-      auxOnAt = time_now;
+      resetTimers();
       break;
     case SETAUXDURATION:
       auxDuration += (AUXINCREMENT * 60UL); //add 1 minutes for pump duration
-      auxOnAt = time_now;
+      resetTimers();
       break;
     case SETWATERTIMER:
 
@@ -947,11 +1026,9 @@ void upButtonPressed() {
       lcd.clear();
       break;
     default:
-      if (++displayScreen > 8){
+      if (++displayScreen > 7) {
         displayScreen = 0;
       }
-      
-      displayScreen = (displayScreen++ % 10);
       displayChanged = true;
       lcd.clear();
   }
@@ -1008,55 +1085,54 @@ void downButtonPressed() {
       time_nutrient_expires = timelib_get() + (daysToReplaceNutrient * 24 * 60 * 60UL);
       break;
     case SETLIGHTTIMEHOURS:
-      //decrease light on time by 15 minutes
-      lightOffAt -= (60UL * 60); //Sub 1 hours for light off at - used to start cycle later in the day
-      lightOnAt -= (60UL * 60);
-      resetLightTimer();
+      //decrease light time
+      lightOnHour--;
+      //todo: roll over if under 0
+      //lightOnAt -= (60UL * 60);
+      resetTimers();
       break;
     case SETLIGHTTIMEMINUTES:
-      //decrease light on time by 15 minutes
-      lightOffAt -= (1UL * 60); //Sub 1 minutes for light off at - used to start cycle later in the day
-      lightOnAt -= (1UL * 60);
-      resetLightTimer();
+      //decrease light on time
+      lightOnMin--;
+      //lightOnAt -= (1UL * 60);
+      resetTimers();
       break;
     case SETLIGHTDURATION:
       lightDuration -= (15UL * 60); //sub 15 minutes for light duration
-      resetLightTimer();
+      resetTimers();
       break;
     case SETCONTINUOUSPUMP:
       continuousPump = !continuousPump;
       break;
     case SETPUMPINTERVAL:
       floodInterval -= (1UL * 60); //sub 1 minutes for pump cycle
-       pumpOnAt = time_now;
-      pumpLastOn = time_now;
+      resetTimers();
       break;
     case SETPUMPDURATION:
       floodDuration -= (1UL * 60); //sub 1 minutes for pump duration
-       pumpOnAt = time_now;
-      pumpLastOn = time_now;
+      resetTimers();
       break;
     case SETCONTINUOUSFAN:
       continuousFan = !continuousFan;
       break;
     case SETFANINTERVAL:
       fanInterval -= (FANINCREMENT * 60UL); //sub 1 minute for pump cycle
-      fanOnAt = time_now;
+      resetTimers();
       break;
     case SETFANDURATION:
       fanDuration -= (FANINCREMENT * 60UL); //sub 1 minutes for pump duration
-      fanOnAt = time_now;
+      resetTimers();
       break;
     case SETCONTINUOUSAUX:
       continuousAux = !continuousAux;
       break;
     case SETAUXINTERVAL:
       auxInterval -= (AUXINCREMENT * 60UL); //sub 1 minute for pump cycle
-      auxOnAt = time_now;
+      resetTimers();
       break;
     case SETAUXDURATION:
       auxDuration -= (AUXINCREMENT * 60UL); //sub 1 minutes for pump duration
-      auxOnAt = time_now;
+      resetTimers();
       break;
     case SETWATERTIMER:
       if (daysToReplaceWater < 1) {
@@ -1089,7 +1165,7 @@ void downButtonPressed() {
       lcd.clear();
       break;
     default:
-      displayScreen = displayScreen--;
+      displayScreen--;
       displayChanged = true;
       lcd.clear();
   }
@@ -1120,6 +1196,8 @@ void initDHT22() {
 }
 
 
+
+
 /////////////////////////
 // T expSmoothing(T value, T prevValue)
 //
@@ -1136,6 +1214,9 @@ T expSmoothing(T value, T prevValue) {
 
   return average;
 }
+
+
+
 
 /////////////////////////
 // T dataSmooth(T*)
@@ -1175,6 +1256,9 @@ T dataSmooth(T *history) {
   return avg;
 
 }
+
+
+
 
 /////////////////////////
 // receiveEvent(int)
@@ -1252,6 +1336,9 @@ void receiveEvent(int bytesReceived) {
 
   }
 }
+
+
+
 
 
 /////////////////////////
@@ -1339,6 +1426,9 @@ void requestEvent() {
 //}
 
 
+
+
+
 /////////////////////////
 // intToCharBuffer(buffer, offset, value)
 //
@@ -1352,6 +1442,9 @@ void intToCharBuffer(char *buffer, int offset, int value) {
   buffer[offset] = (value >> 8) & 0xFF;
   buffer[offset + 1] = value & 0xFF;
 }
+
+
+
 
 
 /////////////////////////
@@ -1380,11 +1473,6 @@ String setMode (int modeNumber) {
   String str;
 
   switch (modeNumber) {
-    case 0:
-      systemMode = OFF;
-      sysMode = 1;
-      str = "OFF";
-      break;
     case 1:
       systemMode = OFF;
       sysMode = 1;
@@ -1405,13 +1493,8 @@ String setMode (int modeNumber) {
       sysMode = 4;
       str = "MANUAL LIGHT";
       break;
-    case 5:
-      systemMode = MANUAL_PUMP_OFF;
-      sysMode = 4;
-      str = "MANUAL LIGHT";
-      break;
     default:
-      sysMode = 1;
+      sysMode = 2;
       systemMode = AUTO;
       str = "AUTO";
       break;
@@ -1420,6 +1503,10 @@ String setMode (int modeNumber) {
   return str;
 
 }
+
+
+
+
 
 /////////////////////////
 // readSettings()
@@ -1448,6 +1535,10 @@ void readSettings() {
   EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
 
 }
+
+
+
+
 
 /////////////////////////
 // writeSettings()
@@ -1480,6 +1571,9 @@ void writeSettings() {
 }
 
 
+
+
+
 /////////////////////////
 // menu_ISR()
 //
@@ -1490,6 +1584,9 @@ void menu_ISR() {
   buttonStatus = MENU;
 }
 
+
+
+
 /////////////////////////
 // up_ISR()
 //
@@ -1498,6 +1595,9 @@ void menu_ISR() {
 void up_ISR() {
   buttonStatus = UP;
 }
+
+
+
 
 /////////////////////////
 // down_ISR()

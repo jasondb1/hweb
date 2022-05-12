@@ -43,7 +43,7 @@ uint32_t pumpDuration = 360; //millis for flood duration : 6 mins
 uint32_t lightInterval = 86400; //24 hour cycles
 //uint32_t lightDuration = 57600; //16 hours on
 uint32_t lightDuration = 54000; //15 hours
-uint8_t lightOnHour = 3;
+uint8_t lightOnHour = 5;
 uint8_t lightOnMin = 0;
 
 #ifdef FANLARGEVALUES
@@ -97,16 +97,21 @@ uint16_t daysToReplaceNutrient = 21;
 uint16_t lightSensorNow = analogRead(pinLightSensor);
 
 //status and values
-boolean statusSystemOn = true;
-boolean statusPumpOn = false;
-boolean statusFanOn = false;
-boolean statusAuxOn = false;
-boolean statusLightOn = false;
-boolean manualMode = false;
-boolean continuousPump = true;
-boolean continuousFan = false;
-boolean continuousAux = false;
-boolean pumpWhenLightOff = true;
+
+//status and values
+struct Status{
+boolean statusSystemOn;
+boolean statusPumpOn;
+boolean statusFanOn;
+boolean statusAuxOn;
+boolean statusLightOn;
+boolean manualMode;
+boolean continuousPump;
+boolean continuousFan;
+boolean continuousAux;
+boolean pumpWhenLightOff;
+};
+
 
 int16_t valuePhotoResistor = -99;
 float valueHumidity = -99;
@@ -125,7 +130,7 @@ sMode systemMode = AUTO;
 uint8_t sysMode = 0;
 int8_t displayScreen = 0;
 
-
+  struct Status status;
 
 
 
@@ -142,7 +147,24 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print(F("Initializing..."));
 
+
+status.statusSystemOn = true;
+status.statusPumpOn = false;
+status.statusFanOn = false;
+status.statusAuxOn = false;
+status.statusLightOn = false;
+status.manualMode = false;
+status.continuousPump = true;
+status.continuousFan = false;
+status.continuousAux = false;
+status.pumpWhenLightOff = true;
+
+
   //setup pump and light
+  digitalWrite(pumpPin, HIGH);
+  digitalWrite(lightPin, HIGH);
+  digitalWrite(fanPin, HIGH);
+  digitalWrite(auxPin, HIGH);
   pinMode(pumpPin, OUTPUT);
   pinMode(lightPin, OUTPUT);
   pinMode(fanPin, OUTPUT);
@@ -270,50 +292,50 @@ void loop() {
 
   //light on and off default to on
   if ( (time_now < lightOffAt && systemMode == AUTO) || systemMode == MANUAL_PUMP_ON || systemMode == MANUAL_PUMP_OFF)  { //turning the light on
-    if (!statusLightOn) {
+    if (!status.statusLightOn) {
       digitalWrite(lightPin, LOW); //light on
-      statusLightOn = true;
+      status.statusLightOn = true;
     }
   } else {
-    if (statusLightOn) {
+    if (status.statusLightOn) {
       digitalWrite(lightPin, HIGH); //light off
-      statusLightOn = false;
+      status.statusLightOn = false;
     }
   }
 
   //TODO: Pump protection with reservoir level (may add setting for this protectionk
 
   //pump on and off default to on
-  if ( (time_now < pumpOffAt && systemMode == AUTO) || systemMode == MANUAL_PUMP_ON || (continuousPump && systemMode == AUTO) ) { //turning the pump on
+  if ( (time_now < pumpOffAt && systemMode == AUTO) || systemMode == MANUAL_PUMP_ON || (status.continuousPump && systemMode == AUTO) ) { //turning the pump on
     //if (!statusPumpOn)
     digitalWrite(pumpPin, LOW); //pump on
-    statusPumpOn = true;
+    status.statusPumpOn = true;
   } else {
     //if (statusPumpOn)
     digitalWrite(pumpPin, HIGH); //pump off
-    statusPumpOn = false;
+    status.statusPumpOn = false;
   }
 
   //fan on and off
-  if ( (time_now < fanOffAt && systemMode == AUTO) || (continuousFan && systemMode != OFF) ) { //turning the pump on
+  if ( (time_now < fanOffAt && systemMode == AUTO) || (status.continuousFan && systemMode != OFF) ) { //turning the pump on
     //if (!statusFanOn)
     digitalWrite(fanPin, LOW); //pump on
-    statusFanOn = true;
+    status.statusFanOn = true;
   } else {
     //if (statusFanOn)
     digitalWrite(fanPin, HIGH); //pump off
-    statusFanOn = false;
+    status.statusFanOn = false;
   }
 
   //aux on and off
-  if ( (time_now < auxOffAt && systemMode == AUTO) || (continuousAux && systemMode != OFF)  ) { //turning the pump on
+  if ( (time_now < auxOffAt && systemMode == AUTO) || (status.continuousAux && systemMode != OFF)  ) { //turning the pump on
     //if (!statusAuxOn)
     digitalWrite(auxPin, LOW); //pump on
-    statusAuxOn = true;
+    status.statusAuxOn = true;
   } else {
     //if (statusAuxOn)
     digitalWrite(auxPin, HIGH); //pump off
-    statusAuxOn = false;
+    status.statusAuxOn = false;
   }
 
   if (buttonStatus != NONE) {
@@ -427,12 +449,12 @@ void displayInfo(int screen) {
     case 2:
       lcd.setCursor(0, 0);
       lcd.print(F("Light:"));
-      lcd.print( statusLightOn ? " On" : "Off");
+      lcd.print( status.statusLightOn ? " On" : "Off");
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
 
-      if (statusLightOn) {
+      if (status.statusLightOn) {
         printTime(lightOnAt);
         lcd.print(F("-"));
         printTime(lightOffAt);
@@ -446,12 +468,12 @@ void displayInfo(int screen) {
     case 3:
       lcd.setCursor(0, 0);
       lcd.print(F("Pump:"));
-      lcd.print( statusPumpOn ? " On" : "Off");
+      lcd.print( status.statusPumpOn ? " On" : "Off");
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
 
-      if (statusPumpOn) {
+      if (status.statusPumpOn) {
         lcd.print(F("Off "));
         printTime(pumpOffAt);
         lcd.setCursor(11, 1);
@@ -466,12 +488,12 @@ void displayInfo(int screen) {
     case 4:
       lcd.setCursor(0, 0);
       lcd.print(F("Aux1:"));
-      lcd.print( statusFanOn ? " On" : "Off");
+      lcd.print( status.statusFanOn ? " On" : "Off");
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
 
-      if (statusFanOn) {
+      if (status.statusFanOn) {
         lcd.print(F("Off "));
         printTime(auxOffAt);
         lcd.setCursor(11, 1);
@@ -486,12 +508,12 @@ void displayInfo(int screen) {
     case 5:
       lcd.setCursor(0, 0);
       lcd.print(F("Aux2:"));
-      lcd.print( statusAuxOn ? " On" : "Off");
+      lcd.print( status.statusAuxOn ? " On" : "Off");
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
 
-      if (statusAuxOn) {
+      if (status.statusAuxOn) {
         lcd.print(F("Off "));
         printTime(auxOffAt);
         lcd.setCursor(11, 1);
@@ -704,7 +726,7 @@ void displayMenu() {
       break;
     case SETCONTINUOUSPUMP:
       str1 = F("Continuous Pump");
-      if (continuousPump) {
+      if (status.continuousPump) {
         strcpy(str2, "Continuous");
       } else {
         strcpy(str2, "Timer");
@@ -720,7 +742,7 @@ void displayMenu() {
       break;
     case SETCONTINUOUSFAN:
       str1 = F("Continuous Aux1");
-      if (continuousFan) {
+      if (status.continuousFan) {
         strcpy(str2, "Continuous");
       } else {
         strcpy(str2, "Timer");
@@ -736,7 +758,7 @@ void displayMenu() {
       break;
     case SETCONTINUOUSAUX:
       str1 = F("Continuous Aux2");
-      if (continuousAux) {
+      if (status.continuousAux) {
         strcpy(str2, "Continuous");
       } else {
         strcpy(str2, "Timer");
@@ -925,7 +947,7 @@ void upButtonPressed() {
       resetTimers();
       break;
     case SETCONTINUOUSPUMP:
-      continuousPump = !continuousPump;
+      status.continuousPump = !status.continuousPump;
       break;
     case SETPUMPINTERVAL:
       pumpInterval += (1UL * 60); //add 1 minute for pump cycle
@@ -936,7 +958,7 @@ void upButtonPressed() {
       resetTimers();
       break;
     case SETCONTINUOUSFAN:
-      continuousFan = !continuousFan;
+      status.continuousFan = !status.continuousFan;
       break;
     case SETFANINTERVAL:
       fanInterval += (FANINCREMENT * 60UL); //add 1 minute for pump cycle
@@ -947,7 +969,7 @@ void upButtonPressed() {
       resetTimers();
       break;
     case SETCONTINUOUSAUX:
-      continuousAux = !continuousAux;
+      status.continuousAux = !status.continuousAux;
       break;
     case SETAUXINTERVAL:
       auxInterval += (AUXINCREMENT * 60UL); //add 1 minute for pump cycle
@@ -1066,7 +1088,7 @@ void downButtonPressed() {
       resetTimers();
       break;
     case SETCONTINUOUSPUMP:
-      continuousPump = !continuousPump;
+      status.continuousPump = !status.continuousPump;
       break;
     case SETPUMPINTERVAL:
       pumpInterval -= (1UL * 60); //sub 1 minutes for pump cycle
@@ -1077,7 +1099,7 @@ void downButtonPressed() {
       resetTimers();
       break;
     case SETCONTINUOUSFAN:
-      continuousFan = !continuousFan;
+      status.continuousFan = !status.continuousFan;
       break;
     case SETFANINTERVAL:
       fanInterval -= (FANINCREMENT * 60UL); //sub 1 minute for pump cycle
@@ -1088,7 +1110,7 @@ void downButtonPressed() {
       resetTimers();
       break;
     case SETCONTINUOUSAUX:
-      continuousAux = !continuousAux;
+      status.continuousAux = !status.continuousAux;
       break;
     case SETAUXINTERVAL:
       auxInterval -= (AUXINCREMENT * 60UL); //sub 1 minute for pump cycle
@@ -1174,7 +1196,7 @@ void initDHT22() {
 template<typename T>
 T expSmoothing(T value, T prevValue) {
 
-  if (value > LOWPASS_VALUE) {
+  if (value > LOWPASS_VALUE || isnan(value) ) {
     return prevValue;
   }
 
@@ -1356,7 +1378,7 @@ void requestEvent() {
   if (outputText) {
     unsigned long secondsToLightOff = (lightOffAt - time_now);
     //buffer
-    sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysmode, statusLightOn, statusPumpOn, secondsToLightOff);
+    sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysmode, status.statusLightOn, status.statusPumpOn, secondsToLightOff);
 
   } else {
     //compose custom buffer output - buffer size for wire library is 32 bytes/characters, customize this for application
@@ -1365,7 +1387,7 @@ void requestEvent() {
     intToCharBuffer(buffer_out, 4, valHum);
 
     //TODO: change to unix timestamp on light
-    if (statusLightOn) {
+    if (status.statusLightOn) {
       unsigned int minutesToLightOff = (lightOffAt - time_now) / 60UL;
       //longToCharBuffer(buffer_out, 6, (lightOffAt - time_now) );
       intToCharBuffer(buffer_out, 6, minutesToLightOff);
@@ -1378,8 +1400,8 @@ void requestEvent() {
     intToCharBuffer(buffer_out, 10, pumpInterval / 60);
     intToCharBuffer(buffer_out, 12, pumpDuration / 60);
     buffer_out[14] = sysmode;
-    buffer_out[15] = statusLightOn;
-    buffer_out[16] = statusPumpOn;
+    buffer_out[15] = status.statusLightOn;
+    buffer_out[16] = status.statusPumpOn;
     intToCharBuffer(buffer_out, 17, valueReservoirDepth);
     //reserve byte for fan status
 
@@ -1486,8 +1508,8 @@ String setMode (int modeNumber) {
 void readSettings() {
 
   int EEAddr = EEADDR;
-  EEPROM.put(EEAddr, lightOnHour); EEAddr += sizeof(lightOnHour);
-  EEPROM.put(EEAddr, lightOnMin); EEAddr += sizeof(lightOnMin);
+  EEPROM.get(EEAddr, lightOnHour); EEAddr += sizeof(lightOnHour);
+  EEPROM.get(EEAddr, lightOnMin); EEAddr += sizeof(lightOnMin);
   EEPROM.get(EEAddr, lightInterval); EEAddr += sizeof(lightInterval);
   EEPROM.get(EEAddr, lightDuration); EEAddr += sizeof(lightDuration);
   EEPROM.get(EEAddr, pumpInterval); EEAddr += sizeof(pumpInterval);
@@ -1498,10 +1520,10 @@ void readSettings() {
   EEPROM.get(EEAddr, auxDuration); EEAddr += sizeof(auxDuration);
   EEPROM.get(EEAddr, daysToReplaceWater); EEAddr += sizeof(daysToReplaceWater);
   EEPROM.get(EEAddr, daysToReplaceNutrient); EEAddr += sizeof(daysToReplaceNutrient);
-  EEPROM.get(EEAddr, continuousPump); EEAddr += sizeof(continuousPump);
-  EEPROM.get(EEAddr, continuousFan); EEAddr += sizeof(continuousFan);
-  EEPROM.get(EEAddr, continuousAux); EEAddr += sizeof(continuousAux);
-  EEPROM.get(EEAddr, pumpWhenLightOff); EEAddr += sizeof(pumpWhenLightOff);
+  EEPROM.get(EEAddr, status.continuousPump); EEAddr += sizeof(status.continuousPump);
+  EEPROM.get(EEAddr, status.continuousFan); EEAddr += sizeof(status.continuousFan);
+  EEPROM.get(EEAddr, status.continuousAux); EEAddr += sizeof(status.continuousAux);
+  EEPROM.get(EEAddr, status.pumpWhenLightOff); EEAddr += sizeof(status.pumpWhenLightOff);
   EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
 
 }
@@ -1530,10 +1552,10 @@ void writeSettings() {
   EEPROM.put(EEAddr, auxDuration); EEAddr += sizeof(auxDuration);
   EEPROM.put(EEAddr, daysToReplaceWater); EEAddr += sizeof(daysToReplaceWater);
   EEPROM.put(EEAddr, daysToReplaceNutrient); EEAddr += sizeof(daysToReplaceNutrient);
-  EEPROM.put(EEAddr, continuousPump); EEAddr += sizeof(continuousPump);
-  EEPROM.put(EEAddr, continuousFan); EEAddr += sizeof(continuousFan);
-  EEPROM.put(EEAddr, continuousAux); EEAddr += sizeof(continuousAux);
-  EEPROM.put(EEAddr, pumpWhenLightOff); EEAddr += sizeof(pumpWhenLightOff);
+  EEPROM.put(EEAddr, status.continuousPump); EEAddr += sizeof(status.continuousPump);
+  EEPROM.put(EEAddr, status.continuousFan); EEAddr += sizeof(status.continuousFan);
+  EEPROM.put(EEAddr, status.continuousAux); EEAddr += sizeof(status.continuousAux);
+  EEPROM.put(EEAddr, status.pumpWhenLightOff); EEAddr += sizeof(status.pumpWhenLightOff);
   EEPROM.put(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
 
 }

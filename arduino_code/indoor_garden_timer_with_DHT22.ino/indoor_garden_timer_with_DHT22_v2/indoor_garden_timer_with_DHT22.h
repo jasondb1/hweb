@@ -4,7 +4,8 @@
 
 #include <EEPROM.h>
 #include <Wire.h>
-#include <DHT.h>
+/* #include <DHT.h> */
+#include <dhtnew.h>
 #include <NewPing.h>
 #include "PinChangeInterrupt.h"
 #include "TimeLib.h"
@@ -12,6 +13,7 @@
 
 
 /*//#define DEBUG */
+/*#define LOADDEFAULTS */
 #define AUXTWOLARGEVALUES
 #define AUXONELARGEVALUES
 
@@ -20,9 +22,10 @@
 #define PUMPDURATIONINCREMENT 1UL //minute increments
 #define AUXTWOINCREMENT 15UL //minute increments
 #define AUXONEINCREMENT 15UL //minute increments
-#define MENUDELAY 15UL //10 seconds for menu to timeout
-#define PUMPDELAY 15UL //15 second delay
-#define BUTTONTIMEOUT 150 //150 ms to prevent button bounce
+#define MENUDELAY 15UL // seconds for menu to timeout
+//#define PUMPDELAY 15UL //15 second delay
+#define EQUIPDELAY 7UL // 7 second delay
+#define BUTTONTIMEOUT 150UL //150 ms to prevent button bounce
 
 
 #define swName = "Hydroponics Controller"

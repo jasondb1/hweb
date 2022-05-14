@@ -7,13 +7,14 @@
 
 //Timelibrary
 struct timelib_tm tinfo;
-timelib_t time_now, initialt, time_water_expires, time_nutrient_expires, time_next_update;
+timelib_t time_now, initialt, time_water_expires, time_nutrient_expires, time_next_update, menuDelay;
 uint8_t previousDay;
 
 //communications
-char buffer_out[BUFSIZE]; //max buffer size is 32 bytes
-byte receivedCommands[MAX_SENT_BYTES];
-const byte outputText = false; //1 - text, 2 - binary
+uint8_t serialCommunications = 0; //0 - disable; 1 - text, 2 - binary
+boolean readReservoir = false;
+boolean readLight = false;
+
 
 //pins
 const uint8_t pumpPin = PUMPPIN; //pin number for activating relay for pump
@@ -30,11 +31,16 @@ volatile buttonModes buttonStatus = NONE; //status for ISR routine
 menuItems menuItem = STATUS;
 boolean menuItemSelected = false;
 boolean displayChanged = false;
+
+//Commonly used strings
 const char* modeDescription[4] = {"Off", "Auto", "Manual Pump", "Manual Light"};
 const char* commonString[2] = {"Off", "On"};
+const char* stringFormat[3] = {"%02d:%02d", "%d Days", "%lu:%02lu"};
 
 
-DHT dht(DHTPIN, DHTTYPE);
+//Devices
+//DHT dht(DHTPIN, DHTTYPE);
+DHTNEW dht(DHTPIN);
 NewPing sonar(TRIGPIN, ECHOPIN, MAX_DISTANCE);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -100,23 +106,23 @@ uint16_t daysToReplaceNutrient = 21;
 //setup options
 uint16_t lightSensorNow = analogRead(pinLightSensor);
 
-//status and values
-
-//status and values
-struct Status{
-boolean statusSystemOn;
-boolean statusPumpOn;
-boolean statusAuxOneOn;
-boolean statusAuxTwoOn;
-boolean statusLightOn;
-boolean manualMode;
-boolean continuousPump;
-boolean continuousAuxOne;
-boolean continuousAuxTwo;
-boolean pumpWhenLightOff;
+//status initializations
+struct Status {
+  boolean statusSystemOn;
+  boolean statusPumpOn;
+  boolean statusAuxOneOn;
+  boolean statusAuxTwoOn;
+  boolean statusLightOn;
+  boolean manualMode;
+  boolean continuousPump;
+  boolean continuousAuxOne;
+  boolean continuousAuxTwo;
+  boolean pumpWhenLightOff;
 };
 
+struct Status status;
 
+//sensor defaults
 int16_t valuePhotoResistor = -99;
 float valueHumidity = -99;
 float valueTemperature = -99;
@@ -134,9 +140,6 @@ int8_t minTemp = 127;
 uint8_t sysMode = 0;
 int8_t displayScreen = 0;
 
-struct Status status;
-
-
 
 
 /////////////////////////
@@ -149,20 +152,19 @@ void setup() {
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
-  lcd.print(F("Init..."));
+  lcd.print("Init...");
 
-
-status.statusSystemOn = true;
-status.statusPumpOn = false;
-status.statusAuxOneOn = false;
-status.statusAuxTwoOn = false;
-status.statusLightOn = false;
-status.manualMode = false;
-status.continuousPump = true;
-status.continuousAuxOne = false;
-status.continuousAuxTwo = false;
-status.pumpWhenLightOff = true;
-
+  //set status'
+  status.statusSystemOn = true;
+  status.statusPumpOn = false;
+  status.statusAuxOneOn = false;
+  status.statusAuxTwoOn = false;
+  status.statusLightOn = false;
+  status.manualMode = false;
+  status.continuousPump = true;
+  status.continuousAuxOne = false;
+  status.continuousAuxTwo = false;
+  status.pumpWhenLightOff = true;
 
   //setup pump and light
   digitalWrite(pumpPin, HIGH);
@@ -174,17 +176,17 @@ status.pumpWhenLightOff = true;
   pinMode(auxOnePin, OUTPUT);
   pinMode(auxTwoPin, OUTPUT);
 
+  //  pinMode(buttonMenu, INPUT);
+  //  pinMode(buttonUp, INPUT);
+  //  pinMode(buttonDown, INPUT);
   pinMode(buttonMenu, INPUT_PULLUP);
   pinMode(buttonUp, INPUT_PULLUP);
   pinMode(buttonDown, INPUT_PULLUP);
+  digitalWrite(buttonMenu, HIGH);
+  digitalWrite(buttonUp, HIGH);
+  digitalWrite(buttonDown, HIGH);
 
-  digitalWrite(pumpPin, HIGH); //pump off
-  digitalWrite(lightPin, LOW); //light off
-  digitalWrite(auxOnePin, LOW); //fan off
-  digitalWrite(auxTwoPin, LOW); //aux off
-
-  delay(10000);
-  //digitalWrite(pumpPin, LOW); //pump off
+  delay(5000);
 
   sysMode = 1; //set to auto
 
@@ -192,13 +194,15 @@ status.pumpWhenLightOff = true;
   pinMode(pinLightSensor, INPUT);// Set pResistor - A0 pin as an input (optional)
   pinMode(TRIGPIN, OUTPUT);
   pinMode(ECHOPIN, INPUT);
-  dht.begin();
+  //dht.begin();
   initDHT22();
 
   //setup of i2c communication
-  Wire.begin(SLAVE_ADDR);       // join i2c bus with slave address
-  Wire.onRequest(requestEvent); // register event
-  Wire.onReceive(receiveEvent);
+  if (serialCommunications > 0) {
+    Wire.begin(SLAVE_ADDR);       // join i2c bus with slave address
+    Wire.onRequest(requestEvent); // register event
+    Wire.onReceive(receiveEvent);
+  }
 
   //set time to Jan 1, 2021
   tinfo.tm_year = 21;
@@ -215,11 +219,14 @@ status.pumpWhenLightOff = true;
   //timelib_set_provider(time_provider, TIMELIB_SECS_PER_DAY);
 
 #ifndef DEBUG
+#ifndef LOADDEFAULTS
   readSettings();//Read EEPROM
+#endif
 #endif
 
   //Set timers for water and nutrient timer
   time_now = timelib_get();
+  menuDelay = time_now;
   time_water_expires = time_now + (daysToReplaceWater * 24 * 60 * 60L);
   time_nutrient_expires = time_now + (daysToReplaceNutrient * 24 * 60 * 60L);
 
@@ -231,15 +238,16 @@ status.pumpWhenLightOff = true;
   //Serial.begin(9600);
 #endif
 
-  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu), menu_ISR, FALLING);
+  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu), menu_ISR, FALLING); //UNO has only pin 2 and 3 for default interrupt, so needing alternate library to make this happen
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp), up_ISR, FALLING);
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown), down_ISR, FALLING);
+  //  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu), menu_ISR, FALLING);
+  //  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp), up_ISR, FALLING);
+  //  attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown), down_ISR, FALLING);
 
   lcd.clear();
   displayChanged = true;
-
 }
-
 
 
 /////////////////////////
@@ -249,18 +257,74 @@ status.pumpWhenLightOff = true;
 
 void loop() {
 
-  timelib_t menuDelay;
   time_now = timelib_get();
 
-  readSensors();
+  if (buttonStatus != NONE) {
+    delay(BUTTONTIMEOUT);
+    switch (buttonStatus) {
+      case MENU:
+        menuButtonPressed();
+        break;
+      case UP:
+        valueButtonPressed(1);
+        break;
+      case DOWN:
+        valueButtonPressed(-1);
+        break;
+      default:
+        menuButtonPressed();
+        break;
+    }
+    menuDelay = time_now + MENUDELAY;
+  }
 
-  timelib_break(time_now, &tinfo);
-  if (tinfo.tm_mday > previousDay) {
-    previousDay = tinfo.tm_mday;
+  if (menuItem == STATUS) {
+    if (time_now > menuDelay) {
+      displayChanged = true;
+      menuDelay = time_now + MENUDELAY; //Menu delay on screen update
+    }
+
+    if (displayChanged) {
+      displayInfo(displayScreen);
+    }
+
+    delay(DELAY); //this is to save power
+    readSensors();
+    checkTimers(time_now);
+
+  } else {
+
+    if (displayChanged) {
+      displayMenu();
+    }
+
+    if (time_now > menuDelay) {
+      menuItem = STATUS;
+      lcd.clear();
+      displayChanged = true;
+      displayInfo(displayScreen);
+    }
+    delay(BUTTONTIMEOUT);
+  }
+
+  //Check if days roll over
+  //timelib_break(time_now, &tinfo);
+  //if (tinfo.tm_mday > previousDay) {
+  //timelib_t today = timelib_day_t(time_now);
+  if ( timelib_day() > previousDay) {
+    previousDay = timelib_day();
     maxTemp = -127;
     minTemp = 127;
     //TODO: days planted write days planted
   }
+}
+
+/////////////////////////
+// checkTimers(timelib_t)
+//
+// checks and calculate new times
+
+void checkTimers(timelib_t time_now) {
 
   //Calculate when light goes on
   if ( time_now > lightOnAt) {
@@ -272,22 +336,23 @@ void loop() {
   //Calculate when to run pump
   if ( time_now > pumpOnAt) {
     pumpLastOn = time_now;
-    pumpOffAt = time_now + pumpDuration;
-    pumpOnAt = time_now + pumpInterval + PUMPDELAY;
+    pumpOffAt = pumpDuration + pumpOnAt;
+    //pumpOnAt = time_now + pumpInterval + EQUIPDELAY;
+    pumpOnAt = pumpInterval + pumpOnAt + EQUIPDELAY;
     displayChanged = true;
   }
 
   //calculate when to turn fan on
   if ( time_now > auxOneOnAt) {
     auxOneOffAt = auxOneDuration  + auxOneOnAt;
-    auxOneOnAt = auxOneInterval + auxOneOnAt;
+    auxOneOnAt = auxOneInterval + auxOneOnAt + (EQUIPDELAY * 2);
     displayChanged = true;
   }
 
   //calculate when to turn aux on
   if ( time_now > auxTwoOnAt) {
     auxTwoOffAt = auxTwoDuration + auxTwoOnAt;
-    auxTwoOnAt = auxTwoInterval + auxTwoOnAt;
+    auxTwoOnAt = auxTwoInterval + auxTwoOnAt + (EQUIPDELAY * 3);
     displayChanged = true;
   }
 
@@ -339,55 +404,8 @@ void loop() {
     status.statusAuxTwoOn = false;
   }
 
-  if (buttonStatus != NONE) {
-    switch (buttonStatus) {
-      case MENU:
-        menuButtonPressed();
-        break;
-      case UP:
-        valueButtonPressed(1);
-        break;
-      case DOWN:
-        valueButtonPressed(-1);
-        break;
-    }
-    menuDelay = time_now + MENUDELAY; 
-  }
-
-  if (menuItem == STATUS) {
-    //if (displayChanged || (time_now > time_next_update) ) {
-    if (time_now > menuDelay) {
-      displayChanged = true;
-      menuDelay = time_now + MENUDELAY; //Menu delay update
-    }
-
-    if (displayChanged ) {
-      displayInfo(displayScreen);
-      //time_next_update = time_now + (10UL); //10 second update
-    }
-    
-    delay(DELAY); //this is to save power
-  
-  } else {
-
-
-    if (displayChanged) {
-      displayMenu();
-    }
-
-    if (time_now > menuDelay) {
-      menuItem = STATUS;
-      lcd.clear();
-      displayChanged = true;
-      displayInfo(displayScreen);
-    }
-
-    delay(BUTTONTIMEOUT);
-  }
+  return;
 }
-
-
-
 
 
 /////////////////////////
@@ -397,11 +415,23 @@ void loop() {
 
 void readSensors() {
 
-  valuePhotoResistor = analogRead(pinLightSensor);
-  valueTemperature = expSmoothing<float>(dht.readTemperature(), valueTemperature);
-  valueHumidity = expSmoothing<float>(dht.readHumidity(), valueHumidity);
-  uint16_t distance = sonar.convert_cm(sonar.ping_median(5));
-  valueReservoirDepth = reservoirBottom - distance;
+  if (readLight)
+    valuePhotoResistor = analogRead(pinLightSensor);
+
+  if (readReservoir) {
+    uint16_t distance = sonar.convert_cm(sonar.ping_median(5));
+    valueReservoirDepth = reservoirBottom - distance;
+  }
+
+  if (millis() - dht.lastRead() > 2000)
+  {
+    dht.read();
+    valueTemperature = expSmoothing<float>(dht.getTemperature(), valueTemperature);
+    valueHumidity = expSmoothing<float>(dht.getHumidity(), valueHumidity);
+  }
+
+  //  valueTemperature = expSmoothing<float>(dht.readTemperature(), valueTemperature);
+  //  valueHumidity = expSmoothing<float>(dht.readHumidity(), valueHumidity);
 
   if (valueTemperature > maxTemp)
     maxTemp = valueTemperature;
@@ -420,9 +450,6 @@ void readSensors() {
 }
 
 
-
-
-
 /////////////////////////
 // displayInfo()
 //
@@ -436,17 +463,17 @@ void displayInfo(int screen) {
   switch (screen) {
 
     case 1:
+      sprintf(str, "Max Temp: %02d", maxTemp);
       lcd.setCursor(0, 0);
-      lcd.print(F("Max Temp: "));
-      lcd.print(maxTemp);
+      lcd.print(str);
       lcd.setCursor(0, 1);
-      lcd.print(F("Min Temp: "));
-      lcd.print(minTemp);
+      sprintf(str2, "Min Temp: %02d", minTemp);
+      lcd.print(str2);
       break;
     case 2:
       lcd.setCursor(0, 0);
-      lcd.print(F("Light:"));
-      lcd.print( status.statusLightOn ? commonString[1] : commonString[0]);
+      sprintf(str, "Light: %s", status.statusLightOn ? commonString[1] : commonString[0]);
+      lcd.print(str);
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
@@ -461,93 +488,92 @@ void displayInfo(int screen) {
         printTime(lightOnAt);
       }
       break;
-
     case 3:
       lcd.setCursor(0, 0);
-      lcd.print(F("Pump:"));
+      lcd.print("Pump:");
       lcd.print( status.statusPumpOn ? commonString[1] : commonString[0]);
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
 
       if (status.statusPumpOn) {
-        lcd.print(F("Off "));
+        printTime((pumpOnAt - pumpInterval));
+        lcd.print('-');
         printTime(pumpOffAt);
-        lcd.setCursor(11, 1);
-        lcd.print( ((pumpOffAt - time_now) / 60UL) +1);
       } else {
-        lcd.print(F("On  "));
+        printTime(pumpOffAt);
+        lcd.print('-');
         printTime(pumpOnAt);
-        lcd.setCursor(11, 1);
-        lcd.print( ((pumpOnAt - time_now) / 60UL) +1 );
       }
+
+      //      if (status.statusPumpOn) {
+      //        lcd.print("Off ");
+      //        printTime(pumpOffAt);
+      //        lcd.setCursor(11, 1);
+      //        lcd.print( ((pumpOffAt - time_now) / 60UL) + 1);
+      //      } else {
+      //        lcd.print("On  ");
+      //        printTime(pumpOnAt);
+      //        lcd.setCursor(11, 1);
+      //        lcd.print( ((pumpOnAt - time_now) / 60UL) + 1 );
+      //      }
       break;
     case 4:
       lcd.setCursor(0, 0);
-      lcd.print(F("Aux One:"));
+      lcd.print("Aux 1:");
       lcd.print( status.statusAuxOneOn ? commonString[1] : commonString[0]);
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
 
       if (status.statusAuxOneOn) {
-        lcd.print(F("Off "));
-        printTime(auxTwoOffAt);
-        lcd.setCursor(11, 1);
-        lcd.print( ((auxOneOffAt - time_now) / 60UL) + 1 );
+        printTime(auxOneOnAt - auxOneInterval);
+        lcd.print('-');
+        printTime(auxOneOffAt);
       } else {
-        lcd.print(F("On  "));
+        printTime(auxOneOffAt);
+        lcd.print('-');
         printTime(auxOneOnAt);
-        lcd.setCursor(11, 1);
-        lcd.print( ((auxOneOnAt - time_now) / 60UL) + 1 );
       }
+
+
+      //      if (status.statusAuxOneOn) {
+      //        lcd.print("Off ");
+      //        printTime(auxTwoOffAt);
+      //        lcd.setCursor(11, 1);
+      //        lcd.print( ((auxOneOffAt - time_now) / 60UL) + 1 );
+      //      } else {
+      //        lcd.print("On  ");
+      //        printTime(auxOneOnAt);
+      //        lcd.setCursor(11, 1);
+      //        lcd.print( ((auxOneOnAt - time_now) / 60UL) + 1 );
+      //      }
       break;
     case 5:
       lcd.setCursor(0, 0);
-      lcd.print(F("Aux Two:"));
+      lcd.print("Aux 2:");
       lcd.print( status.statusAuxTwoOn ? commonString[1] : commonString[0]);
       lcd.setCursor(11, 0);
       printTime(time_now);
       lcd.setCursor(0, 1);
-
       if (status.statusAuxTwoOn) {
-        lcd.print(F("Off "));
+        printTime(auxTwoOnAt - auxTwoInterval);
+        lcd.print('-');
         printTime(auxTwoOffAt);
-        lcd.setCursor(11, 1);
-        lcd.print( ((auxTwoOffAt - time_now) / 60UL) + 1);
       } else {
-        lcd.print(F("On  "));
+        printTime(auxTwoOffAt);
+        lcd.print('-');
         printTime(auxTwoOnAt);
-        lcd.setCursor(11, 1);
-        lcd.print( ((auxTwoOnAt - time_now) / 60UL) + 1);
       }
       break;
 
-//      case 6:
-//      lcd.setCursor(0, 0);
-//      lcd.print(F("Mem:"));
-//      lcd.setCursor(0, 1);
-//      //lcd.print(freeMemory());
-//      break;
+    //      case 6:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(F("Mem:"));
+    //      lcd.setCursor(0, 1);
+    //      //lcd.print(freeMemory());
+    //      break;
 
-
-//    case 6:
-//      lcd.setCursor(0, 0);
-//      //printTime(pumpOnAt);
-//      sprintf(str, "ON L% ld P% ld", ( (lightOnAt - time_now) / (1 * 60UL) ) , ( pumpOnAt - time_now ) / (1 * 60L) );
-//      lcd.print(str);
-//      lcd.setCursor(0, 1);
-//      sprintf(str, "F% ld A% ld", ( (auxOneOnAt - time_now) / (1 * 60UL) ), ( (auxTwoOnAt - time_now) / (1 * 60UL) ) );
-//      lcd.print(str);
-//      break;
-//    case 7:
-//      lcd.setCursor(0, 0);
-//      sprintf(str, "OFF L% ld P% ld", ( (lightOffAt - time_now) / (1 * 60UL) ) , (pumpOffAt - time_now) / (1 * 60UL) );
-//      lcd.print(str);
-//      lcd.setCursor(0, 1);
-//      sprintf(str, "F% ld A% ld", ( (auxOneOffAt - time_now) / (1 * 60UL) ), ( (auxTwoOffAt - time_now) / (1 * 60UL) ) );
-//      lcd.print(str);
-//      break;
     default:
       //print time
       displayScreen = 0;
@@ -555,13 +581,15 @@ void displayInfo(int screen) {
       printTime(time_now);
 
 #ifdef DISPLAYRESERVOIR
-      //print reservoir depth
-      lcd.setCursor(6, 0);
-      lcd.print(valueReservoirDepth);
-      lcd.print(F(" cm"));
+      if (readReservoir) {
+        //print reservoir depth
+        lcd.setCursor(6, 0);
+        lcd.print(valueReservoirDepth);
+        lcd.print(" cm");
+      }
 #endif
 
-      //  //Days to Water Change
+      //Days to Water Change
       int32_t result = (time_water_expires - time_now) / (24 * 60 * 60L);
       sprintf(str, "W% ld", result );
       lcd.setCursor(12, 0);
@@ -583,12 +611,7 @@ void displayInfo(int screen) {
       lcd.print(str);
       break;
   }
-
 }
-
-
-
-
 
 /////////////////////////
 // printTime(timelib_t)
@@ -599,19 +622,9 @@ void printTime(timelib_t timestamp)
 {
   timelib_break(timestamp, &tinfo);
 
-  if (tinfo.tm_hour < 10)
-    lcd.print('0');
-  lcd.print(tinfo.tm_hour);
-  lcd.print(':');
-  if (tinfo.tm_min < 10)
-    lcd.print('0');
-  lcd.print(tinfo.tm_min);
-  //    lcd.print(':');
-  //  if (tinfo.tm_sec < 10)
-  //    lcd.print('0');
-  //  lcd.print(tinfo.tm_sec);
-
-
+  char str[12];
+  sprintf(str, stringFormat[0], tinfo.tm_hour, tinfo.tm_min);
+  lcd.print(str);
 }
 
 
@@ -633,7 +646,6 @@ void resetLightTimer() {
   if (lightOnAt < time_now) {
     lightOnAt += (24 * 60 * 60UL); //set to next day
   }
-
 }
 
 
@@ -644,11 +656,16 @@ void resetLightTimer() {
 
 void resetTimers() {
   resetLightTimer();
-  pumpOnAt = time_now + pumpInterval + PUMPDELAY;
-  pumpLastOn = time_now;
+  pumpOnAt = time_now + pumpInterval + EQUIPDELAY;
+  //pumpLastOn = time_now;
+  //pumpOnAt = lightOnAt - pumpInterval + EQUIPDELAY;
   pumpOffAt = time_now + pumpDuration;
-  auxOneOnAt = lightOnAt - lightInterval;
-  auxTwoOnAt = lightOnAt - lightInterval;
+  auxOneOnAt = lightOnAt - lightInterval + (EQUIPDELAY * 2); //+delay?
+  auxTwoOnAt = lightOnAt - lightInterval + (EQUIPDELAY * 3); // +delay
+
+  //  while (pumpOnAt < time_now) {
+  //    pumpOnAt += auxOneInterval;
+  //  }
 
   while (auxOneOnAt < time_now) {
     auxOneOnAt += auxOneInterval;
@@ -658,11 +675,10 @@ void resetTimers() {
     auxTwoOnAt += auxTwoInterval;
   }
 
+  pumpOffAt = pumpOnAt + pumpDuration - pumpInterval;
   auxOneOffAt = auxOneOnAt + auxOneDuration - auxOneInterval;
   auxTwoOffAt = auxTwoOnAt + auxTwoDuration - auxTwoInterval;
-
 }
-
 
 
 /////////////////////////
@@ -682,8 +698,6 @@ void displayMenu() {
     case SETMODE:
       strcpy(str1, "Set Mode");
       strcpy(str2, modeDescription[sysMode]);
-      //strcpy(str2, setMode(sysMode));
-      //sprintf(str2, "%d", sysMode );
       break;
     case RESETWATERTIMER:
       strcpy(str1, "Reset Water Timer");
@@ -696,32 +710,32 @@ void displayMenu() {
     case SETHOUR:
       timelib_break(time_now, &tinfo);
       strcpy (str1, "Set Hour");
-      sprintf(str2, "%02d:%02d", tinfo.tm_hour, tinfo.tm_min );
+      sprintf(str2, stringFormat[0], tinfo.tm_hour, tinfo.tm_min );
       break;
     case SETMINUTE:
       timelib_break(time_now, &tinfo);
       strcpy (str1, "Set Minutes");
-      sprintf(str2, "%02d:%02d", tinfo.tm_hour, tinfo.tm_min );
+      sprintf(str2, stringFormat[0], tinfo.tm_hour, tinfo.tm_min );
       break;
     case SETWATERTIMER:
       strcpy (str1, "Set Water Timer");
-      sprintf(str2, "%d Days", daysToReplaceWater);
+      sprintf(str2, stringFormat[1], daysToReplaceWater);
       break;
     case SETNUTRIENTTIMER:
       strcpy (str1, "Set Nutr. Timer");
-      sprintf(str2, "%d Days", daysToReplaceNutrient);
+      sprintf(str2, stringFormat[1], daysToReplaceNutrient);
       break;
     case SETLIGHTTIMEHOURS:
       strcpy (str1, "Set Light On Hrs");
-      sprintf(str2, "%02d:%02d", lightOnHour, lightOnMin );
+      sprintf(str2, stringFormat[0], lightOnHour, lightOnMin );
       break;
     case SETLIGHTTIMEMINUTES:
-      strcpy (str1,"Set Light On Mins");
-      sprintf(str2, "%02d:%02d", lightOnHour, lightOnMin );
+      strcpy (str1, "Set Light On Mins");
+      sprintf(str2, stringFormat[0], lightOnHour, lightOnMin );
       break;
     case SETLIGHTDURATION:
       strcpy (str1, "Set Light Dur.");
-      sprintf(str2, "%lu:%02lu Hrs", ld_minutes / 60 , ld_minutes % 60  );
+      sprintf(str2, stringFormat[2], ld_minutes / 60 , ld_minutes % 60  );
       break;
     case SETCONTINUOUSPUMP:
       strcpy (str1, "Continuous Pump");
@@ -735,12 +749,12 @@ void displayMenu() {
       strcpy (str1, "Set Pump Interval");
       //sprintf(str2, "%lu Mins", pumpInterval / 60UL);
       //long hours = pumpInterval / 3600;
-      sprintf(str2, "%lu:%02lu", pumpInterval / 3600 , pumpInterval % 3600UL / 60  );
+      sprintf(str2, stringFormat[2], pumpInterval / 3600 , pumpInterval % 3600UL / 60  );
       break;
     case SETPUMPDURATION:
       strcpy (str1, "Set Pump Dur.");
       //sprintf(str2, "%lu Mins", (pumpDuration / 60UL) );
-      sprintf(str2, "%lu:%02lu", pumpDuration / 3600 , pumpDuration % 3600 / 60  );
+      sprintf(str2, stringFormat[2], pumpDuration / 3600 , pumpDuration % 3600 / 60  );
       break;
     case SETCONTINUOUSAUXONE:
       strcpy (str1, "Continuous aux1");
@@ -752,13 +766,11 @@ void displayMenu() {
       break;
     case SETAUXONEINTERVAL:
       strcpy (str1, "Set aux1 Interval");
-      //sprintf(str2, "%lu Mins", auxOneInterval / 60UL);
-      sprintf(str2, "%lu:%02lu", auxOneInterval / 3600 , auxOneInterval % 3600 / 60  );
+      sprintf(str2, stringFormat[2], auxOneInterval / 3600 , auxOneInterval % 3600 / 60  );
       break;
     case SETAUXONEDURATION:
       strcpy (str1, "Set aux1 Dur.");
-      sprintf(str2, "%lu:%02lu", auxOneDuration / 3600 , auxOneDuration % 3600 / 60  );
-      //sprintf(str2, "%lu Mins", (auxOneDuration / 60UL) );
+      sprintf(str2, stringFormat[2], auxOneDuration / 3600 , auxOneDuration % 3600 / 60  );
       break;
     case SETCONTINUOUSAUXTWO:
       strcpy (str1, "Continuous aux2");
@@ -770,21 +782,23 @@ void displayMenu() {
       break;
     case SETAUXTWOINTERVAL:
       strcpy (str1, "Set aux2 Interval");
-      //sprintf(str2, "%lu Mins", auxTwoInterval / 60UL);
-      sprintf(str2, "%lu:%02lu Hrs", auxTwoInterval / 3600 , auxTwoInterval % 3600 /60  );
+      sprintf(str2, stringFormat[2], auxTwoInterval / 3600 , auxTwoInterval % 3600 / 60  );
       break;
     case SETAUXTWODURATION:
       strcpy (str1, "Set aux2 Dur.");
-      //sprintf(str2, "%lu Mins", (auxTwoDuration / 60UL) );
-      sprintf(str2, "%lu:%02lu Hrs", auxTwoDuration / 3600 , auxTwoDuration % 3600 / 60  );
+      sprintf(str2, stringFormat[2], auxTwoDuration / 3600 , auxTwoDuration % 3600 / 60  );
       break;
     case SETRESERVOIRBOTTOM:
       strcpy (str1, "Reservoir Btm");
-      sprintf(str2, "%lu cm", reservoirBottom );
+      sprintf(str2, "%u cm", reservoirBottom );
       break;
     case SAVESETTINGS:
       strcpy (str1, "Save Settings");
       strcpy(str2, "");
+      break;
+    case STATUS:
+      break;
+    default:
       break;
   }
 
@@ -878,18 +892,12 @@ void menuButtonPressed() {
       menuItem = SAVESETTINGS;
       break;
     case SAVESETTINGS:
-    //      menuItem = STATUS;
-    //      lcd.clear();
-    //      break;
     default:
       menuItem = STATUS;
       lcd.clear();
   }
-  delay(BUTTONTIMEOUT);
   buttonStatus = NONE;
-
 }
-
 
 
 /////////////////////////
@@ -908,22 +916,24 @@ void valueButtonPressed(int8_t buttonvalue) {
       break;
     case SETHOUR:
       timelib_break(time_now, &tinfo);
-      if (tinfo.tm_hour >= 23) {
+      tinfo.tm_hour += (1 * buttonvalue);
+
+      if (tinfo.tm_hour > 23 || tinfo.tm_hour <= 0) {
         tinfo.tm_hour = 0;
-      } else {
-        tinfo.tm_hour += (1 * buttonvalue);
       }
+
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
       resetTimers();
       break;
     case SETMINUTE:
       timelib_break(time_now, &tinfo);
-      if (tinfo.tm_min >= 59) {
+      tinfo.tm_min += (1 * buttonvalue);
+
+      if (tinfo.tm_min > 59 || tinfo.tm_min <= 0) {
         tinfo.tm_min = 0;
-      } else {
-        tinfo.tm_min += (1 * buttonvalue);
       }
+
       initialt = timelib_make(&tinfo);
       timelib_set(initialt);
       resetTimers();
@@ -950,11 +960,11 @@ void valueButtonPressed(int8_t buttonvalue) {
       status.continuousPump = !status.continuousPump;
       break;
     case SETPUMPINTERVAL:
-      pumpInterval += (PUMPINTERVALINCREMENT * 60 * buttonvalue); //add 1 minute for pump cycle
+      pumpInterval += (PUMPINTERVALINCREMENT * 60UL * buttonvalue); //add 1 minute for pump cycle
       resetTimers();
       break;
     case SETPUMPDURATION:
-      pumpDuration += (PUMPDURATIONINCREMENT * 60 * buttonvalue); //add 1 minutes for pump duration
+      pumpDuration += (PUMPDURATIONINCREMENT * 60UL * buttonvalue); //add 1 minutes for pump duration
       resetTimers();
       break;
     case SETCONTINUOUSAUXONE:
@@ -1006,7 +1016,7 @@ void valueButtonPressed(int8_t buttonvalue) {
       break;
     case SAVESETTINGS:
       lcd.clear();
-      lcd.print(F("Writing Settings..."));
+      lcd.print("Writing Settings...");
       writeSettings();
       menuItem = STATUS;
       lcd.clear();
@@ -1017,7 +1027,6 @@ void valueButtonPressed(int8_t buttonvalue) {
       lcd.clear();
   }
 
-  delay(BUTTONTIMEOUT);
   buttonStatus = NONE;
 }
 
@@ -1034,16 +1043,19 @@ void initDHT22() {
   int32_t sumTemperature = 0;
 
   for (int x = 0; x < samples; x++) {
-    sumHumidity += dht.readHumidity();
-    sumTemperature += dht.readTemperature();
-    delay(500);
+    if (millis() - dht.lastRead() > 2000)
+    {
+      dht.read();
+      sumTemperature += dht.getTemperature();
+      sumHumidity += dht.getHumidity();
+
+    }
+    delay (2200);
   }
 
   valueHumidity = sumHumidity / samples;
   valueTemperature = sumTemperature / samples;
 }
-
-
 
 
 /////////////////////////
@@ -1062,9 +1074,6 @@ T expSmoothing(T value, T prevValue) {
 
   return average;
 }
-
-
-
 
 
 /////////////////////////
@@ -1107,7 +1116,6 @@ T dataSmooth(T *history) {
 }
 
 
-
 /////////////////////////
 // receiveEvent(int)
 //
@@ -1131,18 +1139,19 @@ void receiveEvent(int bytesReceived) {
   Serial.println("[Receive Event]");
 #endif
 
-  int value;
+  int value = 0;
 
   while (Wire.available()) {
     value = Wire.read();
 
+    if (bytesReceived > 0) {
 #ifdef DEBUG
-    Serial.print("data received: ");
-    Serial.println(bytesReceived);
+      Serial.print("data received: ");
+      Serial.println(bytesReceived);
 #endif
+    }
 
   }
-
   switch (value) {
     case 5:
       lightDuration += (15UL * 60); //add 15 minutes for light duration
@@ -1186,7 +1195,6 @@ void receiveEvent(int bytesReceived) {
 }
 
 
-
 /////////////////////////
 // requestEvent()
 //
@@ -1197,7 +1205,7 @@ void requestEvent() {
   //TODO add the pump status, light status and mode
 
   //int sysmode;
-  
+  char buffer_out[BUFSIZE]; //max buffer size is 32 bytes
 
 #ifdef DEBUG
   Serial.print("\n---Sending");
@@ -1213,10 +1221,10 @@ void requestEvent() {
   int valTemp = valueTemperature * 10; //do this to include one decimal place and *10 at destination
   int valHum = valueHumidity;
 
-  if (outputText) {
+  if (serialCommunications) {
     unsigned long secondsToLightOff = (lightOffAt - time_now);
     //buffer
-    sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %u", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysMode, status.statusLightOn, status.statusPumpOn, secondsToLightOff);
+    sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %lu", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysMode, status.statusLightOn, status.statusPumpOn, secondsToLightOff);
 
   } else {
     //compose custom buffer output - buffer size for wire library is 32 bytes/characters, customize this for application
@@ -1282,53 +1290,6 @@ void longToCharBuffer(char *buffer, int offset, long value) {
 }
 
 /////////////////////////
-// String setMode(int)
-//
-// Sets the mode, and returns the string of what the mode is;
-
-//const char* setMode (int modeNumber) {
-//uint8_t setMode (int modeNumber);
-//
-//  //String str;
-//  //char str1[BUFSIZE];
-//
-//  switch (modeNumber) {
-//    case 1:
-//      systemMode = OFF;
-//      sysMode = 1;
-//      strcpy (str1, "OFF");
-//      break;
-//    case 2:
-//      systemMode = AUTO;
-//      sysMode = 2;
-//      strcpy (str1, "AUTO");
-//      break;
-//    case 3:
-//      systemMode = MANUAL_PUMP_ON;
-//      sysMode = 3;
-//      strcpy (str1, "MANUAL PUMP");
-//      break;
-//    case 4:
-//      systemMode = MANUAL_PUMP_OFF;
-//      sysMode = 4;
-//      strcpy (str1, "MANUAL LIGHT");
-//      break;
-//    default:
-//      sysMode = 2;
-//      systemMode = AUTO;
-//      strcpy (str1, "AUTO");
-//      break;
-//  }
-//
-//  return sysMode;
-//
-//}
-
-
-
-
-
-/////////////////////////
 // readSettings()
 //
 //  read settings from eeprom
@@ -1353,7 +1314,6 @@ void readSettings() {
   EEPROM.get(EEAddr, status.continuousAuxTwo); EEAddr += sizeof(status.continuousAuxTwo);
   EEPROM.get(EEAddr, status.pumpWhenLightOff); EEAddr += sizeof(status.pumpWhenLightOff);
   EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
-
 }
 
 
@@ -1382,9 +1342,7 @@ void writeSettings() {
   EEPROM.put(EEAddr, status.continuousAuxTwo); EEAddr += sizeof(status.continuousAuxTwo);
   EEPROM.put(EEAddr, status.pumpWhenLightOff); EEAddr += sizeof(status.pumpWhenLightOff);
   EEPROM.put(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
-
 }
-
 
 
 /////////////////////////
@@ -1398,8 +1356,6 @@ void menu_ISR() {
 }
 
 
-
-
 /////////////////////////
 // up_ISR()
 //
@@ -1408,8 +1364,6 @@ void menu_ISR() {
 void up_ISR() {
   buttonStatus = UP;
 }
-
-
 
 
 /////////////////////////

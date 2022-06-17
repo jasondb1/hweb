@@ -10,6 +10,7 @@
 #include <NewPing.h>
 #include "PinChangeInterrupt.h"
 #include <LiquidCrystal_I2C.h>
+#include <avr/wdt.h>
 
 
 /*//#define DEBUG */

@@ -6,7 +6,7 @@
 #include "indoor_garden_timer_with_DHT22.h"
 
 //Timelibrary
-time_t time_now, initialt, time_water_expires, time_nutrient_expires, menuDelay;
+time_t initialt, time_water_expires, time_nutrient_expires, menuDelay;
 uint8_t previousDay;
 uint8_t intervalIncrement = 10;
 uint8_t durationIncrement = 10;
@@ -20,7 +20,7 @@ boolean readLight = false;
 struct Equipment {
   time_t timeOn;
   time_t timeOff;
-  boolean isContinuous;
+  uint8_t mode; //0 - Off, 1 - Timer, 2 - Continuous, 3 - Manual
   boolean isRunning;
   uint32_t duration;
   uint32_t interval;
@@ -45,12 +45,12 @@ volatile buttonModes buttonStatus = NONE; //status for ISR routine
 uint8_t menuValue = 0;
 //boolean menuItemSelected = false;
 boolean displayChanged = false;
-boolean defaultValues = false;
+//boolean defaultValues = false;
 
 //Commonly used strings
 const char* modeDescription[4] = {"Off", "Auto", "Manual Pump", "Manual Light"};
 const char* mainMenuNames[7] = {"", "Time", "Light", "Pump", "Aux1", "Aux2", "Other"};
-const char* commonString[9] = {"Off", "On", "Continuous", "Timer", "Interval", "Duration", "Increment", "Hour", "Minutes"};
+const char* commonString[10] = {"Off", "On", "Continuous", "Timer", "Interval", "Duration", "Increment", "Hour", "Minutes", "Manual"};
 const char* stringFormat[5] = {"%02d:%02d", "%d Days", "%lu:%02lu", "%s %s", "%s %s %s"};
 
 //Devices
@@ -68,15 +68,6 @@ uint16_t daysToReplaceNutrient = 21;
 //setup options
 uint16_t lightSensorNow = analogRead(pinLightSensor);
 
-//status initializations
-struct Status {
-  boolean statusSystemOn;
-  boolean manualMode;
-  boolean pumpWhenLightOff;
-};
-
-struct Status status;
-
 //sensor defaults
 int16_t valuePhotoResistor = -99;
 float valueHumidity = -99;
@@ -92,7 +83,7 @@ int8_t maxTemp = -127;
 int8_t minTemp = 127;
 
 uint8_t sysMode = 0;
-int8_t displayScreen = 0;
+uint8_t displayScreen = 0;
 
 
 /////////////////////////
@@ -107,61 +98,20 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("Init...");
 
+  
+
+#ifndef DEBUG
+  readSettings();//Read EEPROM
+#endif
+
   light.pin = LIGHTPIN;
-  //light.name = NAMELIGHT;
-  light.duration = 54000;
-  light.interval = 86400;
-  light.timeOn = 5;
-  light.timeOff = 0;
-  light.isContinuous = false;
-  light.isRunning = false;
-
   pump.pin = PUMPPIN;
-  //pump.name = NAMEPUMP;
-#ifdef PUMPLARGEVALUES
-  pump.duration = 54000;
-  pump.interval = 86400;;
-#else
-  pump.duration = 0;
-  pump.interval = 3600;
-#endif
-  pump.timeOn = 5;
-  pump.timeOff = 0;
-  pump.isContinuous = false;
-  pump.isRunning = false;
-
   aux1.pin = AUXONEPIN;
-  //aux1.name = NAMEAUXONE;
-#ifdef AUXONELARGEVALUES
-  aux1.duration = 54000;
-  aux1.interval = 86400;;
-#else
-  aux1.duration = 0;
-  aux1.interval = 3600;
-#endif
-  aux1.timeOn = 5;
-  aux1.timeOff = 0;
-  aux1.isContinuous = false;
-  aux1.isRunning = false;
-
   aux2.pin = AUXTWOPIN;
-  //aux2.name = NAMEAUXTWO;
-#ifdef AUXTWOLARGEVALUES
-  aux2.duration = 54000;
-  aux2.interval = 86400;
-#else
-  aux2.duration = 0;
-  aux2.interval = 3600;
-#endif
-  aux2.timeOn = 5;
-  aux2.timeOff = 0;
-  aux2.isContinuous = false;
+  light.isRunning = false;
+  pump.isRunning = false;
+  aux1.isRunning = false;
   aux2.isRunning = false;
-
-  //set status'
-  status.statusSystemOn = true;
-  status.manualMode = false;
-  status.pumpWhenLightOff = true;
 
   //setup pump and light
   digitalWrite(pump.pin, HIGH);
@@ -179,6 +129,8 @@ void setup() {
   digitalWrite(buttonMenu, HIGH);
   digitalWrite(buttonUp, HIGH);
   digitalWrite(buttonDown, HIGH);
+
+  //pinMode(LED_BUILTIN, OUTPUT);
 
   delay(5000);
 
@@ -200,15 +152,10 @@ void setup() {
   //setTime(hr,min,sec,day,mnth,yr);
   setTime(12, 00, 00, 1, 1, 2022);
 
-#ifndef DEBUG
-  readSettings();//Read EEPROM
-#endif
-
   //Set timers for water and nutrient timer
-  time_now = now();
-  menuDelay = time_now;
-  time_water_expires = time_now + (daysToReplaceWater * 24 * 60 * 60L);
-  time_nutrient_expires = time_now + (daysToReplaceNutrient * 24 * 60 * 60L);
+  menuDelay = now();
+  time_water_expires = now() + (daysToReplaceWater * 24 * 60 * 60L);
+  time_nutrient_expires = now() + (daysToReplaceNutrient * 24 * 60 * 60L);
 
   resetTimers();
 
@@ -217,12 +164,15 @@ void setup() {
   //Serial.begin(9600);
 #endif
 
+  lcd.clear();
+  displayChanged = true;
+
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu), menu_ISR, FALLING); //UNO has only pin 2 and 3 for default interrupt, so needing alternate library to make this happen
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp), up_ISR, FALLING);
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown), down_ISR, FALLING);
 
-  lcd.clear();
-  displayChanged = true;
+wdt_enable(WDTO_8S); //enable watchdog timer with 8 seconds
+
 }
 
 
@@ -232,8 +182,6 @@ void setup() {
 // Main loop that runs after setup()
 
 void loop() {
-
-  time_now = now();
 
   if (buttonStatus != NONE) {
     delay(BUTTONTIMEOUT);
@@ -251,23 +199,27 @@ void loop() {
         menuButtonPressed();
         break;
     }
-    menuDelay = time_now + MENUDELAY;
+    menuDelay = now() + MENUDELAY;
   }
 
   //if (menuItem == STATUS) {
   if (menuValue == 0) {
-    if (time_now > menuDelay) {
+    if (now() > menuDelay) {
       displayChanged = true;
-      menuDelay = time_now + MENUDELAY; //Menu delay on screen update
+      menuDelay = now() + MENUDELAY; //Menu delay on screen update
     }
 
     if (displayChanged) {
       displayInfo(displayScreen);
     }
 
-    delay(DELAY); //this is to save power
+    //digitalWrite(LED_BUILTIN, HIGH);
+    //delay(DELAY); //this is to save power
     readSensors();
-    checkTimers(time_now);
+    checkTimers(now());
+    //digitalWrite(LED_BUILTIN, LOW);
+    //status.statusInternalLed = !status.statusInternalLed;
+    //digitalWrite(LED_BUILTIN, status.statusInternalLed ? HIGH : LOW);
 
   } else {
 
@@ -275,7 +227,7 @@ void loop() {
       displayMenu();
     }
 
-    if (time_now > menuDelay) {
+    if (now() > menuDelay) {
       //menuItem = STATUS;
       menuValue = 0;
       lcd.clear();
@@ -285,11 +237,15 @@ void loop() {
     delay(BUTTONTIMEOUT);
   }
 
+  wdt_reset();
+
   //Check if days roll over
   if ( day() > previousDay || (day() == 1 && previousDay > 1) ) {
     previousDay = day();
     maxTemp = -127;
     minTemp = 127;
+    displayScreen = 0;
+    displayChanged = true;
     //TODO: days planted write days planted
   }
 }
@@ -330,58 +286,90 @@ void checkTimers(time_t time_now) {
   }
 
   //light on and off default to on
-  if ( (time_now < light.timeOff && sysMode == 1) || sysMode == 2 || sysMode == 3)  { //turning the light on
+  if ( (time_now < light.timeOff && sysMode == 1 && light.mode == 1 ) || sysMode == 2 || sysMode == 3 || (light.mode > 1 && sysMode == 1))  { //turning the light on
     if (!light.isRunning) {
+      lcd.noBacklight();
+      lcd.noDisplay();
       digitalWrite(light.pin, LOW); //light on
       light.isRunning = true;
+      delay(1500);
+      lcd.display();
+      lcd.backlight();
+      lcd.clear();
     }
   } else {
     if (light.isRunning) {
       digitalWrite(light.pin, HIGH); //light off
       light.isRunning = false;
+      lcd.clear();
     }
   }
+   wdt_reset();
 
   //TODO: Pump protection with reservoir level (may add setting for this protectionk
 
   //pump on and off default to on
-  if ( (time_now < pump.timeOff && sysMode == 1) || sysMode == 2 || (pump.isContinuous && sysMode == 1) ) { //turning the pump on
+  if ( (time_now < pump.timeOff && sysMode == 1 && pump.mode == 1 ) || sysMode == 2 || (pump.mode > 1 && sysMode == 1) ) { //turning the pump on
     if (!pump.isRunning) {
+      lcd.noBacklight();
+      lcd.noDisplay();
       digitalWrite(pump.pin, LOW); //pump on
       pump.isRunning = true;
+      delay(1500);
+      lcd.display();
+      lcd.backlight();
+      lcd.clear();
     }
   } else {
     if (pump.isRunning) {
       digitalWrite(pump.pin, HIGH); //pump off
       pump.isRunning = false;
+      lcd.clear();
     }
   }
+   wdt_reset();
 
   //fan on and off
-  if ( (time_now < aux1.timeOff && sysMode == 1) || (aux1.isContinuous && sysMode != 0) ) { //turning the pump on
+  if ( (time_now < aux1.timeOff && sysMode == 1 && aux1.mode == 1 ) || (aux1.mode > 1 && sysMode == 1) ) { //turning the pump on
     if (!aux1.isRunning) {
+      lcd.noBacklight();
+      lcd.noDisplay();
       digitalWrite(aux1.pin, LOW); //pump on
       aux1.isRunning = true;
+      delay(1500);
+      lcd.display();
+      lcd.backlight();
+      lcd.clear();
     }
   } else {
     if (aux1.isRunning) {
       digitalWrite(aux1.pin, HIGH); //pump off
       aux1.isRunning = false;
+      lcd.clear();
     }
   }
+   wdt_reset();
 
   //aux on and off
-  if ( (time_now < aux2.timeOff && sysMode == 1) || (aux2.isContinuous && sysMode != 0)  ) { //turning the pump on
+  if ( (time_now < aux2.timeOff && sysMode == 1 && aux2.mode == 1 ) || (aux2.mode > 1 && sysMode == 1)  ) { //turning the pump on
     if (!aux2.isRunning) {
+      lcd.noBacklight();
+      lcd.noDisplay();
       digitalWrite(aux2.pin, LOW); //pump on
       aux2.isRunning = true;
+      delay(1500);
+      lcd.display();
+      lcd.backlight();
+      lcd.clear();
     }
   } else {
     if (aux2.isRunning) {
       digitalWrite(aux2.pin, HIGH); //pump off
       aux2.isRunning = false;
+      lcd.clear();
     }
   }
+   wdt_reset();
 
   return;
 }
@@ -408,6 +396,7 @@ void readSensors() {
     valueTemperature = expSmoothing<float>(dht.getTemperature(), valueTemperature);
     valueHumidity = expSmoothing<float>(dht.getHumidity(), valueHumidity);
   }
+  //delay(2000);
 
   //  valueTemperature = expSmoothing<float>(dht.readTemperature(), valueTemperature);
   //  valueHumidity = expSmoothing<float>(dht.readHumidity(), valueHumidity);
@@ -439,94 +428,90 @@ void displayInfo(int screen) {
   char str[BUFSIZE];
   char str2[BUFSIZE];
 
+  strncpy(str, "", BUFSIZE);
+  strncpy(str2, "", BUFSIZE);
+
   switch (screen) {
 
     case 1:
-      sprintf(str, "Max T: %02d", maxTemp);
+      snprintf(str, BUFSIZE, "Max T: %02d", maxTemp);
       lcd.setCursor(0, 0);
       lcd.print(str);
       lcd.setCursor(0, 1);
-      sprintf(str2, "Min T: %02d", minTemp);
+      snprintf(str2, BUFSIZE, "Min T: %02d", minTemp);
       lcd.print(str2);
       break;
     case 2:
-      lcd.setCursor(0, 0);
-      sprintf(str, "%s: %s", mainMenuNames[2], light.isRunning ? commonString[1] : commonString[0]);
-      lcd.print(str);
-      lcd.setCursor(11, 0);
-      printTime(time_now);
-      lcd.setCursor(0, 1);
-
-      if (light.isRunning) {
-        printTime(light.timeOn);
-        lcd.print('-');
-        printTime(light.timeOff);
-      } else {
-        printTime(light.timeOff);
-        lcd.print('-');
-        printTime(light.timeOn);
-      }
+      printEquipmentStatus(&light, mainMenuNames[2]);
       break;
     case 3:
-      lcd.setCursor(0, 0);
-      lcd.print(mainMenuNames[3]);
-      lcd.print(':');
-      lcd.print( pump.isRunning ? commonString[1] : commonString[0]);
-      lcd.setCursor(11, 0);
-      printTime(time_now);
-      lcd.setCursor(0, 1);
-
-      if (pump.isRunning) {
-        printTime((pump.timeOn - pump.interval));
-        lcd.print('-');
-        printTime(pump.timeOff);
-      } else {
-        printTime(pump.timeOff);
-        lcd.print('-');
-        printTime(pump.timeOn);
-      }
+      printEquipmentStatus(&pump, mainMenuNames[3]);
       break;
     case 4:
-      lcd.setCursor(0, 0);
-      lcd.print(mainMenuNames[4]);
-      lcd.print( aux1.isRunning ? commonString[1] : commonString[0]);
-      lcd.setCursor(11, 0);
-      printTime(time_now);
-      lcd.setCursor(0, 1);
-
-      if (aux1.isRunning) {
-        printTime(aux1.timeOn - aux1.interval);
-        lcd.print('-');
-        printTime(aux1.timeOff);
-      } else {
-        printTime(aux1.timeOff);
-        lcd.print('-');
-        printTime(aux1.timeOn);
-      }
+      printEquipmentStatus(&aux1, mainMenuNames[4]);
       break;
     case 5:
-      lcd.setCursor(0, 0);
-      lcd.print(mainMenuNames[5]);
-      lcd.print(':');
-      lcd.print( aux2.isRunning ? commonString[1] : commonString[0]);
-      lcd.setCursor(11, 0);
-      printTime(time_now);
-      lcd.setCursor(0, 1);
-      if (aux2.isRunning) {
-        printTime(aux2.timeOn - aux2.interval);
-        lcd.print('-');
-        printTime(aux2.timeOff);
-      } else {
-        printTime(aux2.timeOff);
-        lcd.print('-');
-        printTime(aux2.timeOn);
-      }
+      printEquipmentStatus(&aux2, mainMenuNames[5]);
       break;
+
+    //    case 6:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(light.pin);
+    //      lcd.print(':');
+    //      lcd.print(pump.pin);
+    //      lcd.print(':');
+    //      lcd.print(aux1.pin);
+    //      lcd.print(':');
+    //      lcd.print(aux2.pin);
+    //      lcd.setCursor(0, 1);
+    //      lcd.print(now());
+    //      break;
+
+    //          case 7:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(light.timeOn);
+    //       lcd.setCursor(0, 1);
+    //      lcd.print(light.timeOff);
+    //
+    //      break;
+    //      case 8:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(pump.timeOn);
+    //       lcd.setCursor(0, 1);
+    //      lcd.print(pump.timeOff);
+    //
+    //      break;
+    //      case 9:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(aux1.timeOn);
+    //       lcd.setCursor(0, 1);
+    //      lcd.print(aux1.timeOff);
+    //
+    //      break;
+    //            case 10:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(light.duration);
+    //       lcd.setCursor(0, 1);
+    //      lcd.print(light.interval);
+    //      break;
+    //                  case 11:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(pump.duration);
+    //       lcd.setCursor(0, 1);
+    //      lcd.print(pump.interval);
+    //      break;
+    //                  case 12:
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(aux1.duration);
+    //       lcd.setCursor(0, 1);
+    //      lcd.print(aux1.interval);
+    //      break;
+
     default:
       //print time
       displayScreen = 0;
       lcd.setCursor(0, 0);
-      printTime(time_now);
+      printTime(now());
 
 #ifdef DISPLAYRESERVOIR
       if (readReservoir) {
@@ -538,8 +523,8 @@ void displayInfo(int screen) {
 #endif
 
       //Days to Water Change
-      int32_t result = (time_water_expires - time_now) / (24 * 60 * 60L);
-      sprintf(str, "W% ld", result );
+      int32_t result = (time_water_expires - now()) / (24 * 60 * 60L);
+      snprintf(str, BUFSIZE, "W% ld", result );
       lcd.setCursor(12, 0);
       lcd.print(str);
       //print temperature
@@ -553,8 +538,8 @@ void displayInfo(int screen) {
       lcd.print(str2);
       lcd.print('%');
       //Days to Nutrient Change
-      result = (time_nutrient_expires - time_now) / (24 * 60 * 60L);
-      sprintf(str, "N% ld", result );
+      result = (time_nutrient_expires - now()) / (24 * 60 * 60L);
+      snprintf(str, BUFSIZE, "N% ld", result );
       lcd.setCursor(12, 1);
       lcd.print(str);
       break;
@@ -569,10 +554,38 @@ void displayInfo(int screen) {
 void printTime(time_t timestamp)
 {
   char str[12];
-  sprintf(str, stringFormat[0], hour(timestamp), minute(timestamp) );
+  snprintf(str, BUFSIZE, stringFormat[0], hour(timestamp), minute(timestamp) );
   lcd.print(str);
 }
 
+/////////////////////////
+// printEquipmentStatus(Equipment* equipment)
+//
+// print Equipment
+
+void printEquipmentStatus(Equipment* equipment, const char* nameString)
+{
+  lcd.setCursor(0, 0);
+  lcd.print(nameString);
+  lcd.print(':');
+  lcd.print( equipment->isRunning ? commonString[1] : commonString[0]);
+  lcd.setCursor(11, 0);
+  printTime(now());
+  lcd.setCursor(0, 1);
+
+  if (equipment->isRunning) {
+    printTime(equipment->timeOn);
+    lcd.print('-');
+    printTime(equipment->timeOff);
+  } else {
+    printTime(equipment->timeOff);
+    lcd.print('-');
+    printTime(equipment->timeOn);
+  }
+
+  lcd.setCursor(13, 1);
+  lcd.print(getEquipmentMode(equipment));
+}
 
 /////////////////////////
 // resetTimer()
@@ -580,22 +593,23 @@ void printTime(time_t timestamp)
 // Reset Timers for Equipment
 
 void resetTimer(struct Equipment *equipment) {
-  time_now = now();
 
   tmElements_t tinfo;
-  breakTime(time_now, tinfo);
+  breakTime(now(), tinfo);
 
   tinfo.Hour = hour(equipment->timeOn);
   tinfo.Minute = minute(equipment->timeOn);
   tinfo.Second = 00;
   equipment->timeOn = makeTime(tinfo);
 
-  while (equipment->timeOn < time_now) {
+  while (equipment->timeOn < now()) {
     equipment->timeOn += equipment->interval;
   }
 
   equipment->timeOff = equipment->timeOn + equipment->duration - equipment->interval;
 
+
+  //possibly turn off relay
 }
 
 
@@ -622,170 +636,154 @@ void displayMenu() {
 
   char str1[BUFSIZE];
   char str2[BUFSIZE];
-  strcpy(str1, "");
-  strcpy(str2, "");
+  strncpy(str1, "", BUFSIZE);
+  strncpy(str2, "", BUFSIZE);
 
   if (menuValue % 10 == 0) { //Exit
-    strcpy(str1, "< Back");
+    strncpy(str1, "< Back", BUFSIZE);
   }
   else if (menuValue < 10) {
-    strcpy(str1, mainMenuNames[menuValue]);
-    strcat(str1, " >");
+    strncpy(str1, mainMenuNames[menuValue], BUFSIZE);
+    strncat(str1, " >", BUFSIZE);
   }
   else {
 
     switch (menuValue) {
       case 11:
-        strcpy(str1, "Mode");
-        strcpy(str2, modeDescription[sysMode]);
+        strncpy(str1, "Mode", BUFSIZE);
+        strncpy(str2, modeDescription[sysMode], BUFSIZE);
         break;
       case 12: //set hour
-        sprintf(str1, stringFormat[3], mainMenuNames[1], commonString[7]);
-        sprintf(str2, stringFormat[0], hour(), minute() );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[1], commonString[7]);
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(), minute() );
         break;
       case 13: //set minute
-        sprintf(str1, stringFormat[3], mainMenuNames[1], commonString[8]);
-        sprintf(str2, stringFormat[0], hour(), minute() );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[1], commonString[8]);
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(), minute() );
         break;
       case 14: //set intreval increment
-        //strcpy (str1, "Interval Increment");
-        sprintf (str1, stringFormat[3], commonString[4], commonString[6] );
-        sprintf(str2, "%d", intervalIncrement );
+        snprintf(str1, BUFSIZE, stringFormat[3], commonString[4], commonString[6] );
+        snprintf(str2, BUFSIZE, "%d", intervalIncrement );
         break;
       case 15: //set Durationincrement
-        //strcpy (str1, "Duration Increment");
-        sprintf (str1, stringFormat[3], commonString[5], commonString[6] );
-        sprintf(str2, "%d", durationIncrement );
+        snprintf(str1, BUFSIZE, stringFormat[3], commonString[5], commonString[6] );
+        snprintf(str2, BUFSIZE, "%d", durationIncrement );
         break;
       case 21: //timer / continuous
-        //strcpy(str1, light.name);
-        strcpy(str1, mainMenuNames[2]);
-        strcpy(str2, light.isContinuous ? commonString[2] : commonString[3]);
+        strncpy(str1, mainMenuNames[2], BUFSIZE);
+        strncpy(str2, getEquipmentMode(&light), BUFSIZE);
         break;
       case 22: //time on light hour
-        //strcpy (str1, "Light On Hrs");
-        sprintf (str1, stringFormat[4], mainMenuNames[1], commonString[1], commonString[7] );
-        sprintf(str2, stringFormat[0], hour(light.timeOn), minute(light.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[1], commonString[1], commonString[7] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(light.timeOn), minute(light.timeOn) );
         break;
       case 23: //time on light minute
-        //strcpy (str1, "Light On Min");
-        sprintf (str1, stringFormat[4], mainMenuNames[1], commonString[1], commonString[8] );
-        sprintf(str2, stringFormat[0], hour(light.timeOn), minute(light.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[1], commonString[1], commonString[8] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(light.timeOn), minute(light.timeOn) );
         break;
       case 24: //light interval
-        //strcpy (str1, "Light Interval");
-        sprintf (str1, stringFormat[3], mainMenuNames[2], commonString[4] );
-        sprintf(str2, stringFormat[2], light.interval / 3600 , light.interval % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[2], commonString[4] );
+        snprintf(str2, BUFSIZE, stringFormat[2], light.interval / 3600 , light.interval % 3600 / 60  );
         break;
       case 25: //light duration
-        //strcpy (str1, "Light Duration");
-        sprintf (str1, stringFormat[3], mainMenuNames[2], commonString[5] );
-        sprintf(str2, stringFormat[2], light.duration / 3600 , light.duration % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[2], commonString[5] );
+        snprintf(str2, BUFSIZE, stringFormat[2], light.duration / 3600 , light.duration % 3600 / 60  );
         break;
       case 31:
-        strcpy(str1, mainMenuNames[3]);
-        strcpy(str2, pump.isContinuous ? commonString[2] : commonString[3]);
+        strncpy(str1, mainMenuNames[3], BUFSIZE);
+        strncpy(str2, getEquipmentMode(&pump), BUFSIZE);
         break;
       case 32:
-        //strcpy (str1, "Pump On Hrs");
-        sprintf (str1, stringFormat[4], mainMenuNames[3], commonString[1], commonString[7] );
-        sprintf(str2, stringFormat[0], hour(pump.timeOn), minute(pump.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[3], commonString[1], commonString[7] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(pump.timeOn), minute(pump.timeOn) );
         break;
       case 33:
-        //strcpy (str1, "Pump On Min");
-        sprintf (str1, stringFormat[4], mainMenuNames[3], commonString[1], commonString[8] );
-        sprintf(str2, stringFormat[0], hour(pump.timeOn), minute(pump.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[3], commonString[1], commonString[8] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(pump.timeOn), minute(pump.timeOn) );
         break;
       case 34:
-        //strcpy (str1, "Pump Interval");
-        sprintf (str1, stringFormat[3], mainMenuNames[3], commonString[4] );
-        sprintf(str2, stringFormat[2], pump.interval / 3600 , pump.interval % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[3], commonString[4] );
+        snprintf(str2, BUFSIZE, stringFormat[2], pump.interval / 3600 , pump.interval % 3600 / 60  );
         break;
       case 35:
-        //strcpy (str1, "Pump Duration");
-        sprintf (str1, stringFormat[3], mainMenuNames[3], commonString[5] );
-        sprintf(str2, stringFormat[2], pump.duration / 3600 , pump.duration % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[3], commonString[5] );
+        snprintf(str2, BUFSIZE, stringFormat[2], pump.duration / 3600 , pump.duration % 3600 / 60  );
         break;
       case 41:
-        strcpy(str1, mainMenuNames[4]);
-        strcpy(str2, aux1.isContinuous ? commonString[2] : commonString[3]);
+        strncpy(str1, mainMenuNames[4], BUFSIZE);
+        strncpy(str2, getEquipmentMode(&aux1), BUFSIZE);
         break;
       case 42:
-        //strcpy (str1, "Aux1 On Hrs");
-        sprintf (str1, stringFormat[4], mainMenuNames[4], commonString[1], commonString[7] );
-        sprintf(str2, stringFormat[0], hour(aux1.timeOn), minute(aux1.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[4], commonString[1], commonString[7] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(aux1.timeOn), minute(aux1.timeOn) );
         break;
       case 43:
-        //strcpy (str1, "Aux1 On Min");
-        sprintf (str1, stringFormat[4], mainMenuNames[4], commonString[1], commonString[8] );
-        sprintf(str2, stringFormat[0], hour(aux1.timeOn), minute(aux1.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[4], commonString[1], commonString[8] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(aux1.timeOn), minute(aux1.timeOn) );
         break;
       case 44:
-        //strcpy (str1, "Aux1 Interval");
-        sprintf (str1, stringFormat[3], mainMenuNames[4], commonString[4] );
-        sprintf(str2, stringFormat[2], aux1.interval / 3600 , aux1.interval % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[4], commonString[4] );
+        snprintf(str2, BUFSIZE, stringFormat[2], aux1.interval / 3600 , aux1.interval % 3600 / 60  );
         break;
       case 45:
-        //strcpy (str1, "Aux1 Duration");
-        sprintf (str1, stringFormat[3], mainMenuNames[4], commonString[5] );
-        sprintf(str2, stringFormat[2], aux1.duration / 3600 , aux1.duration % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[4], commonString[5] );
+        snprintf(str2, BUFSIZE, stringFormat[2], aux1.duration / 3600 , aux1.duration % 3600 / 60  );
         break;
       case 51:
-        strcpy(str1, mainMenuNames[5]);
-        strcpy(str2, aux2.isContinuous ? commonString[2] : commonString[3]);
+        strncpy(str1, mainMenuNames[5], BUFSIZE);
+        strncpy(str2, getEquipmentMode(&aux2), BUFSIZE);
         break;
       case 52:
-        //strcpy (str1, "Aux2 On Hrs");
-        sprintf (str1, stringFormat[4], mainMenuNames[5], commonString[1], commonString[7] );
-        sprintf(str2, stringFormat[0], hour(aux2.timeOn), minute(aux2.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[5], commonString[1], commonString[7] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(aux2.timeOn), minute(aux2.timeOn) );
         break;
       case 53:
-        //strcpy (str1, "Aux2 On Min");
-        sprintf (str1, stringFormat[4], mainMenuNames[5], commonString[1], commonString[8] );
-        sprintf(str2, stringFormat[0], hour(aux2.timeOn), minute(aux2.timeOn) );
+        snprintf(str1, BUFSIZE, stringFormat[4], mainMenuNames[5], commonString[1], commonString[8] );
+        snprintf(str2, BUFSIZE, stringFormat[0], hour(aux2.timeOn), minute(aux2.timeOn) );
         break;
       case 54:
-        //strcpy (str1, "Aux2 Interval");
-        sprintf (str1, stringFormat[3], mainMenuNames[5], commonString[4] );
-        sprintf(str2, stringFormat[2], aux2.interval / 3600 , aux2.interval % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[5], commonString[4] );
+        snprintf(str2, BUFSIZE, stringFormat[2], aux2.interval / 3600 , aux2.interval % 3600 / 60  );
         break;
       case 55:
-        //strcpy (str1, "Aux2 Duration");
-        sprintf (str1, stringFormat[3], mainMenuNames[5], commonString[5] );
-        sprintf(str2, stringFormat[2], aux2.duration / 3600 , aux2.duration % 3600 / 60  );
+        snprintf(str1, BUFSIZE, stringFormat[3], mainMenuNames[5], commonString[5] );
+        snprintf(str2, BUFSIZE, stringFormat[2], aux2.duration / 3600 , aux2.duration % 3600 / 60  );
         break;
       case 61:
-        strcpy (str1, "Save Settings");
+        strncpy (str1, "Save Settings", BUFSIZE);
         break;
       case 62:
-        strcpy(str1, "Reset Water Timer");
-        sprintf(str2, "%ld Days", (time_water_expires - time_now) / (24 * 60 * 60L) );
+        strncpy(str1, "Reset Water Timer", BUFSIZE);
+        snprintf(str2, BUFSIZE, "%ld Days", (time_water_expires - now()) / (24 * 60 * 60L) );
         break;
       case 63:
-        strcpy (str1, "Set Water Timer");
-        sprintf(str2, stringFormat[1], daysToReplaceWater);
+        strncpy (str1, "Set Water Timer", BUFSIZE);
+        snprintf(str2, BUFSIZE, stringFormat[1], daysToReplaceWater);
         break;
       case 64:
-        strcpy (str1, "Reset Nutr. Timer");
-        sprintf(str2, "%ld Days", (time_nutrient_expires - time_now) / (24 * 60 * 60L) );
+        strncpy (str1, "Reset Nutr. Timer", BUFSIZE);
+        snprintf(str2, BUFSIZE, "%ld Days", (time_nutrient_expires - now()) / (24 * 60 * 60L) );
         break;
       case 65:
-        strcpy (str1, "Set Nutr. Timer");
-        sprintf(str2, stringFormat[1], daysToReplaceNutrient);
+        strncpy (str1, "Set Nutr. Timer", BUFSIZE);
+        snprintf(str2, BUFSIZE, stringFormat[1], daysToReplaceNutrient);
         break;
       case 66:
-        strcpy (str1, "Reservoir Btm");
-        sprintf(str2, "%u cm", reservoirBottom );
+        strncpy (str1, "Reservoir Btm", BUFSIZE);
+        snprintf(str2, BUFSIZE, "%u cm", reservoirBottom );
         break;
       case 67: //reservoir offset - not implemented yet
-        strcpy (str1, "Res1");
+        strncpy (str1, "Read Reservoir", BUFSIZE);
+        strncpy(str2, readReservoir ? commonString[1] : commonString[0], BUFSIZE);
         break;
       case 68: //enable serial communications - not implemented yet
-        strcpy (str1, "Res2");
+        strncpy (str1, "Serial Comms", BUFSIZE);
+        strncpy(str2, serialCommunications ? commonString[1] : commonString[0], BUFSIZE);
         break;
       case 69:
-        strcpy (str1, "Reset Next Reboot");
-        sprintf(str2, "%d", defaultValues );
+        strncpy (str1, "Set Defaults", BUFSIZE);
+        //snprintf(str2, BUFSIZE, "%d", defaultValues );
+        //strncpy(str2, defaultValues ? commonString[1] : commonString[0], BUFSIZE);
         break;
       default:
         break;
@@ -871,9 +869,31 @@ void valueButtonPressed(int8_t buttonvalue) {
   displayChanged = true;
 
   if (menuValue == 0 ) { //change display screen
-    displayScreen += (1 * buttonvalue);
-    displayChanged = true;
-    lcd.clear();
+    if (buttonvalue > 0) {
+      displayScreen++;
+      displayChanged = true;
+      lcd.clear();
+    }
+    else {
+      switch (displayScreen) {
+
+        case 2:
+          light.mode = ++light.mode % 4;
+          break;
+        case 3:
+          pump.mode = ++pump.mode % 4;
+          break;
+        case 4:
+          aux1.mode = ++aux1.mode % 4;
+          break;
+        case 5:
+          aux2.mode = ++aux2.mode % 4;
+          break;
+        default:
+          break;
+      }
+    }
+
   }
   else if (menuValue < 10) { //change
     menuValue = (menuValue * 10) + 1;
@@ -912,7 +932,7 @@ void valueButtonPressed(int8_t buttonvalue) {
         }
         break;
       case 21: //timer / continuous
-        light.isContinuous = !light.isContinuous;
+        light.mode = ++light.mode % 4;
         break;
       case 22:
         light.timeOn = setHour(light.timeOn, (1 * buttonvalue));
@@ -931,7 +951,7 @@ void valueButtonPressed(int8_t buttonvalue) {
         resetTimers();
         break;
       case 31:
-        pump.isContinuous = !pump.isContinuous;
+        pump.mode = ++pump.mode % 4;
         break;
       case 32:
         pump.timeOn = setHour(pump.timeOn, (1 * buttonvalue));
@@ -950,7 +970,7 @@ void valueButtonPressed(int8_t buttonvalue) {
         resetTimers();
         break;
       case 41:
-        aux1.isContinuous = !aux1.isContinuous;
+        aux1.mode = ++aux1.mode % 4;
         break;
       case 42:
         aux1.timeOn = setHour(aux1.timeOn, (1 * buttonvalue));
@@ -969,7 +989,7 @@ void valueButtonPressed(int8_t buttonvalue) {
         resetTimers();
         break;
       case 51:
-        aux2.isContinuous = !aux2.isContinuous;
+        aux2.mode = ++aux2.mode % 4;
         break;
       case 52:
         aux2.timeOn = setHour(aux2.timeOn, (1 * buttonvalue));
@@ -989,7 +1009,7 @@ void valueButtonPressed(int8_t buttonvalue) {
         break;
       case 61:
         lcd.clear();
-        lcd.print("Writing Settings...");
+        lcd.print("Saving");
         writeSettings();
         menuValue = 0;
         delay(2000);
@@ -1018,18 +1038,25 @@ void valueButtonPressed(int8_t buttonvalue) {
         }
         break;
       case 66:
-        if (reservoirBottom >= 400) {
+        if (reservoirBottom > 400) {
           reservoirBottom = 400;
         } else {
           reservoirBottom += (1 * buttonvalue);
         }
         break;
-      case 67: //reservoir offset - not implemented yet
+      case 67: //read reservoir
+        readReservoir = !readReservoir;
         break;
       case 68: //enable serial communications - not implemented yet
+        serialCommunications = !serialCommunications;
         break;
       case 69:
-        defaultValues = !defaultValues;
+      lcd.clear();
+        lcd.print("Reset");
+        setDefaults();
+        menuValue = 0;
+        delay(2000);
+        lcd.clear();
         break;
       default:
         displayScreen += (1 * buttonvalue);
@@ -1069,6 +1096,33 @@ void initDHT22() {
   valueTemperature = sumTemperature / samples;
 }
 
+
+/////////////////////////
+// const char* getEquipmentMode(Equipment *equipment)
+//
+//
+
+const char* getEquipmentMode(Equipment *equipment) {
+
+  const char* st;
+
+  switch (equipment->mode) {
+    case 1:
+      st = commonString[3];
+      break;
+    case 2:
+      st = commonString[2];
+      break;
+    case 3:
+      st = commonString[9];
+      break;
+    default:
+      st = commonString[0];
+      break;
+  }
+
+  return st;
+}
 
 /////////////////////////
 // time_t setHour ( time_t timestamp, uint16_t value)
@@ -1173,6 +1227,65 @@ T dataSmooth(T *history) {
 
   return avg;
 
+}
+
+/////////////////////////
+// void setDefaultTimes()
+//
+// 
+
+void setDefaults() {
+  //light.name = NAMELIGHT;
+  light.duration = 54000;
+  light.interval = 86400;
+  light.timeOn = 5;
+  light.timeOff = 0;
+  light.mode = 1;
+
+  //pump.name = NAMEPUMP;
+#ifdef PUMPLARGEVALUES
+  pump.duration = 54000;
+  pump.interval = 86400;
+#else
+  pump.duration = 0;
+  pump.interval = 3600;
+#endif
+  pump.timeOn = 5;
+  pump.timeOff = 0;
+  pump.mode = 1;
+
+  //aux1.name = NAMEAUXONE;
+#ifdef AUXONELARGEVALUES
+  aux1.duration = 54000;
+  aux1.interval = 86400;
+#else
+  aux1.duration = 0;
+  aux1.interval = 3600;
+#endif
+  aux1.timeOn = 5;
+  aux1.timeOff = 0;
+  aux1.mode = 1;
+
+  //aux2.name = NAMEAUXTWO;
+#ifdef AUXTWOLARGEVALUES
+  aux2.duration = 54000;
+  aux2.interval = 86400;
+#else
+  aux2.duration = 10;
+  aux2.interval = 3600;
+#endif
+  aux2.timeOn = 5;
+  aux2.timeOff = 0;
+  aux2.mode = 1;
+
+  readReservoir = false;
+  reservoirBottom = 40;
+
+  daysToReplaceWater = 21;
+  daysToReplaceNutrient = 21;
+  time_water_expires = now() + (daysToReplaceWater * 24 * 60 * 60L);
+  time_nutrient_expires = now() + (daysToReplaceNutrient * 24 * 60 * 60L);
+  
 }
 
 
@@ -1281,9 +1394,9 @@ void requestEvent() {
   int valHum = valueHumidity;
 
   if (serialCommunications) {
-    unsigned long secondsToLightOff = (light.timeOff - time_now);
+    unsigned long secondsToLightOff = (light.timeOff - now());
     //buffer
-    sprintf(buffer_out, "%d %d.%d %d.%d %d %d %d %lu", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysMode, light.isRunning, pump.isRunning, secondsToLightOff);
+    snprintf(buffer_out, BUFSIZE, "%d %d.%d %d.%d %d %d %d %lu", valuePhotoResistor, valTemp / 100, valTemp % 100, valHum / 10, valHum % 10, sysMode, light.isRunning, pump.isRunning, secondsToLightOff);
 
   } else {
     //compose custom buffer output - buffer size for wire library is 32 bytes/characters, customize this for application
@@ -1293,11 +1406,11 @@ void requestEvent() {
 
     //TODO: change to unix timestamp on light
     if (light.isRunning) {
-      unsigned int minutesToLightOff = (light.timeOff - time_now) / 60UL;
-      //longToCharBuffer(buffer_out, 6, (light.timeOff - time_now) );
+      unsigned int minutesToLightOff = (light.timeOff - now()) / 60UL;
+      //longToCharBuffer(buffer_out, 6, (light.timeOff - now()) );
       intToCharBuffer(buffer_out, 6, minutesToLightOff);
     } else {
-      unsigned int minutesToLightOn = (light.timeOn - time_now) / 60UL;
+      unsigned int minutesToLightOn = (light.timeOn - now()) / 60UL;
       intToCharBuffer(buffer_out, 6, minutesToLightOn );
     }
 
@@ -1356,18 +1469,36 @@ void longToCharBuffer(char *buffer, int offset, long value) {
 void readSettings() {
 
   int EEAddr = EEADDR;
-  EEPROM.get(EEAddr, defaultValues); EEAddr += sizeof(defaultValues);
+  //EEPROM.get(EEAddr, defaultValues); EEAddr += sizeof(defaultValues);
 
-  if (defaultValues) {
-    defaultValues = false;
-    EEPROM.get(EEAddr, light); EEAddr += sizeof(light);
-    EEPROM.get(EEAddr, pump); EEAddr += sizeof(pump);
-    EEPROM.get(EEAddr, aux1); EEAddr += sizeof(aux1);
-    EEPROM.get(EEAddr, aux1); EEAddr += sizeof(aux2);
+  //if (defaultValues) {
+    //defaultValues = false;
+    EEPROM.get(EEAddr, light.timeOn); EEAddr += sizeof(light.timeOn);
+    EEPROM.get(EEAddr, light.duration); EEAddr += sizeof(light.duration);
+    EEPROM.get(EEAddr, light.interval); EEAddr += sizeof(light.interval);
+    EEPROM.get(EEAddr, light.mode); EEAddr += sizeof(light.mode);
+
+    EEPROM.get(EEAddr, pump.timeOn); EEAddr += sizeof(pump.timeOn);
+    EEPROM.get(EEAddr, pump.duration); EEAddr += sizeof(pump.duration);
+    EEPROM.get(EEAddr, pump.interval); EEAddr += sizeof(pump.interval);
+    EEPROM.get(EEAddr, pump.mode); EEAddr += sizeof(pump.mode);
+
+    EEPROM.get(EEAddr, aux1.timeOn); EEAddr += sizeof(aux1.timeOn);
+    EEPROM.get(EEAddr, aux1.duration); EEAddr += sizeof(aux1.duration);
+    EEPROM.get(EEAddr, aux1.interval); EEAddr += sizeof(aux1.interval);
+    EEPROM.get(EEAddr, aux1.mode); EEAddr += sizeof(aux1.mode);
+
+    EEPROM.get(EEAddr, aux2.timeOn); EEAddr += sizeof(aux2.timeOn);
+    EEPROM.get(EEAddr, aux2.duration); EEAddr += sizeof(aux2.duration);
+    EEPROM.get(EEAddr, aux2.interval); EEAddr += sizeof(aux2.interval);
+    EEPROM.get(EEAddr, aux2.mode); EEAddr += sizeof(aux2.mode);
+
     EEPROM.get(EEAddr, daysToReplaceWater); EEAddr += sizeof(daysToReplaceWater);
     EEPROM.get(EEAddr, daysToReplaceNutrient); EEAddr += sizeof(daysToReplaceNutrient);
     EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
-  }
+    EEPROM.get(EEAddr, readReservoir); EEAddr += sizeof(readReservoir);
+    EEPROM.get(EEAddr, serialCommunications); EEAddr += sizeof(serialCommunications);
+  //}
 }
 
 
@@ -1379,14 +1510,33 @@ void readSettings() {
 void writeSettings() {
 
   int EEAddr = EEADDR;
-  EEPROM.put(EEAddr, defaultValues); EEAddr += sizeof(defaultValues);
-  EEPROM.put(EEAddr, light); EEAddr += sizeof(light);
-  EEPROM.put(EEAddr, pump); EEAddr += sizeof(pump);
-  EEPROM.put(EEAddr, aux1); EEAddr += sizeof(aux1);
-  EEPROM.put(EEAddr, aux2); EEAddr += sizeof(aux2);
+  //EEPROM.put(EEAddr, defaultValues); EEAddr += sizeof(defaultValues);
+  
+  EEPROM.put(EEAddr, light.timeOn); EEAddr += sizeof(light.timeOn);
+  EEPROM.put(EEAddr, light.duration); EEAddr += sizeof(light.duration);
+  EEPROM.put(EEAddr, light.interval); EEAddr += sizeof(light.interval);
+  EEPROM.put(EEAddr, light.mode); EEAddr += sizeof(light.mode);
+
+  EEPROM.put(EEAddr, pump.timeOn); EEAddr += sizeof(pump.timeOn);
+  EEPROM.put(EEAddr, pump.duration); EEAddr += sizeof(pump.duration);
+  EEPROM.put(EEAddr, pump.interval); EEAddr += sizeof(pump.interval);
+  EEPROM.put(EEAddr, pump.mode); EEAddr += sizeof(pump.mode);
+
+  EEPROM.put(EEAddr, aux1.timeOn); EEAddr += sizeof(aux1.timeOn);
+  EEPROM.put(EEAddr, aux1.duration); EEAddr += sizeof(aux1.duration);
+  EEPROM.put(EEAddr, aux1.interval); EEAddr += sizeof(aux1.interval);
+  EEPROM.put(EEAddr, aux1.mode); EEAddr += sizeof(aux1.mode);
+
+  EEPROM.put(EEAddr, aux2.timeOn); EEAddr += sizeof(aux2.timeOn);
+  EEPROM.put(EEAddr, aux2.duration); EEAddr += sizeof(aux2.duration);
+  EEPROM.put(EEAddr, aux2.interval); EEAddr += sizeof(aux2.interval);
+  EEPROM.put(EEAddr, aux2.mode); EEAddr += sizeof(aux2.mode);
+
   EEPROM.put(EEAddr, daysToReplaceWater); EEAddr += sizeof(daysToReplaceWater);
   EEPROM.put(EEAddr, daysToReplaceNutrient); EEAddr += sizeof(daysToReplaceNutrient);
   EEPROM.put(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
+  EEPROM.put(EEAddr, readReservoir); EEAddr += sizeof(readReservoir);
+  EEPROM.put(EEAddr, serialCommunications); EEAddr += sizeof(serialCommunications);
 }
 
 

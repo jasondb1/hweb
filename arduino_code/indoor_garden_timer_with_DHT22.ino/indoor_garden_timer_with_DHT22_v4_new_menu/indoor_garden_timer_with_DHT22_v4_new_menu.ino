@@ -98,7 +98,7 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("Init...");
 
-  
+
 
 #ifndef DEBUG
   readSettings();//Read EEPROM
@@ -132,7 +132,7 @@ void setup() {
 
   //pinMode(LED_BUILTIN, OUTPUT);
 
-  delay(5000);
+  delay(3000);
 
   sysMode = 1; //set to auto
 
@@ -171,7 +171,7 @@ void setup() {
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp), up_ISR, FALLING);
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown), down_ISR, FALLING);
 
-wdt_enable(WDTO_8S); //enable watchdog timer with 8 seconds
+  wdt_enable(WDTO_8S); //enable watchdog timer with 8 seconds
 
 }
 
@@ -267,109 +267,74 @@ void checkTimers(time_t time_now) {
   //Calculate when to run pump
   if ( time_now > pump.timeOn) {
     pump.timeOff = pump.duration + pump.timeOn;
-    pump.timeOn = pump.interval + pump.timeOn + EQUIPDELAY;
+    pump.timeOn = pump.interval + pump.timeOn;
     displayChanged = true;
   }
 
   //calculate when to turn fan on
   if ( time_now > aux1.timeOn) {
     aux1.timeOff = aux1.duration  + aux1.timeOn;
-    aux1.timeOn = aux1.interval + aux1.timeOn + (EQUIPDELAY * 2);
+    aux1.timeOn = aux1.interval + aux1.timeOn;
     displayChanged = true;
   }
 
   //calculate when to turn aux on
   if ( time_now > aux2.timeOn) {
     aux2.timeOff = aux2.duration + aux2.timeOn;
-    aux2.timeOn = aux2.interval + aux2.timeOn + (EQUIPDELAY * 3);
+    aux2.timeOn = aux2.interval + aux2.timeOn;
     displayChanged = true;
   }
 
   //light on and off default to on
   if ( (time_now < light.timeOff && sysMode == 1 && light.mode == 1 ) || sysMode == 2 || sysMode == 3 || (light.mode > 1 && sysMode == 1))  { //turning the light on
     if (!light.isRunning) {
-      lcd.noBacklight();
-      lcd.noDisplay();
-      digitalWrite(light.pin, LOW); //light on
-      light.isRunning = true;
-      delay(1500);
-      lcd.display();
-      lcd.backlight();
-      lcd.clear();
+      turnEquipmentOn(&light);
     }
   } else {
     if (light.isRunning) {
-      digitalWrite(light.pin, HIGH); //light off
-      light.isRunning = false;
-      lcd.clear();
+      turnEquipmentOff(&light);
+
     }
   }
-   wdt_reset();
+  wdt_reset();
 
   //TODO: Pump protection with reservoir level (may add setting for this protectionk
 
   //pump on and off default to on
   if ( (time_now < pump.timeOff && sysMode == 1 && pump.mode == 1 ) || sysMode == 2 || (pump.mode > 1 && sysMode == 1) ) { //turning the pump on
     if (!pump.isRunning) {
-      lcd.noBacklight();
-      lcd.noDisplay();
-      digitalWrite(pump.pin, LOW); //pump on
-      pump.isRunning = true;
-      delay(1500);
-      lcd.display();
-      lcd.backlight();
-      lcd.clear();
+      turnEquipmentOn(&pump);
     }
   } else {
     if (pump.isRunning) {
-      digitalWrite(pump.pin, HIGH); //pump off
-      pump.isRunning = false;
-      lcd.clear();
+      turnEquipmentOff(&pump);
     }
   }
-   wdt_reset();
+  wdt_reset();
 
   //fan on and off
   if ( (time_now < aux1.timeOff && sysMode == 1 && aux1.mode == 1 ) || (aux1.mode > 1 && sysMode == 1) ) { //turning the pump on
     if (!aux1.isRunning) {
-      lcd.noBacklight();
-      lcd.noDisplay();
-      digitalWrite(aux1.pin, LOW); //pump on
-      aux1.isRunning = true;
-      delay(1500);
-      lcd.display();
-      lcd.backlight();
-      lcd.clear();
+      turnEquipmentOn(&aux1);
     }
   } else {
     if (aux1.isRunning) {
-      digitalWrite(aux1.pin, HIGH); //pump off
-      aux1.isRunning = false;
-      lcd.clear();
+      turnEquipmentOn(&aux1);
     }
   }
-   wdt_reset();
+  wdt_reset();
 
   //aux on and off
   if ( (time_now < aux2.timeOff && sysMode == 1 && aux2.mode == 1 ) || (aux2.mode > 1 && sysMode == 1)  ) { //turning the pump on
     if (!aux2.isRunning) {
-      lcd.noBacklight();
-      lcd.noDisplay();
-      digitalWrite(aux2.pin, LOW); //pump on
-      aux2.isRunning = true;
-      delay(1500);
-      lcd.display();
-      lcd.backlight();
-      lcd.clear();
+      turnEquipmentOn(&aux2);
     }
   } else {
     if (aux2.isRunning) {
-      digitalWrite(aux2.pin, HIGH); //pump off
-      aux2.isRunning = false;
-      lcd.clear();
+      turnEquipmentOn(&aux2);
     }
   }
-   wdt_reset();
+  wdt_reset();
 
   return;
 }
@@ -563,8 +528,7 @@ void printTime(time_t timestamp)
 //
 // print Equipment
 
-void printEquipmentStatus(Equipment* equipment, const char* nameString)
-{
+void printEquipmentStatus(Equipment* equipment, const char* nameString) {
   lcd.setCursor(0, 0);
   lcd.print(nameString);
   lcd.print(':');
@@ -588,6 +552,53 @@ void printEquipmentStatus(Equipment* equipment, const char* nameString)
 }
 
 /////////////////////////
+// turnEquipmentOn(Equipment* equipment)
+//
+//
+
+void turnEquipmentOn(Equipment* equipment) {
+
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
+
+  lcd.noBacklight();
+  lcd.noDisplay();
+  digitalWrite(equipment->pin, LOW); //pump on
+  equipment->isRunning = true;
+  delay(1500);
+  lcd.display();
+  lcd.backlight();
+  lcd.clear();
+
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
+}
+
+/////////////////////////
+// turnEquipmentOff(Equipment* equipment)
+//
+//
+
+void turnEquipmentOff(Equipment* equipment) {
+
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
+
+  digitalWrite(equipment->pin, HIGH); //light off
+  equipment->isRunning = false;
+  lcd.clear();
+
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
+
+}
+
+
+/////////////////////////
 // resetTimer()
 //
 // Reset Timers for Equipment
@@ -601,6 +612,7 @@ void resetTimer(struct Equipment *equipment) {
   tinfo.Minute = minute(equipment->timeOn);
   tinfo.Second = 00;
   equipment->timeOn = makeTime(tinfo);
+  equipment->timeOn -= 24 * 60 * 60UL;
 
   while (equipment->timeOn < now()) {
     equipment->timeOn += equipment->interval;
@@ -790,6 +802,10 @@ void displayMenu() {
     }
   }
 
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print(str1);
@@ -802,6 +818,10 @@ void displayMenu() {
     lcd.setCursor(15, 1);
     lcd.print('>');
   }
+
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
 
   displayChanged = false;
 
@@ -818,6 +838,9 @@ void menuButtonPressed() {
   displayChanged = true;
 
   menuValue++;
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
 
   if (menuValue < 10) {
     if (menuValue > 6) {
@@ -854,6 +877,9 @@ void menuButtonPressed() {
     lcd.clear();
     menuValue = 0;
   }
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+  enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
 
   buttonStatus = NONE;
 }
@@ -870,9 +896,15 @@ void valueButtonPressed(int8_t buttonvalue) {
 
   if (menuValue == 0 ) { //change display screen
     if (buttonvalue > 0) {
+      disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+      disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+      disablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
       displayScreen++;
       displayChanged = true;
       lcd.clear();
+      enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonMenu));
+      enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonUp));
+      enablePinChangeInterrupt(digitalPinToPinChangeInterrupt(buttonDown));
     }
     else {
       switch (displayScreen) {
@@ -1051,7 +1083,7 @@ void valueButtonPressed(int8_t buttonvalue) {
         serialCommunications = !serialCommunications;
         break;
       case 69:
-      lcd.clear();
+        lcd.clear();
         lcd.print("Reset");
         setDefaults();
         menuValue = 0;
@@ -1232,7 +1264,7 @@ T dataSmooth(T *history) {
 /////////////////////////
 // void setDefaultTimes()
 //
-// 
+//
 
 void setDefaults() {
   //light.name = NAMELIGHT;
@@ -1285,7 +1317,7 @@ void setDefaults() {
   daysToReplaceNutrient = 21;
   time_water_expires = now() + (daysToReplaceWater * 24 * 60 * 60L);
   time_nutrient_expires = now() + (daysToReplaceNutrient * 24 * 60 * 60L);
-  
+
 }
 
 
@@ -1472,32 +1504,32 @@ void readSettings() {
   //EEPROM.get(EEAddr, defaultValues); EEAddr += sizeof(defaultValues);
 
   //if (defaultValues) {
-    //defaultValues = false;
-    EEPROM.get(EEAddr, light.timeOn); EEAddr += sizeof(light.timeOn);
-    EEPROM.get(EEAddr, light.duration); EEAddr += sizeof(light.duration);
-    EEPROM.get(EEAddr, light.interval); EEAddr += sizeof(light.interval);
-    EEPROM.get(EEAddr, light.mode); EEAddr += sizeof(light.mode);
+  //defaultValues = false;
+  EEPROM.get(EEAddr, light.timeOn); EEAddr += sizeof(light.timeOn);
+  EEPROM.get(EEAddr, light.duration); EEAddr += sizeof(light.duration);
+  EEPROM.get(EEAddr, light.interval); EEAddr += sizeof(light.interval);
+  EEPROM.get(EEAddr, light.mode); EEAddr += sizeof(light.mode);
 
-    EEPROM.get(EEAddr, pump.timeOn); EEAddr += sizeof(pump.timeOn);
-    EEPROM.get(EEAddr, pump.duration); EEAddr += sizeof(pump.duration);
-    EEPROM.get(EEAddr, pump.interval); EEAddr += sizeof(pump.interval);
-    EEPROM.get(EEAddr, pump.mode); EEAddr += sizeof(pump.mode);
+  EEPROM.get(EEAddr, pump.timeOn); EEAddr += sizeof(pump.timeOn);
+  EEPROM.get(EEAddr, pump.duration); EEAddr += sizeof(pump.duration);
+  EEPROM.get(EEAddr, pump.interval); EEAddr += sizeof(pump.interval);
+  EEPROM.get(EEAddr, pump.mode); EEAddr += sizeof(pump.mode);
 
-    EEPROM.get(EEAddr, aux1.timeOn); EEAddr += sizeof(aux1.timeOn);
-    EEPROM.get(EEAddr, aux1.duration); EEAddr += sizeof(aux1.duration);
-    EEPROM.get(EEAddr, aux1.interval); EEAddr += sizeof(aux1.interval);
-    EEPROM.get(EEAddr, aux1.mode); EEAddr += sizeof(aux1.mode);
+  EEPROM.get(EEAddr, aux1.timeOn); EEAddr += sizeof(aux1.timeOn);
+  EEPROM.get(EEAddr, aux1.duration); EEAddr += sizeof(aux1.duration);
+  EEPROM.get(EEAddr, aux1.interval); EEAddr += sizeof(aux1.interval);
+  EEPROM.get(EEAddr, aux1.mode); EEAddr += sizeof(aux1.mode);
 
-    EEPROM.get(EEAddr, aux2.timeOn); EEAddr += sizeof(aux2.timeOn);
-    EEPROM.get(EEAddr, aux2.duration); EEAddr += sizeof(aux2.duration);
-    EEPROM.get(EEAddr, aux2.interval); EEAddr += sizeof(aux2.interval);
-    EEPROM.get(EEAddr, aux2.mode); EEAddr += sizeof(aux2.mode);
+  EEPROM.get(EEAddr, aux2.timeOn); EEAddr += sizeof(aux2.timeOn);
+  EEPROM.get(EEAddr, aux2.duration); EEAddr += sizeof(aux2.duration);
+  EEPROM.get(EEAddr, aux2.interval); EEAddr += sizeof(aux2.interval);
+  EEPROM.get(EEAddr, aux2.mode); EEAddr += sizeof(aux2.mode);
 
-    EEPROM.get(EEAddr, daysToReplaceWater); EEAddr += sizeof(daysToReplaceWater);
-    EEPROM.get(EEAddr, daysToReplaceNutrient); EEAddr += sizeof(daysToReplaceNutrient);
-    EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
-    EEPROM.get(EEAddr, readReservoir); EEAddr += sizeof(readReservoir);
-    EEPROM.get(EEAddr, serialCommunications); EEAddr += sizeof(serialCommunications);
+  EEPROM.get(EEAddr, daysToReplaceWater); EEAddr += sizeof(daysToReplaceWater);
+  EEPROM.get(EEAddr, daysToReplaceNutrient); EEAddr += sizeof(daysToReplaceNutrient);
+  EEPROM.get(EEAddr, reservoirBottom); EEAddr += sizeof(reservoirBottom);
+  EEPROM.get(EEAddr, readReservoir); EEAddr += sizeof(readReservoir);
+  EEPROM.get(EEAddr, serialCommunications); EEAddr += sizeof(serialCommunications);
   //}
 }
 
@@ -1511,7 +1543,7 @@ void writeSettings() {
 
   int EEAddr = EEADDR;
   //EEPROM.put(EEAddr, defaultValues); EEAddr += sizeof(defaultValues);
-  
+
   EEPROM.put(EEAddr, light.timeOn); EEAddr += sizeof(light.timeOn);
   EEPROM.put(EEAddr, light.duration); EEAddr += sizeof(light.duration);
   EEPROM.put(EEAddr, light.interval); EEAddr += sizeof(light.interval);

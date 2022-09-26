@@ -25,7 +25,7 @@
 #define AUXONEINCREMENT 15UL //minute increments
 #define MENUDELAY 12UL // seconds for menu to timeout
 //#define PUMPDELAY 15UL //15 second delay
-#define EQUIPDELAY 7UL // 7 second delay
+#define EQUIPDELAY 10UL // 7 second delay
 #define BUTTONTIMEOUT 150UL //150 ms to prevent button bounce
 
 

@@ -52,7 +52,7 @@
     "cookie-signature": "^1.1.0",
     "core-util-is": "^1.0.2",
     "cors": "^2.8.5",
-    "d3": "^5.12.0",
+    "d3": "^7.6.1",
     "dashdash": "^1.14.1",
     "debug": "^2.6.9",
     "deep-extend": "^0.6.0",
